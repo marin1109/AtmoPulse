@@ -63,7 +63,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void getWeatherData() async {
+  // Récupération des données météo
+  Future<void> getWeatherData() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -91,15 +92,60 @@ class _HomePageState extends State<HomePage> {
           weatherData = currentData.current;
           weeklyForecast = forecastData.forecast;
         });
+
+        final sharedPrefs = await SharedPreferences.getInstance();
+      
+        final Map<String, dynamic> weatherMap = {
+          'location': currentData.location.toJson(),
+          'current': currentData.current.toJson(),
+        };
+
+        final Map<String, dynamic> forecastMap = {
+          'location': forecastData.location.toJson(),
+          'current': forecastData.current.toJson(),
+          'forecast': forecastData.forecast?.toJson(),
+        };
+
+        final weatherJson = jsonEncode(weatherMap);
+        final forecastJson = jsonEncode(forecastMap);
+
+        await sharedPrefs.setString('currentWeather', weatherJson);
+        await sharedPrefs.setString('forecastWeather', forecastJson);
       }
     } catch (e) {
       print('Erreur inattendue : $e');
     }
   }
 
+  Future<void> loadSavedWeatherData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? weatherString = prefs.getString('currentWeather');
+    final String? forecastString = prefs.getString('forecastWeather');
+    
+    if (weatherString != null && forecastString != null) {
+      final Map<String, dynamic> decodedJson = jsonDecode(weatherString);
+      final Map<String, dynamic> decodedForecastJson = jsonDecode(forecastString!);
+
+      final locationObj = Location.fromJson(decodedJson['location']);
+      final currentObj = CurrentWeather.fromJson(decodedJson['current']);
+      final weeklyForecastObj = ForecastWeather.fromJson(decodedForecastJson['forecast']);
+      
+      setState(() {
+        location = locationObj;
+        weatherData = currentObj;
+        weeklyForecast = weeklyForecastObj;
+      });
+      
+      print('Données météo chargées depuis les SharedPreferences.');
+    } else {
+      print('Aucune donnée météo sauvegardée.');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    loadSavedWeatherData(); 
     getWeatherData();
   }
 
@@ -132,10 +178,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<UserPreferences>(
       builder: (context, userPreferences, child) {
-      
         return Scaffold(
           appBar: AppBar(
-            title: Text(
+            title: const Text(
               'AtmoPulse',
               style: TextStyle(
                 fontFamily: 'Montserrat',
@@ -144,7 +189,7 @@ class _HomePageState extends State<HomePage> {
             ),
             actions: [
               PopupMenuButton<String>(
-                icon: Icon(Icons.menu),
+                icon: const Icon(Icons.menu),
                 onSelected: (String value) {
                   switch (value) {
                     case 'compte':
@@ -175,12 +220,13 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(value: 'compte', child: Text('Compte')),
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
+                      value: 'compte', child: Text('Compte')),
+                  const PopupMenuItem<String>(
                       value: 'preferences', child: Text('Préférences')),
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
                       value: 'a_propos', child: Text('À propos')),
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
                       value: 'contact', child: Text('Contact')),
                 ],
               ),
@@ -189,91 +235,130 @@ class _HomePageState extends State<HomePage> {
             elevation: 0,
           ),
           extendBodyBehindAppBar: true,
-          body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.blue.shade700,
-                  Colors.blue.shade200,
-                ],
+          
+          body: RefreshIndicator(
+            onRefresh: getWeatherData,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.blue.shade700,
+                    Colors.blue.shade200,
+                  ],
+                ),
               ),
-            ),
-            child: Center(
-              child: weatherData != null
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+
+              // On utilise une ListView pour pouvoir scroller
+              child: (weatherData != null)
+                  ? ListView(
                       children: [
-                        SizedBox(height: 80),
-                        Text(
-                          '$location',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
+                        const SizedBox(height: 80),
+                        // Affichage de la localisation
+                        Center(
+                          child: Text(
+                            '$location',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Image.network(
-                          'https:${weatherData!.condition.icon}',
-                          width: 100,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          Temperature.loadTemperatureText(weatherData!.temp, userPreferences.preferredTemperatureUnit),
-                          style: TextStyle(
-                            fontSize: 60,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
+                        const SizedBox(height: 20),
+
+                        // Icône météo
+                        Center(
+                          child: Image.network(
+                            'https:${weatherData!.condition.icon}',
+                            width: 100,
                           ),
                         ),
-                        Text(
-                          decodeUtf8(weatherData!.condition.text),
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontFamily: 'Montserrat',
-                            color: Colors.white70,
+                        const SizedBox(height: 10),
+
+                        // Température
+                        Center(
+                          child: Text(
+                            Temperature.loadTemperatureText(
+                              weatherData!.temp,
+                              userPreferences.preferredTemperatureUnit,
+                            ),
+                            style: const TextStyle(
+                              fontSize: 60,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        // Condition météo
+                        Center(
+                          child: Text(
+                            decodeUtf8(weatherData!.condition.text),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontFamily: 'Montserrat',
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Infos vent / humidité / précipitations
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _buildWeatherInfo(
                               icon: Icons.air,
-                              value: WindSpeed.loadWindText(weatherData!.wind, userPreferences.preferredWindUnit),
+                              value: WindSpeed.loadWindText(
+                                weatherData!.wind,
+                                userPreferences.preferredWindUnit,
+                              ),
                               label: 'Vent',
                             ),
                             _buildWeatherInfo(
                               icon: Icons.water_drop,
-                              value: Humidity.loadHumidityText(weatherData!.humidity, userPreferences.preferredHumidityUnit),
+                              value: Humidity.loadHumidityText(
+                                weatherData!.humidity,
+                                userPreferences.preferredHumidityUnit,
+                              ),
                               label: 'Humidité',
                             ),
                             _buildWeatherInfo(
                               icon: Icons.opacity,
-                              value: Precipitation.loadPrecipitationText(weatherData!.precipitation, userPreferences.preferredPrecipitationUnit),
+                              value: Precipitation.loadPrecipitationText(
+                                weatherData!.precipitation,
+                                userPreferences.preferredPrecipitationUnit,
+                              ),
                               label: 'Précip.',
                             ),
                           ],
                         ),
-                        SizedBox(height: 30),
-                        Text(
-                          'Prévisions Hebdomadaires',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
+                        const SizedBox(height: 30),
+
+                        // Titre "Prévisions Hebdomadaires"
+                        const Center(
+                          child: Text(
+                            'Prévisions Hebdomadaires',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Expanded(
-                          child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            itemCount: weeklyForecast?.forecastDays.length ?? 0,
+                        const SizedBox(height: 10),
+
+                        // Liste des prévisions
+                        if (weeklyForecast?.forecastDays != null)
+                          ListView.builder(
+                            // nested ListView, on fixe shrinkWrap et physics
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: weeklyForecast!.forecastDays.length,
                             itemBuilder: (context, index) {
                               final day = weeklyForecast!.forecastDays[index];
                               final DateTime date = DateTime.parse(day.date);
@@ -281,8 +366,10 @@ class _HomePageState extends State<HomePage> {
 
                               return Card(
                                 color: Colors.white.withOpacity(0.2),
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 20),
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 20,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
@@ -293,7 +380,7 @@ class _HomePageState extends State<HomePage> {
                                       Expanded(
                                         child: Text(
                                           dayOfWeek,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 18,
                                             fontFamily: 'Montserrat',
                                             color: Colors.white,
@@ -304,10 +391,14 @@ class _HomePageState extends State<HomePage> {
                                         'https:${day.condition.icon}',
                                         width: 40,
                                       ),
-                                      SizedBox(width: 10),
+                                      const SizedBox(width: 10),
                                       Text(
-                                        Temperature.loadTemperatureText(day.avgTemp, userPreferences.preferredTemperatureUnit),
-                                        style: TextStyle(
+                                        Temperature.loadTemperatureText(
+                                          day.avgTemp,
+                                          userPreferences
+                                              .preferredTemperatureUnit,
+                                        ),
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontFamily: 'Montserrat',
                                           color: Colors.white,
@@ -319,11 +410,12 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                           ),
-                        )
                       ],
                     )
-                  : CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  : const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
                     ),
             ),
           ),
@@ -332,15 +424,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildWeatherInfo(
-      {required IconData icon, required String value, required String label}) {
+  Widget _buildWeatherInfo({
+    required IconData icon,
+    required String value,
+    required String label,
+  }) {
     return Column(
       children: [
         Icon(icon, color: Colors.white, size: 28),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontFamily: 'Montserrat',
             color: Colors.white,
@@ -348,7 +443,7 @@ class _HomePageState extends State<HomePage> {
         ),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Montserrat',
             color: Colors.white70,

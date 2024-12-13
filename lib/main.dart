@@ -13,7 +13,7 @@ import 'types/precipitation_type.dart';
 import 'types/humidity_type.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: "assets/.env");
   
   WidgetsFlutterBinding.ensureInitialized();
 

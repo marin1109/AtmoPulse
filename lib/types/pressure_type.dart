@@ -140,4 +140,11 @@ class Pressure {
     return value >= 870 && value <= 1084;
   }
   
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'unit': unit.name,
+    };
+  }
+
 }

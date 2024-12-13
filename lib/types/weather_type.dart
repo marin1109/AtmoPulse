@@ -35,6 +35,16 @@ class WeatherData {
           : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'location': location.toJson(),
+      'current': current.toJson(),
+      // attention : forecast peut être null
+      'forecast': forecast?.toJson(),
+    };
+  }
+
 }
 
 class Location {
@@ -66,6 +76,18 @@ class Location {
       timezone: Timezone(json['tz_id']),
       localtime: Localtime(json['localtime']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': city.name,
+      'region': region.name,
+      'country': country.name,
+      'lat': latitude.latitude,
+      'lon': longitude.value,
+      'tz_id': timezone.timezone,
+      'localtime': localtime.localtime,
+    };
   }
 
   @override
@@ -105,6 +127,19 @@ class CurrentWeather {
       condition: Condition.fromJson(json['condition']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'temp_c': temp.value,
+      'wind_kph': wind.value,
+      'pressure_mb': pressure.value,  
+      'precip_mm': precipitation.value,
+      'humidity': humidity.value,
+      'uv': uv.value,
+      'condition': condition.toJson(),
+    };
+  }
+
 }
 
 class ForecastWeather {
@@ -119,6 +154,13 @@ class ForecastWeather {
           .toList(),
     );
   }
+
+    Map<String, dynamic> toJson() {
+    return {
+      'forecastday': forecastDays.map((fd) => fd.toJson()).toList(),
+    };
+  }
+
 }
 
 class ForecastDay {
@@ -157,6 +199,22 @@ class ForecastDay {
       uv: UV(json['day']['uv'].toDouble()),
       );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date,
+      'day': {
+        'maxtemp_c': maxTemp.value,
+        'mintemp_c': minTemp.value,
+        'avgtemp_c': avgTemp.value,
+        'maxwind_kph': maxWind.value,
+        'totalprecip_mm': totalPrecipitation.value,
+        'avghumidity': avgHumidity.value,
+        'condition': condition.toJson(),
+        'uv': uv.value,
+      }
+    };
+  }
   
 }
 
@@ -177,6 +235,14 @@ class Condition {
       icon: json['icon'],
       code: json['code'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      'icon': icon,
+      'code': code,
+    };
   }
 
 }

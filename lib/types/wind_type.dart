@@ -155,4 +155,11 @@ class WindSpeed {
     return speed >= 0 && speed <= 408;
   }
   
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'unit': unit.name,
+    };
+  }
+
 }

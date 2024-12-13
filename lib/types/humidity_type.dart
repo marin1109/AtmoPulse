@@ -92,4 +92,11 @@ class Humidity {
     return value >= 0 && value <= 100;
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'unit': unit.name,
+    };
+  }
+
 }

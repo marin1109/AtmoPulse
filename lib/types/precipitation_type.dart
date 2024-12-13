@@ -94,5 +94,12 @@ class Precipitation {
   static bool isValidPrecipitation(double value) {
     return value >= 0 && value <= 305;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'unit': unit.name,
+    };
+  }
   
 }

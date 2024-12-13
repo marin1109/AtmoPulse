@@ -95,5 +95,12 @@ class Temperature {
   static bool isValidTemperature(int value) {
     return value >= -100 && value <= 60;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'unit': unit.name,
+    };
+  }
   
 }
