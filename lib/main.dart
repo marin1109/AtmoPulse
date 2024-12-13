@@ -18,11 +18,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('unite_temperature', TemperatureUnit.celsius.name);
-  prefs.setString('unite_vitesse', WindUnit.kmh.name);
-  prefs.setString('unite_pression', PressureUnit.hPa.name);
-  prefs.setString('unite_precipitations', PrecipitationUnit.mm.name);
-  prefs.setString('unite_humidite', HumidityUnit.relative.name);
+  if(!prefs.containsKey('unite_temperature')) {
+    prefs.setString('unite_temperature', TemperatureUnit.celsius.name);
+  }
+  if(!prefs.containsKey('unite_vitesse')) {
+    prefs.setString('unite_vitesse', WindUnit.kmh.name);
+  }
+  if(!prefs.containsKey('unite_pression')) {
+    prefs.setString('unite_pression', PressureUnit.hPa.name);
+  }
+  if(!prefs.containsKey('unite_precipitations')) {
+    prefs.setString('unite_precipitations', PrecipitationUnit.mm.name);
+  }
+  if(!prefs.containsKey('unite_humidite')) {
+    prefs.setString('unite_humidite', HumidityUnit.relative.name);
+  }
+  
 
   runApp(
     ChangeNotifierProvider(
