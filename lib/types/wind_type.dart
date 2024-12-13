@@ -1,0 +1,158 @@
+enum WindUnit { kmh, ms, mph, fts, knots }
+
+class WindSpeed {
+  final int value;
+  final WindUnit unit;
+
+  WindSpeed(this.value, this.unit);
+
+  // Conversion en km/h
+  int toKmh() {
+    switch (unit) {
+      case WindUnit.kmh:
+        return value;
+      case WindUnit.ms:
+        return (value * 3.6).round();
+      case WindUnit.mph:
+        return (value * 1.60934).round();
+      case WindUnit.fts:
+        return (value * 1.09728).round();
+      case WindUnit.knots:
+        return (value * 1.852).round();
+    }
+  }
+
+  // Conversion en m/s
+  int toMs() {
+    switch (unit) {
+      case WindUnit.kmh:
+        return (value / 3.6).round();
+      case WindUnit.ms:
+        return value;
+      case WindUnit.mph:
+        return (value * 0.44704).round();
+      case WindUnit.fts:
+        return (value * 0.3048).round();
+      case WindUnit.knots:
+        return (value * 0.514444).round();
+    }
+  }
+
+  // Conversion en mph
+  int toMph() {
+    switch (unit) {
+      case WindUnit.kmh:
+        return (value * 0.621371).round();
+      case WindUnit.ms:
+        return (value * 2.23694).round();
+      case WindUnit.mph:
+        return value;
+      case WindUnit.fts:
+        return (value * 0.681818).round();
+      case WindUnit.knots:
+        return (value * 1.15078).round();
+    }
+  }
+
+  // Conversion en ft/s
+  int toFts() {
+    switch (unit) {
+      case WindUnit.kmh:
+        return (value * 0.911344).round();
+      case WindUnit.ms:
+        return (value * 3.28084).round();
+      case WindUnit.mph:
+        return (value * 1.46667).round();
+      case WindUnit.fts:
+        return value;
+      case WindUnit.knots:
+        return (value * 1.68781).round();
+    }
+  }
+
+  // Conversion en nœuds
+  int toKnots() {
+    switch (unit) {
+      case WindUnit.kmh:
+        return (value * 0.539957).round();
+      case WindUnit.ms:
+        return (value * 1.94384).round();
+      case WindUnit.mph:
+        return (value * 0.868976).round();
+      case WindUnit.fts:
+        return (value * 0.592484).round();
+      case WindUnit.knots:
+        return value;
+    }
+  }
+
+  // Conversion en unité donnée
+  @override
+  String toString() {
+    switch (unit) {
+      case WindUnit.kmh:
+        return "$value km/h";
+      case WindUnit.ms:
+        return "$value m/s";
+      case WindUnit.mph:
+        return "$value mph";
+      case WindUnit.fts:
+        return "$value ft/s";
+      case WindUnit.knots:
+        return "$value nœuds";
+    }
+  }
+
+  // Conversion de l'unité en string
+  static String unitToString(WindUnit unit) {
+    switch (unit) {
+      case WindUnit.kmh:
+        return "km/h";
+      case WindUnit.ms:
+        return "m/s";
+      case WindUnit.mph:
+        return "mph";
+      case WindUnit.fts:
+        return "ft/s";
+      case WindUnit.knots:
+        return "nœuds";
+    }
+  }
+
+  static WindUnit stringToWindUnit(String unit) {
+    switch (unit) {
+      case "kmh":
+        return WindUnit.kmh;
+      case "ms":
+        return WindUnit.ms;
+      case "mph":
+        return WindUnit.mph;
+      case "fts":
+        return WindUnit.fts;
+      case "knots":
+        return WindUnit.knots;
+      default:
+        throw Exception('Valeur de vitesse du vent inconnue : $unit');
+    }
+  }
+
+  static String loadWindText(WindSpeed wind, WindUnit prefs) {
+    switch (prefs) {
+      case WindUnit.kmh:
+        return "${wind.toKmh()} km/h";
+      case WindUnit.ms:
+        return "${wind.toMs()} m/s";
+      case WindUnit.mph:
+        return "${wind.toMph()} mph";
+      case WindUnit.fts:
+        return "${wind.toFts()} ft/s";
+      case WindUnit.knots:
+        return "${wind.toKnots()} nœuds";
+    }
+  }
+
+  static bool isValidWindSpeed(int speed) {
+    return speed >= 0 && speed <= 408;
+  }
+  
+}

@@ -1,0 +1,75 @@
+# Flutter & Dart specific
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+.melos/
+
+# iOS specific
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/App.framework
+ios/Flutter/engine/
+ios/Flutter/Flutter.podspec
+ios/Flutter/Flutter.podspec.lock
+ios/Flutter/Flutter.xcframework
+ios/Flutter/FlutterEngine.podspec
+ios/Flutter/flutter_assets/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/Flutter.framework
+
+# Android specific
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/proguard-rules.pro
+android/app/google-services.json
+android/key.properties
+android/app/appcenter-config.json
+
+# Visual Studio Code specific
+.vscode/
+
+# IntelliJ specific
+.idea/
+*.iml
+
+# Other IDEs and editors
+*.swp
+*.swo
+
+# macOS specific
+*.DS_Store
+
+# Linux specific
+linux/flutter/ephemeral/
+.snapcraft/
+# Linux specific build outputs
+build/linux/
+
+# Windows specific
+windows/flutter/ephemeral/
+build/windows/
+
+# Web specific
+web/.dart_tool/
+web/flutter/
+build/web/
+
+# Localization files (Flutter Intl)
+intl_translation/
+generated/
+locales/
+jsons/
+
+# Flutter Symbolication files
+symbols/
+
+# .env file
+assets/.env
