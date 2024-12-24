@@ -21,7 +21,8 @@ class Humidity {
           100 *
           pow(10, (7.5 * temperatureCelsius) / (temperatureCelsius + 237.3));
 
-      double partialPressure = value / 100 * saturationPressure;
+      double partialPressure =
+          (value * saturationPressure) / 100;
 
       return (partialPressure * mwWater) / (r * (temperatureCelsius + 273.15));
     }
@@ -88,8 +89,9 @@ class Humidity {
   }
 
   // Vérifie si la valeur de l'humidité est valide
-  static bool isValidHumidity(double value) {
-    return value >= 0 && value <= 100;
+  static bool isValidHumidity(double value, HumidityUnit unit, double temperatureCelsius) {
+    Humidity humidity = Humidity(value, unit);
+    return humidity.toRelative(temperatureCelsius) >= 0 && humidity.toRelative(temperatureCelsius) <= 100;
   }
 
   Map<String, dynamic> toJson() {

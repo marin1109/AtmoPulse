@@ -91,8 +91,9 @@ class Precipitation {
     }
   }
 
-  static bool isValidPrecipitation(double value) {
-    return value >= 0 && value <= 305;
+  static bool isValidPrecipitation(double value, PrecipitationUnit unit) {
+    Precipitation precipitation = Precipitation(value, unit);
+    return precipitation.toMillimeters() >= 0 && precipitation.toMillimeters() <= 305;
   }
 
   Map<String, dynamic> toJson() {

@@ -151,8 +151,9 @@ class WindSpeed {
     }
   }
 
-  static bool isValidWindSpeed(int speed) {
-    return speed >= 0 && speed <= 408;
+  static bool isValidWindSpeed(int speed, WindUnit unit) {
+    WindSpeed wind = WindSpeed(speed, unit);
+    return wind.toKmh() >= 0 && wind.toKmh() <= 408;
   }
   
   Map<String, dynamic> toJson() {

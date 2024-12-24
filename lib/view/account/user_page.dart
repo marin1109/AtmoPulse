@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 // Importer vos services et types
 import '../../services/account_service.dart';
@@ -9,6 +10,8 @@ import '../../types/lname_type.dart';
 import '../../types/email_type.dart';
 import '../../types/password_type.dart';
 import '../../types/age_type.dart';
+
+import '../../utils/user_preferences.dart';
 
 // Import supplémentaire pour valider et gérer les types (humidity, etc.)
 import '../../types/humidity_type.dart';
@@ -427,7 +430,6 @@ class _UserPageState extends State<UserPage> {
 
   // Méthode pour afficher la boîte de dialogue d'édition des préférences
   void _showEditPreferencesDialog(BuildContext context) {
-    // On remplit d'abord les contrôleurs avec les valeurs actuelles
     _tempMinController.text = temperatureMin.toString();
     _tempMaxController.text = temperatureMax.toString();
     _humidityMinController.text = humidityMin.toString();
@@ -442,6 +444,15 @@ class _UserPageState extends State<UserPage> {
 
     final formKey = GlobalKey<FormState>();
 
+    final userPrefs = Provider.of<UserPreferences>(context, listen: false);
+    
+    late String tempUnit = Temperature.unitToString(userPrefs.preferredTemperatureUnit);
+    late String windUnit = WindSpeed.unitToString(userPrefs.preferredWindUnit);
+    late String pressureUnit = Pressure.unitToString(userPrefs.preferredPressureUnit);
+    late String humidityUnit = Humidity.unitToString(userPrefs.preferredHumidityUnit);
+    late String precipitationUnit = Precipitation.unitToString(userPrefs.preferredPrecipitationUnit);  
+    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -452,30 +463,30 @@ class _UserPageState extends State<UserPage> {
               key: formKey,
               child: Column(
                 children: [
-                  _buildNumericField('Température min (°C)', _tempMinController,
-                      (val) => Temperature.isValidTemperature(int.tryParse(val) ?? -999)),
-                  _buildNumericField('Température max (°C)', _tempMaxController,
-                      (val) => Temperature.isValidTemperature(int.tryParse(val) ?? -999),
+                  _buildNumericField('Température min ($tempUnit)', _tempMinController,
+                      (val) => Temperature.isValidTemperature(int.tryParse(val) ?? -999, userPrefs.preferredTemperatureUnit),),
+                  _buildNumericField('Température max ($tempUnit)', _tempMaxController,
+                      (val) => Temperature.isValidTemperature(int.tryParse(val) ?? -999, userPrefs.preferredTemperatureUnit),
                       minController: _tempMinController),
-                  _buildNumericField('Humidité min (%)', _humidityMinController,
-                      (val) => Humidity.isValidHumidity(double.tryParse(val) ?? -1)),
-                  _buildNumericField('Humidité max (%)', _humidityMaxController,
-                      (val) => Humidity.isValidHumidity(double.tryParse(val) ?? -1),
+                  _buildNumericField('Humidité min ($windUnit)', _humidityMinController,
+                      (val) => Humidity.isValidHumidity(double.tryParse(val) ?? -1, userPrefs.preferredHumidityUnit, 25)),
+                  _buildNumericField('Humidité max ($windUnit)', _humidityMaxController,
+                      (val) => Humidity.isValidHumidity(double.tryParse(val) ?? -1, userPrefs.preferredHumidityUnit, 25),
                       minController: _humidityMinController),
-                  _buildNumericField('Pression min (hPa)', _pressureMinController,
-                      (val) => Pressure.isValidPressure(double.tryParse(val) ?? -1)),
-                  _buildNumericField('Pression max (hPa)', _pressureMaxController,
-                      (val) => Pressure.isValidPressure(double.tryParse(val) ?? -1),
+                  _buildNumericField('Pression min ($pressureUnit)', _pressureMinController,
+                      (val) => Pressure.isValidPressure(double.tryParse(val) ?? -1, userPrefs.preferredPressureUnit)),
+                  _buildNumericField('Pression max ($pressureUnit)', _pressureMaxController,
+                      (val) => Pressure.isValidPressure(double.tryParse(val) ?? -1, userPrefs.preferredPressureUnit),
                       minController: _pressureMinController),
-                  _buildNumericField('Précipitations min (mm)', _precipitationMinController,
-                      (val) => Precipitation.isValidPrecipitation(double.tryParse(val) ?? -1)),
-                  _buildNumericField('Précipitations max (mm)', _precipitationMaxController,
-                      (val) => Precipitation.isValidPrecipitation(double.tryParse(val) ?? -1),
+                  _buildNumericField('Précipitations min ($precipitationUnit)', _precipitationMinController,
+                      (val) => Precipitation.isValidPrecipitation(double.tryParse(val) ?? -1, userPrefs.preferredPrecipitationUnit)),
+                  _buildNumericField('Précipitations max ($precipitationUnit)', _precipitationMaxController,
+                      (val) => Precipitation.isValidPrecipitation(double.tryParse(val) ?? -1, userPrefs.preferredPrecipitationUnit),
                       minController: _precipitationMinController),
-                  _buildNumericField('Vent min (km/h)', _windMinController,
-                      (val) => WindSpeed.isValidWindSpeed(int.tryParse(val) ?? -1)),
-                  _buildNumericField('Vent max (km/h)', _windMaxController,
-                      (val) => WindSpeed.isValidWindSpeed(int.tryParse(val) ?? -1),
+                  _buildNumericField('Vent min ($windUnit)', _windMinController,
+                      (val) => WindSpeed.isValidWindSpeed(int.tryParse(val) ?? -1, userPrefs.preferredWindUnit)),
+                  _buildNumericField('Vent max ($windUnit)', _windMaxController,
+                      (val) => WindSpeed.isValidWindSpeed(int.tryParse(val) ?? -1, userPrefs.preferredWindUnit),
                       minController: _windMinController),
                   _buildNumericField('UV', _uvController,
                       (val) => UV.isValidUV(int.tryParse(val) ?? -1)),
@@ -568,6 +579,13 @@ class _UserPageState extends State<UserPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userPrefs = Provider.of<UserPreferences>(context);
+    late String tempUnit = Temperature.unitToString(userPrefs.preferredTemperatureUnit);
+    late String windUnit = WindSpeed.unitToString(userPrefs.preferredWindUnit);
+    late String pressureUnit = Pressure.unitToString(userPrefs.preferredPressureUnit);
+    late String humidityUnit = Humidity.unitToString(userPrefs.preferredHumidityUnit);
+    late String precipitationUnit = Precipitation.unitToString(userPrefs.preferredPrecipitationUnit);  
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -663,11 +681,11 @@ class _UserPageState extends State<UserPage> {
                     ),
                     SizedBox(height: 20),
 
-                    _buildInfoRow('Température min/max', '$temperatureMin°C / $temperatureMax°C', Icons.thermostat),
-                    _buildInfoRow('Humidité min/max', '$humidityMin% / $humidityMax%', Icons.water),
-                    _buildInfoRow('Pression min/max', '$pressureMin hPa / $pressureMax hPa', Icons.speed),
-                    _buildInfoRow('Précipitations min/max', '$precipitationMin mm / $precipitationMax mm', Icons.water_drop),
-                    _buildInfoRow('Vent min/max', '$windMin km/h / $windMax km/h', Icons.air),
+                    _buildInfoRow('Température min/max', '$temperatureMin$tempUnit / $temperatureMax$tempUnit', Icons.thermostat),
+                    _buildInfoRow('Humidité min/max', '$humidityMin$humidityUnit / $humidityMax$humidityUnit', Icons.water),
+                    _buildInfoRow('Pression min/max', '$pressureMin $pressureUnit / $pressureMax $pressureUnit', Icons.speed),
+                    _buildInfoRow('Précipitations min/max', '$precipitationMin $precipitationUnit / $precipitationMax $precipitationUnit', Icons.water_drop),
+                    _buildInfoRow('Vent min/max', '$windMin $windUnit / $windMax $windUnit', Icons.air),
                     _buildInfoRow('UV', '$uvValue', Icons.wb_sunny),
 
                     SizedBox(height: 20),

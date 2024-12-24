@@ -214,6 +214,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
+    // Récupération de l'instance de UserPreferences fournie par le Provider
+    final userPrefs = Provider.of<UserPreferences>(context);
+
     // Taille de l'écran
     final size = MediaQuery.of(context).size;
 
@@ -245,7 +249,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 controller: _cardController,
                 flipOnTouch: false,
                 front: _buildLoginForm(),
-                back: _buildSignUpForm(),
+                back: _buildSignUpForm(userPrefs),
               ),
             ),
           ),
@@ -293,7 +297,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction du formulaire d'inscription
-  Widget _buildSignUpForm() {
+  Widget _buildSignUpForm(UserPreferences userPrefs) {
     return Card(
       elevation: 12,
       shadowColor: Colors.black38,
@@ -319,13 +323,15 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 const SizedBox(height: 20),
                 _buildPasswordField(),
                 const SizedBox(height: 30),
-                _buildSensibilityFields(),
+                _buildSensibilityFields(userPrefs), 
                 const SizedBox(height: 30),
                 Center(child: _buildSubmitButton('Inscription', _registerUser)),
                 const SizedBox(height: 20),
                 Center(
-                    child: _buildToggleFormButton(
-                        'Déjà un compte ? Connectez-vous')),
+                  child: _buildToggleFormButton(
+                    'Déjà un compte ? Connectez-vous'
+                  ),
+                ),
               ],
             ),
           ),
@@ -335,7 +341,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction des champs de sensibilité
-  Widget _buildSensibilityFields() {
+  Widget _buildSensibilityFields(UserPreferences userPrefs) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -348,15 +354,15 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           ),
         ),
         const SizedBox(height: 20),
-        _buildTemperatureFields(),
+        _buildTemperatureFields(userPrefs),
         const SizedBox(height: 20),
-        _buildHumidityFields(),
+        _buildHumidityFields(userPrefs),
         const SizedBox(height: 20),
-        _buildPressureFields(),
+        _buildPressureFields(userPrefs),
         const SizedBox(height: 20),
-        _buildPrecipitationFields(),
+        _buildPrecipitationFields(userPrefs),
         const SizedBox(height: 20),
-        _buildWindFields(),
+        _buildWindFields(userPrefs),
         const SizedBox(height: 20),
         _buildUVField(),
       ],
@@ -364,14 +370,27 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction des champs de température
-  Widget _buildTemperatureFields() {
+  Widget _buildTemperatureFields(UserPreferences userPrefs) {
+    final tempUnit = userPrefs.preferredTemperatureUnit;
+    late String tempUnitLabel;
+    switch (tempUnit) {
+      case TemperatureUnit.celsius:
+        tempUnitLabel = '°C';
+        break;
+      case TemperatureUnit.fahrenheit:
+        tempUnitLabel = '°F';
+        break;
+      case TemperatureUnit.kelvin:
+        tempUnitLabel = 'K';
+        break;
+    }
     return Row(
       children: [
         Expanded(
           child: TextFormField(
             controller: _tempMinController,
             decoration: InputDecoration(
-              labelText: 'Température min (°C)',
+              labelText: 'Température min ($tempUnitLabel)',
               prefixIcon: const Icon(Icons.thermostat, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -381,12 +400,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final val = int.tryParse(value);
-              if (val == null || !Temperature.isValidTemperature(val)) {
+              if (val == null || !Temperature.isValidTemperature(val, tempUnit)) {
                 return 'Température invalide';
               }
               return null;
             },
-            onSaved: (value) => _temperature_min = Temperature(int.parse(value!), TemperatureUnit.celsius),
+            onSaved: (value) => _temperature_min = Temperature(int.parse(value!), tempUnit),
           ),
         ),
         const SizedBox(width: 10),
@@ -394,7 +413,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           child: TextFormField(
             controller: _tempMaxController,
             decoration: InputDecoration(
-              labelText: 'Température max (°C)',
+              labelText: 'Température max ($tempUnitLabel)',
               prefixIcon: const Icon(Icons.thermostat, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -404,7 +423,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final maxVal = int.tryParse(value);
-              if (maxVal == null || !Temperature.isValidTemperature(maxVal)) {
+              if (maxVal == null || !Temperature.isValidTemperature(maxVal, tempUnit)) {
                 return 'Température invalide';
               }
 
@@ -417,7 +436,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
               return null;
             },
-            onSaved: (value) => _temperature_max = Temperature(int.parse(value!), TemperatureUnit.celsius),
+            onSaved: (value) => _temperature_max = Temperature(int.parse(value!), tempUnit),
           ),
         ),
       ],
@@ -425,14 +444,25 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction des champs d'humidité
-  Widget _buildHumidityFields() {
+  Widget _buildHumidityFields(UserPreferences userPrefs) {
+    final humidityUnit = userPrefs.preferredHumidityUnit;
+    late String humidityUnitLabel;
+    switch (humidityUnit) {
+      case HumidityUnit.relative:
+        humidityUnitLabel = '%';
+        break;
+      case HumidityUnit.absolute:
+        humidityUnitLabel = 'g/m³';
+        break;
+    }
+
     return Row(
       children: [
         Expanded(
           child: TextFormField(
             controller: _humidityMinController,
             decoration: InputDecoration(
-              labelText: 'Humidité min (%)',
+              labelText: 'Humidité min ($humidityUnitLabel)',
               prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -442,12 +472,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final val = double.tryParse(value);
-              if (val == null || !Humidity.isValidHumidity(val)) {
+              if (val == null || !Humidity.isValidHumidity(val, humidityUnit, 25)) {
                 return 'Humidité invalide';
               }
               return null;
             },
-            onSaved: (value) => _humidity_min = Humidity(double.parse(value!), HumidityUnit.relative),
+            onSaved: (value) => _humidity_min = Humidity(double.parse(value!), humidityUnit),
           ),
         ),
         const SizedBox(width: 10),
@@ -455,7 +485,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           child: TextFormField(
             controller: _humidityMaxController,
             decoration: InputDecoration(
-              labelText: 'Humidité max (%)',
+              labelText: 'Humidité max ($humidityUnitLabel)',
               prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -465,7 +495,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final maxVal = double.tryParse(value);
-              if (maxVal == null || !Humidity.isValidHumidity(maxVal)) {
+              if (maxVal == null || !Humidity.isValidHumidity(maxVal, humidityUnit, 25)) {
                 return 'Humidité invalide';
               }
 
@@ -478,7 +508,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
               return null;
             },
-            onSaved: (value) => _humidity_max = Humidity(double.parse(value!), HumidityUnit.relative),
+            onSaved: (value) => _humidity_max = Humidity(double.parse(value!), humidityUnit),
           ),
         ),
       ],
@@ -486,14 +516,34 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction des champs de pression
-  Widget _buildPressureFields() {
+  Widget _buildPressureFields(UserPreferences userPrefs) {
+    final pressureUnit = userPrefs.preferredPressureUnit;
+    late String pressureUnitLabel;
+    switch (pressureUnit) {
+      case PressureUnit.hPa:
+        pressureUnitLabel = 'hPa';
+        break;
+      case PressureUnit.atm:
+        pressureUnitLabel = 'atm';
+        break;
+      case PressureUnit.psi:
+        pressureUnitLabel = 'psi';
+        break;
+      case PressureUnit.Pa:
+        pressureUnitLabel = 'Pa';
+        break;
+      case PressureUnit.mmHg:
+        pressureUnitLabel = 'mmHg';
+        break;
+    }
+
     return Row(
       children: [
         Expanded(
           child: TextFormField(
             controller: _pressureMinController,
             decoration: InputDecoration(
-              labelText: 'Pression min (hPa)',
+              labelText: 'Pression min ($pressureUnitLabel)',
               prefixIcon: const Icon(Icons.speed, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -503,12 +553,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final val = double.tryParse(value);
-              if (val == null || !Pressure.isValidPressure(val)) {
+              if (val == null || !Pressure.isValidPressure(val, pressureUnit)) {
                 return 'Pression invalide';
               }
               return null;
             },
-            onSaved: (value) => _pressure_min = Pressure(double.parse(value!), PressureUnit.hPa),
+            onSaved: (value) => _pressure_min = Pressure(double.parse(value!), pressureUnit),
           ),
         ),
         const SizedBox(width: 10),
@@ -516,7 +566,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           child: TextFormField(
             controller: _pressureMaxController,
             decoration: InputDecoration(
-              labelText: 'Pression max (hPa)',
+              labelText: 'Pression max ($pressureUnitLabel)',
               prefixIcon: const Icon(Icons.speed, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -526,7 +576,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final maxVal = double.tryParse(value);
-              if (maxVal == null || !Pressure.isValidPressure(maxVal)) {
+              if (maxVal == null || !Pressure.isValidPressure(maxVal, pressureUnit)) {
                 return 'Pression invalide';
               }
 
@@ -539,7 +589,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
               return null;
             },
-            onSaved: (value) => _pressure_max = Pressure(double.parse(value!), PressureUnit.hPa),
+            onSaved: (value) => _pressure_max = Pressure(double.parse(value!), pressureUnit),
           ),
         ),
       ],
@@ -547,14 +597,27 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction des champs de précipitations
-  Widget _buildPrecipitationFields() {
+  Widget _buildPrecipitationFields(UserPreferences userPrefs) {
+    final precipitationUnit = userPrefs.preferredPrecipitationUnit;
+    late String precipitationUnitLabel;
+    switch (precipitationUnit) {
+      case PrecipitationUnit.mm:
+        precipitationUnitLabel = 'mm';
+        break;
+      case PrecipitationUnit.inches:
+        precipitationUnitLabel = 'inches';
+        break;
+      case PrecipitationUnit.litersPerSquareMeter:
+        precipitationUnitLabel = 'l/m²';
+        break;
+    }
     return Row(
       children: [
         Expanded(
           child: TextFormField(
             controller: _precipitationMinController,
             decoration: InputDecoration(
-              labelText: 'Précipitations min (mm)',
+              labelText: 'Précipitations min ($precipitationUnitLabel)',
               prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -564,12 +627,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final val = double.tryParse(value);
-              if (val == null || !Precipitation.isValidPrecipitation(val)) {
+              if (val == null || !Precipitation.isValidPrecipitation(val, precipitationUnit)) {
                 return 'Précipitations invalide';
               }
               return null;
             },
-            onSaved: (value) => _precipitation_min = Precipitation(double.parse(value!), PrecipitationUnit.mm),
+            onSaved: (value) => _precipitation_min = Precipitation(double.parse(value!), precipitationUnit),
           ),
         ),
         const SizedBox(width: 10),
@@ -577,7 +640,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           child: TextFormField(
             controller: _precipitationMaxController,
             decoration: InputDecoration(
-              labelText: 'Précipitations max (mm)',
+              labelText: 'Précipitations max ($precipitationUnitLabel)',
               prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -587,7 +650,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final maxVal = double.tryParse(value);
-              if (maxVal == null || !Precipitation.isValidPrecipitation(maxVal)) {
+              if (maxVal == null || !Precipitation.isValidPrecipitation(maxVal, precipitationUnit)) {
                 return 'Précipitations invalide';
               }
 
@@ -600,7 +663,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
               return null;
             },
-            onSaved: (value) => _precipitation_max = Precipitation(double.parse(value!), PrecipitationUnit.mm),
+            onSaved: (value) => _precipitation_max = Precipitation(double.parse(value!), precipitationUnit),
           ),
         ),
       ],
@@ -608,14 +671,33 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   }
 
   // Construction des champs de vent
-  Widget _buildWindFields() {
+  Widget _buildWindFields(UserPreferences userPrefs) {
+    final windUnit = userPrefs.preferredWindUnit;
+    late String windUnitLabel;
+    switch (windUnit) {
+      case WindUnit.kmh:
+        windUnitLabel = 'km/h';
+        break;
+      case WindUnit.ms:
+        windUnitLabel = 'm/s';
+        break;
+      case WindUnit.mph:
+        windUnitLabel = 'mph';
+        break;
+      case WindUnit.fts:
+        windUnitLabel = 'ft/s';
+        break;
+      case WindUnit.knots:
+        windUnitLabel = 'nœuds';
+        break;
+    }
     return Row(
       children: [
         Expanded(
           child: TextFormField(
             controller: _windMinController,
             decoration: InputDecoration(
-              labelText: 'Vitesse du vent min (km/h)',
+              labelText: 'Vitesse du vent min ($windUnitLabel)',
               prefixIcon: const Icon(Icons.air, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -625,12 +707,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final val = int.tryParse(value);
-              if (val == null || !WindSpeed.isValidWindSpeed(val)) {
+              if (val == null || !WindSpeed.isValidWindSpeed(val, windUnit)) {
                 return 'Vitesse du vent invalide';
               }
               return null;
             },
-            onSaved: (value) => _wind_min = WindSpeed(int.parse(value!), WindUnit.kmh),
+            onSaved: (value) => _wind_min = WindSpeed(int.parse(value!), windUnit),
           ),
         ),
         const SizedBox(width: 10),
@@ -638,7 +720,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           child: TextFormField(
             controller: _windMaxController,
             decoration: InputDecoration(
-              labelText: 'Vitesse du vent max (km/h)',
+              labelText: 'Vitesse du vent max ($windUnitLabel)',
               prefixIcon: const Icon(Icons.air, color: Colors.blueAccent),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               filled: true,
@@ -648,7 +730,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
               final maxVal = int.tryParse(value);
-              if (maxVal == null || !WindSpeed.isValidWindSpeed(maxVal)) {
+              if (maxVal == null || !WindSpeed.isValidWindSpeed(maxVal, windUnit)) {
                 return 'Vitesse du vent invalide';
               }
 
@@ -661,7 +743,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
               return null;
             },
-            onSaved: (value) => _wind_max = WindSpeed(int.parse(value!), WindUnit.kmh),
+            onSaved: (value) => _wind_max = WindSpeed(int.parse(value!), windUnit),
           ),
         ),
       ],

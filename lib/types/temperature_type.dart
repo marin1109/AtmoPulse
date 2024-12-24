@@ -92,8 +92,9 @@ class Temperature {
   }
 
   // Vérification de la validité de la valeur de température
-  static bool isValidTemperature(int value) {
-    return value >= -100 && value <= 60;
+  static bool isValidTemperature(int value, TemperatureUnit unit) {
+    Temperature temperature = Temperature(value, unit);
+    return temperature.toCelsius() >= -100 && temperature.toCelsius() <= 60;
   }
 
   Map<String, dynamic> toJson() {

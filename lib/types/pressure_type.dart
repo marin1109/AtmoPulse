@@ -136,8 +136,9 @@ class Pressure {
     }
   }
 
-  static bool isValidPressure(double value) {
-    return value >= 870 && value <= 1084;
+  static bool isValidPressure(double value, PressureUnit unit) {
+    Pressure pressure = Pressure(value, unit);
+    return pressure.toHpa() >= 870 && pressure.toHpa() <= 1084;
   }
   
   Map<String, dynamic> toJson() {
