@@ -29,6 +29,84 @@ import '../../types/temperature_type.dart';
 import '../../types/wind_type.dart';
 import '../../types/precipitation_type.dart';
 import '../../types/humidity_type.dart';
+import '../../types/villeSugg_type.dart';
+
+class CitySearchDelegate extends SearchDelegate<String> {
+  final WeatherService weatherService;
+
+  CitySearchDelegate({required this.weatherService});
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (query.isEmpty) {
+      return Center(child: Text("Tapez le nom d'une ville..."));
+    }
+    
+    // FutureBuilder pour charger les suggestions via l’API
+    return FutureBuilder<List<VS>>(
+      future: weatherService.fetchCitySuggestions(query),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        final suggestions = snapshot.data!;
+        if (suggestions.isEmpty) {
+          return Center(child: Text("Aucune ville trouvée pour '$query'"));
+        }
+
+        return ListView.builder(
+          itemCount: suggestions.length,
+          itemBuilder: (context, index) {
+            final city = suggestions[index];
+            return ListTile(
+              title: Text(city.city.name),
+              subtitle: Text('${city.region.name}, ${city.country.name}'),
+              onTap: () {
+                close(
+                  context,
+                  city.url,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      close(context, query);
+    });
+    return Container();
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      // Bouton pour effacer la saisie
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    // Bouton de retour (flèche) pour fermer la recherche
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -44,6 +122,27 @@ class _HomePageState extends State<HomePage> {
   Location? location;
   CurrentWeather? weatherData;
   ForecastWeather? weeklyForecast;
+
+  bool _isCustomCity = false;
+
+  Future<void> _onCitySelected(String cityUrl) async {
+    final currentData =
+        await weatherService.fetchCurrentWeatherByUrl(cityUrl);
+    final forecastData =
+        await weatherService.fetchWeeklyForecastByUrl(cityUrl);
+
+    if (currentData == null || forecastData == null) {
+      print('Données météo introuvables pour $cityUrl.');
+      return;
+    }
+
+    setState(() {
+      location = currentData.location;
+      weatherData = currentData.current;
+      weeklyForecast = forecastData.forecast;
+      _isCustomCity = true; // On a bien une ville personnalisée
+    });
+  }
 
   // Vérifie si l'utilisateur est déjà connecté
   void _checkLoginStatus() async {
@@ -121,21 +220,23 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     final String? weatherString = prefs.getString('currentWeather');
     final String? forecastString = prefs.getString('forecastWeather');
-    
+
     if (weatherString != null && forecastString != null) {
       final Map<String, dynamic> decodedJson = jsonDecode(weatherString);
-      final Map<String, dynamic> decodedForecastJson = jsonDecode(forecastString!);
+      final Map<String, dynamic> decodedForecastJson =
+          jsonDecode(forecastString);
 
       final locationObj = Location.fromJson(decodedJson['location']);
       final currentObj = CurrentWeather.fromJson(decodedJson['current']);
-      final weeklyForecastObj = ForecastWeather.fromJson(decodedForecastJson['forecast']);
-      
+      final weeklyForecastObj =
+          ForecastWeather.fromJson(decodedForecastJson['forecast']);
+
       setState(() {
         location = locationObj;
         weatherData = currentObj;
         weeklyForecast = weeklyForecastObj;
       });
-      
+
       print('Données météo chargées depuis les SharedPreferences.');
     } else {
       print('Aucune donnée météo sauvegardée.');
@@ -145,7 +246,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    loadSavedWeatherData(); 
+    loadSavedWeatherData();
     getWeatherData();
   }
 
@@ -188,6 +289,32 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             actions: [
+              // Icône de recherche (existant)
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () async {
+                  final cityUrl = await showSearch<String>(
+                    context: context,
+                    delegate: CitySearchDelegate(weatherService: weatherService),
+                  );
+                  if (cityUrl != null && cityUrl.isNotEmpty) {
+                    await _onCitySelected(cityUrl);
+                  }
+                },
+              ),
+
+              // Bouton "Retour à la météo par défaut" (affiché seulement si on a choisi une ville personnalisée)
+              if (_isCustomCity)
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () async {
+                    // Recharger la météo par défaut via la géolocalisation
+                    await getWeatherData();
+                    setState(() {
+                      _isCustomCity = false; 
+                    });
+                  },
+                ),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.menu),
                 onSelected: (String value) {

@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 
 // Types imports
 import '../types/weather_type.dart';
+import '../types/villeSugg_type.dart';
 
 // Classe pour gérer les services météo
 class WeatherService {
@@ -52,4 +53,52 @@ class WeatherService {
       return null;
     }
   }
+
+  // Fonction pour récupérer les données météo actuelles à partir d'une ville
+  Future<WeatherData?> fetchCurrentWeatherByUrl(String cityUrl) async {
+    final url = Uri.parse('$apiBaseUrl/current.json?key=$apiKey&q=$cityUrl&lang=fr');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      WeatherData currentWeather = WeatherData.fromJson(data);
+      return currentWeather;
+    } else {
+      print('Erreur lors de la récupération des données météo actuelles');
+      return null;
+    }
+  }
+
+  // Fonction pour récupérer les prévisions météo à partir d'une ville
+  Future<WeatherData?> fetchWeeklyForecastByUrl(String cityUrl) async {
+    final url = Uri.parse('$apiBaseUrl/forecast.json?key=$apiKey&q=$cityUrl&days=7&lang=fr');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      WeatherData forecastWeather = WeatherData.fromJson(data);
+      return forecastWeather;
+    } else {
+      print('Erreur lors de la récupération des prévisions météo');
+      return null;
+    }
+  }
+
+  Future<List<VS>> fetchCitySuggestions(String query) async {
+    final url = Uri.parse('$apiBaseUrl/search.json?key=$apiKey&q=$query&lang=fr');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data.map((item) => VS( item['name'], 
+                                    item['region'], 
+                                    item['country'], 
+                                    item['url'])).toList();
+    } else {
+      return [];
+    }
+  }
+
 }
