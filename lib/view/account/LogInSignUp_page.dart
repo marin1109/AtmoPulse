@@ -191,7 +191,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           uv: _uvValue,
         );
 
-        final userPrefs = UserPreferences();
+        final userPrefs = Provider.of<UserPreferences>(context, listen: false);
 
         await updatePreferencesUnit(_email,
           userPrefs.preferredTemperatureUnit,
