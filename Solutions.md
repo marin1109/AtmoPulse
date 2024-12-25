@@ -86,13 +86,27 @@ Ce document recense les différents problèmes rencontrés ainsi que les solutio
 
 **Contexte** : Lors de l'inscription, l'utilisateur ajoute ses données météorologiques préférées avec des unités de mesure basique. Cependant, dans la table de ses unités de mesure préférées, les préférences qu'il a dans l'application au moment de l'inscription sont stockées, ce qui crée une incohérence entre les deux tables.
 
+**Statut** : Résolu &#x2705;
+
+#### Solution
+- Utiliser les unités du Provider pour récuperer le type d'unités de mesure préférées.
+
+#### Remarques
+- Il est important de mettre à jour les unités de mesure préférées de l'utilisateur lorsqu'il les modifie.
+
+### Problème 7 : Les préférences de l'utilisateur ne sont pas réglées lorsque l'utilisateur modifie les unités de mesure
+
+**Date** : 25/12/2024
+
+**Contexte** : L'utilisateur peut modifier les unités de mesure dans les paramètres de l'application, cependant, les données de préférences de l'utilisateur restent inchangées.
+
 **Statut** : Non commencé &#x274C;
 
 #### Solution
-- *A faire*
+- Créer une fonction qui met à jour les préférences de l'utilisateur lorsqu'il modifie les unités de mesure.
 
 #### Remarques
-- *A faire*
+- Il est important de mettre à jour les préférences de l'utilisateur lorsqu'il modifie les unités de mesure.
 
 ## Conclusion
 Ce document a permis de recenser les différents problèmes rencontrés ainsi que les solutions apportées pour les résoudre. Il nous a permis de capitaliser sur les erreurs passées pour éviter de les reproduire à l'avenir.
