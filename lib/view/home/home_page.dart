@@ -125,6 +125,105 @@ class _HomePageState extends State<HomePage> {
 
   bool _isCustomCity = false;
 
+  List<Map<String, String>> _favorites = [];
+
+
+  Future<void> _loadFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? favString = prefs.getString('favorites');
+    if (favString != null) {
+      List<dynamic> decoded = jsonDecode(favString);
+      _favorites = decoded.map((item) => Map<String, String>.from(item)).toList();
+    }
+  }
+
+  void _showFavoritesDialog() async {
+    // Vérifier si l’utilisateur est connecté (logique déjà existante chez vous)
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedEmail = prefs.getString('email');
+    if (storedEmail == null || storedEmail.isEmpty) {
+      // Pas connecté, on affiche un SnackBar ou on pousse la page de connexion
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vous devez être connecté pour accéder à vos favoris.')),
+      );
+      return;
+    }
+
+    // L’utilisateur est connecté, on affiche le dialogue
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Mes favoris'),
+          content: (_favorites.isEmpty)
+              ? Text('Vous n\'avez pas encore de favoris.')
+              : SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _favorites.map((fav) {
+                      final cityName = fav['name'] ?? 'Ville inconnue';
+                      final cityUrl = fav['url'] ?? '';
+                      return ListTile(
+                        title: Text(cityName),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () async {
+                            // Supprimer le favori de la liste
+                            setState(() {
+                              _favorites.removeWhere((item) => item['url'] == cityUrl);
+                            });
+                            await _saveFavorites();
+                            // Fermer le dialogue et le rouvrir pour forcer l'UI à se rafraîchir
+                            Navigator.of(context).pop();
+                            _showFavoritesDialog();
+                          },
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pop(); // fermer le dialogue
+                          await _onCitySelected(cityUrl);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  // Méthode pour sauvegarder la liste des favoris
+  Future<void> _saveFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String encoded = jsonEncode(_favorites);
+    await prefs.setString('favorites', encoded);
+  }
+
+  // Méthode pour ajouter une ville
+  Future<void> _addToFavorites(String name, String cityUrl) async {
+    bool alreadyExists = _favorites.any((item) => item['url'] == cityUrl);
+    if (!alreadyExists) {
+      _favorites.add({
+        'name': name,
+        'url': cityUrl,
+      });
+      await _saveFavorites();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$name a été ajouté(e) aux favoris !')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$name est déjà dans vos favoris.')),
+      );
+    }
+  }
+
   Future<void> _onCitySelected(String cityUrl) async {
     final currentData =
         await weatherService.fetchCurrentWeatherByUrl(cityUrl);
@@ -142,6 +241,40 @@ class _HomePageState extends State<HomePage> {
       weeklyForecast = forecastData.forecast;
       _isCustomCity = true; // On a bien une ville personnalisée
     });
+
+    final cityName = currentData.location.city.name;
+
+    bool isLoggedIn = await _isUserLoggedIn();
+    if (isLoggedIn) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Ajouter aux favoris ?'),
+            content: Text('Voulez-vous ajouter $cityName à vos favoris ?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Non'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await _addToFavorites(cityName, cityUrl);
+                },
+                child: Text('Oui'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<bool> _isUserLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedEmail = prefs.getString('email');
+    return (storedEmail != null && storedEmail.isNotEmpty);
   }
 
   // Vérifie si l'utilisateur est déjà connecté
@@ -248,6 +381,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     loadSavedWeatherData();
     getWeatherData();
+    _loadFavorites();
   }
 
   // Liste des jours de la semaine en français
@@ -300,6 +434,14 @@ class _HomePageState extends State<HomePage> {
                   if (cityUrl != null && cityUrl.isNotEmpty) {
                     await _onCitySelected(cityUrl);
                   }
+                },
+              ),
+
+              IconButton(
+                icon: Icon(Icons.star),
+                onPressed: () {
+                  // Vérifier si l’utilisateur est connecté
+                  _showFavoritesDialog();
                 },
               ),
 
@@ -437,29 +579,35 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildWeatherInfo(
-                              icon: Icons.air,
-                              value: WindSpeed.loadWindText(
-                                weatherData!.wind,
-                                userPreferences.preferredWindUnit,
+                            Expanded(
+                              child:_buildWeatherInfo(
+                                icon: Icons.air,
+                                value: WindSpeed.loadWindText(
+                                  weatherData!.wind,
+                                  userPreferences.preferredWindUnit,
+                                ),
+                                label: 'Vent',
                               ),
-                              label: 'Vent',
                             ),
-                            _buildWeatherInfo(
-                              icon: Icons.water_drop,
-                              value: Humidity.loadHumidityText(
-                                weatherData!.humidity,
-                                userPreferences.preferredHumidityUnit,
+                            Expanded(
+                              child: _buildWeatherInfo(
+                                icon: Icons.water,
+                                value: Humidity.loadHumidityText(
+                                  weatherData!.humidity,
+                                  userPreferences.preferredHumidityUnit,
+                                ),
+                                label: 'Humidité',
                               ),
-                              label: 'Humidité',
                             ),
-                            _buildWeatherInfo(
-                              icon: Icons.opacity,
-                              value: Precipitation.loadPrecipitationText(
-                                weatherData!.precipitation,
-                                userPreferences.preferredPrecipitationUnit,
+                            Expanded(
+                              child: _buildWeatherInfo(
+                                icon: Icons.opacity,
+                                value: Precipitation.loadPrecipitationText(
+                                  weatherData!.precipitation,
+                                  userPreferences.preferredPrecipitationUnit,
+                                ),
+                                label: 'Précip.',
                               ),
-                              label: 'Précip.',
                             ),
                           ],
                         ),
@@ -519,17 +667,20 @@ class _HomePageState extends State<HomePage> {
                                         width: 40,
                                       ),
                                       const SizedBox(width: 10),
-                                      Text(
-                                        Temperature.loadTemperatureText(
-                                          day.avgTemp,
-                                          userPreferences
-                                              .preferredTemperatureUnit,
-                                        ),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontFamily: 'Montserrat',
-                                          color: Colors.white,
-                                        ),
+                                      Expanded(
+                                        child: 
+                                          Text(
+                                            Temperature.loadTemperatureText(
+                                              day.avgTemp,
+                                              userPreferences
+                                                  .preferredTemperatureUnit,
+                                            ),
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'Montserrat',
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                       ),
                                     ],
                                   ),

@@ -11,8 +11,7 @@ Cette base de données est conçue pour gérer :
 
 ### 1. Table `utilisateurs`
 Cette table stocke les informations des utilisateurs.
-
-#### Table `utilisateurs` actuelle
+_____________________________________________________________________________________________
 | **Champ**             | **Type**         | **Description**                                |
 |-----------------------|------------------|------------------------------------------------|
 | `id`                  | INT (PK)         | Identifiant unique de l'utilisateur.           |
@@ -33,12 +32,12 @@ Cette table stocke les informations des utilisateurs.
 | `uv`                  | TINYINT          | Index UV maximal souhaité.                     |
 | `precipitations_max`  | FLOAT            | Précipitations maximales souhaitées (en mm).   |
 | `precipitations_min`  | FLOAT            | Précipitations minimales souhaitées (en mm).   |
-
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ---
 
 ### 2. Table `preferences_unite`
 Cette table stocke les préférences d'unités pour chaque utilisateur.
-
+_________________________________________________________________________________________
 | **Champ**             | **Type**         | **Description**                            |
 |-----------------------|------------------|--------------------------------------------|
 | `id`                  | INT (PK)         | Identifiant unique de la préférence.       |
@@ -48,26 +47,20 @@ Cette table stocke les préférences d'unités pour chaque utilisateur.
 | `unite_humidite`      | VARCHAR(25)      | Unité pour l'humidité (ex: absolute).      |
 | `unite_pression`      | VARCHAR(25)      | Unité pour la pression (ex: hPa).          |
 | `unite_precipitations`| VARCHAR(25)      | Unité pour les précipitations (ex: mm).    |
-
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 **Relation :**
 - `preferences_unite.id_utilisateur` est une clé étrangère vers `utilisateurs.id`.
 
 ---
 
-### 3. Table `donnees_meteo`
-Cette table stocke les données météorologiques relevées par heure.
-
+### 3. Table `villes_favories`
+Cette table stocke les villes favorites de chaque utilisateur.
+_________________________________________________________________________________________
 | **Champ**             | **Type**         | **Description**                            |
 |-----------------------|------------------|--------------------------------------------|
-| `id`                  | int (PK)         | Identifiant unique pour chaque relevé.     |
-| `ville`               | int              | Référence à l'utilisateur (optionnel).     |
-| `date_heure`          | datetime         | Date et heure du relevé.                   |
-| `temperature`         | float            | Température relevée.                       |
-| `humidite`            | float            | Humidité relevée (en %).                   |
-| `pression`            | float            | Pression atmosphérique relevée (en hPa).   |
-| `vent`                | float            | Vitesse du vent relevée (ex: km/h).        |
-| `precipitations`      | float            | Précipitations relevées (ex: mm).          |
-| `uv_index`            | int              | Index UV relevé.                           |
-
+| `id`                  | INT (PK)         | Identifiant unique de la ville favorite.   |
+| `id_utilisateur`      | INT (FK)         | Référence à l'utilisateur.                 |
+| `ville_url`           | VARCHAR(200)     | URL de la ville favorite.                  |
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 **Relation :**
-- `donnees_meteo.id_utilisateur` est une clé étrangère vers `utilisateurs.id`.
+- `villes_favories.id_utilisateur` est une clé étrangère vers `utilisateurs.id`.
