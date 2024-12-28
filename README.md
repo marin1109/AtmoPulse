@@ -134,8 +134,3 @@ N’hésitez pas à proposer vos idées et corrections !
 **Marin Postolachi**  
 - [GitHub](https://github.com/marin1109)  
 - *Pour toute question ou suggestion, n’hésitez pas à me contacter.*  
-
----
-
-© 2024 Marin Postolachi – Tous droits réservés.  
-*(Ou la licence de votre choix)*
