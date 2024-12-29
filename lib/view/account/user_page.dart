@@ -237,7 +237,6 @@ class _UserPageState extends State<UserPage> {
     final formKey = GlobalKey<FormState>();
     late Password oldPassword;
     late Password newPassword;
-    late Password confirmPassword;
 
     showDialog(
       context: context,
@@ -291,9 +290,6 @@ class _UserPageState extends State<UserPage> {
                         return 'Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial.';
                       }
                       return null;
-                    },
-                    onChanged: (value) {
-                      confirmPassword = Password(value);
                     },
                   ),
                 ],
