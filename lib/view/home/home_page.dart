@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Service imports
 import '../../services/location_service.dart';
 import '../../services/weather_service.dart';
+import '../../services/account_service.dart';
 
 // Utility imports
 import '../../utils/user_preferences.dart';
@@ -42,7 +43,6 @@ class CitySearchDelegate extends SearchDelegate<String> {
       return Center(child: Text("Tapez le nom d'une ville..."));
     }
     
-    // FutureBuilder pour charger les suggestions via l’API
     return FutureBuilder<List<VS>>(
       future: weatherService.fetchCitySuggestions(query),
       builder: (context, snapshot) {
@@ -63,10 +63,7 @@ class CitySearchDelegate extends SearchDelegate<String> {
               title: Text(city.city.name),
               subtitle: Text('${city.region.name}, ${city.country.name}'),
               onTap: () {
-                close(
-                  context,
-                  city.url,
-                );
+                close(context, city.url);
               },
             );
           },
@@ -86,7 +83,6 @@ class CitySearchDelegate extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
-      // Bouton pour effacer la saisie
       IconButton(
         icon: Icon(Icons.clear),
         onPressed: () {
@@ -98,7 +94,6 @@ class CitySearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildLeading(BuildContext context) {
-    // Bouton de retour (flèche) pour fermer la recherche
     return IconButton(
       icon: Icon(Icons.arrow_back),
       onPressed: () {
@@ -122,34 +117,142 @@ class _HomePageState extends State<HomePage> {
   Location? location;
   CurrentWeather? weatherData;
   ForecastWeather? weeklyForecast;
-
   bool _isCustomCity = false;
 
-  List<Map<String, String>> _favorites = [];
+  // Cache local des favoris
+  List<Map<String, String>> _favorites = []; 
 
+  @override
+  void initState() {
+    super.initState();
+    loadSavedWeatherData();   // récup météo en local
+    getWeatherData();         // récup météo en ligne
+    _loadFavoritesLocally();  // on charge les favoris depuis SharedPreferences
 
-  Future<void> _loadFavorites() async {
+    // Optionnel : si on veut forcer la synchro dès le démarrage
+    // _syncFavoritesFromServerIfLoggedIn();
+  }
+
+  //////////////////////////
+  /// GESTION DES FAVORIS ///
+  //////////////////////////
+
+  // Charger les favoris en local
+  Future<void> _loadFavoritesLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? favString = prefs.getString('favorites');
     if (favString != null) {
       List<dynamic> decoded = jsonDecode(favString);
-      _favorites = decoded.map((item) => Map<String, String>.from(item)).toList();
+      setState(() {
+        _favorites = decoded.map((item) => Map<String, String>.from(item)).toList();
+      });
     }
   }
 
+  // Sauvegarder les favoris en local
+  Future<void> _saveFavoritesLocally() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String encoded = jsonEncode(_favorites);
+    await prefs.setString('favorites', encoded);
+  }
+
+  // Charger depuis le serveur si l'utilisateur est connecté
+  Future<void> _syncFavoritesFromServerIfLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedEmail = prefs.getString('email');
+    if (storedEmail != null && storedEmail.isNotEmpty) {
+      try {
+        final serverFavorites = await getFavoriteCities(storedEmail);
+        // Convertir pour stocker dans notre _favorites
+        List<Map<String, String>> adapted = serverFavorites.map((fav) {
+          // fav = { "id": 12, "ville_url": "Paris" }
+          return {
+            'id': fav['id'].toString(),
+            'url': fav['ville_url'].toString(),
+          };
+        }).toList();
+
+        setState(() {
+          _favorites = adapted;
+        });
+        await _saveFavoritesLocally();
+      } catch (e) {
+        print('Erreur chargement favoris serveur : $e');
+      }
+    }
+  }
+
+  // Ajouter un favori (en local + serveur si connecté)
+  Future<void> _addToFavorites(String name, String cityUrl) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedEmail = prefs.getString('email');
+
+    // Ajout local
+    bool alreadyExists = _favorites.any((item) => item['url'] == cityUrl);
+    if (!alreadyExists) {
+      setState(() {
+        _favorites.add({
+          'name': name,
+          'url': cityUrl,
+        });
+      });
+      await _saveFavoritesLocally();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$name a été ajouté(e) aux favoris !')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$name est déjà dans vos favoris.')),
+      );
+    }
+
+    // Ajout côté serveur (si connecté)
+    if (storedEmail != null && storedEmail.isNotEmpty) {
+      try {
+        await addFavoriteCity(storedEmail, cityUrl);
+        // Si succès, tout est synchro
+      } catch (e) {
+        print('Erreur côté serveur : $e');
+        // Vous pouvez gérer la synchro plus tard si besoin
+      }
+    }
+  }
+
+  // Supprimer un favori (local + serveur si connecté)
+  Future<void> _removeFromFavorites(String cityUrl) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedEmail = prefs.getString('email');
+
+    // Suppression local
+    setState(() {
+      _favorites.removeWhere((item) => item['url'] == cityUrl);
+    });
+    await _saveFavoritesLocally();
+
+    // Suppression côté serveur (si connecté)
+    if (storedEmail != null && storedEmail.isNotEmpty) {
+      try {
+        await removeFavoriteCity(storedEmail, cityUrl);
+      } catch (e) {
+        print('Erreur côté serveur : $e');
+      }
+    }
+  }
+
+  // Afficher la liste des favoris
   void _showFavoritesDialog() async {
-    // Vérifier si l’utilisateur est connecté (logique déjà existante chez vous)
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedEmail = prefs.getString('email');
     if (storedEmail == null || storedEmail.isEmpty) {
-      // Pas connecté, on affiche un SnackBar ou on pousse la page de connexion
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vous devez être connecté pour accéder à vos favoris.')),
       );
       return;
     }
 
-    // L’utilisateur est connecté, on affiche le dialogue
+    // On peut re-synchroniser si on veut toujours avoir la dernière liste
+    await _syncFavoritesFromServerIfLoggedIn();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -161,25 +264,20 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: _favorites.map((fav) {
-                      final cityName = fav['name'] ?? 'Ville inconnue';
+                      final cityName = fav['name'] ?? fav['url'] ?? 'Inconnu';
                       final cityUrl = fav['url'] ?? '';
                       return ListTile(
                         title: Text(cityName),
                         trailing: IconButton(
                           icon: Icon(Icons.delete),
                           onPressed: () async {
-                            // Supprimer le favori de la liste
-                            setState(() {
-                              _favorites.removeWhere((item) => item['url'] == cityUrl);
-                            });
-                            await _saveFavorites();
-                            // Fermer le dialogue et le rouvrir pour forcer l'UI à se rafraîchir
                             Navigator.of(context).pop();
-                            _showFavoritesDialog();
+                            await _removeFromFavorites(cityUrl);
+                            _showFavoritesDialog(); // Raffraîchir
                           },
                         ),
                         onTap: () async {
-                          Navigator.of(context).pop(); // fermer le dialogue
+                          Navigator.of(context).pop();
                           await _onCitySelected(cityUrl);
                         },
                       );
@@ -197,38 +295,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
-  // Méthode pour sauvegarder la liste des favoris
-  Future<void> _saveFavorites() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String encoded = jsonEncode(_favorites);
-    await prefs.setString('favorites', encoded);
-  }
-
-  // Méthode pour ajouter une ville
-  Future<void> _addToFavorites(String name, String cityUrl) async {
-    bool alreadyExists = _favorites.any((item) => item['url'] == cityUrl);
-    if (!alreadyExists) {
-      _favorites.add({
-        'name': name,
-        'url': cityUrl,
-      });
-      await _saveFavorites();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$name a été ajouté(e) aux favoris !')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$name est déjà dans vos favoris.')),
-      );
-    }
-  }
+  /////////////////////////////////////////////
+  /// Méthodes existantes pour la météo etc. ///
+  /////////////////////////////////////////////
 
   Future<void> _onCitySelected(String cityUrl) async {
-    final currentData =
-        await weatherService.fetchCurrentWeatherByUrl(cityUrl);
-    final forecastData =
-        await weatherService.fetchWeeklyForecastByUrl(cityUrl);
+    final currentData = await weatherService.fetchCurrentWeatherByUrl(cityUrl);
+    final forecastData = await weatherService.fetchWeeklyForecastByUrl(cityUrl);
 
     if (currentData == null || forecastData == null) {
       print('Données météo introuvables pour $cityUrl.');
@@ -239,11 +312,10 @@ class _HomePageState extends State<HomePage> {
       location = currentData.location;
       weatherData = currentData.current;
       weeklyForecast = forecastData.forecast;
-      _isCustomCity = true; // On a bien une ville personnalisée
+      _isCustomCity = true; 
     });
 
     final cityName = currentData.location.city.name;
-
     bool isLoggedIn = await _isUserLoggedIn();
     if (isLoggedIn) {
       showDialog(
@@ -277,33 +349,25 @@ class _HomePageState extends State<HomePage> {
     return (storedEmail != null && storedEmail.isNotEmpty);
   }
 
-  // Vérifie si l'utilisateur est déjà connecté
   void _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedEmail = prefs.getString('email');
 
     if (storedEmail != null && storedEmail.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => UserPage()),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => UserPage()));
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LSPage()),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => LSPage()));
     }
   }
 
-  // Récupération des données météo
+  // Récupération des données météo (existant)
   Future<void> getWeatherData() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.deniedForever) {
-          print(
-              'Les permissions de localisation sont refusées de façon permanente.');
+          print('Les permissions de localisation sont refusées de façon permanente.');
           return;
         }
       }
@@ -356,13 +420,11 @@ class _HomePageState extends State<HomePage> {
 
     if (weatherString != null && forecastString != null) {
       final Map<String, dynamic> decodedJson = jsonDecode(weatherString);
-      final Map<String, dynamic> decodedForecastJson =
-          jsonDecode(forecastString);
+      final Map<String, dynamic> decodedForecastJson = jsonDecode(forecastString);
 
       final locationObj = Location.fromJson(decodedJson['location']);
       final currentObj = CurrentWeather.fromJson(decodedJson['current']);
-      final weeklyForecastObj =
-          ForecastWeather.fromJson(decodedForecastJson['forecast']);
+      final weeklyForecastObj = ForecastWeather.fromJson(decodedForecastJson['forecast']);
 
       setState(() {
         location = locationObj;
@@ -376,38 +438,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    loadSavedWeatherData();
-    getWeatherData();
-    _loadFavorites();
-  }
-
-  // Liste des jours de la semaine en français
-  static const List<String> joursSemaine = [
-    "Lundi",
-    "Mardi",
-    "Mercredi",
-    "Jeudi",
-    "Vendredi",
-    "Samedi",
-    "Dimanche"
-  ];
-
-  // Fonction pour obtenir le jour de la semaine à partir d'une date
-  String getJourSemaine(DateTime date) {
-    int dayOfWeek = date.weekday;
-    return joursSemaine[dayOfWeek - 1];
-  }
-
-  String decodeUtf8(String input) {
-    try {
-      return utf8.decode(input.runes.toList());
-    } catch (e) {
-      return input;
-    }
-  }
+  ///////////////////////////////
+  /// Build de l'interface UI ///
+  ///////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -423,7 +456,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             actions: [
-              // Icône de recherche (existant)
               IconButton(
                 icon: Icon(Icons.search),
                 onPressed: () async {
@@ -436,24 +468,19 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
               ),
-
               IconButton(
                 icon: Icon(Icons.star),
                 onPressed: () {
-                  // Vérifier si l’utilisateur est connecté
                   _showFavoritesDialog();
                 },
               ),
-
-              // Bouton "Retour à la météo par défaut" (affiché seulement si on a choisi une ville personnalisée)
               if (_isCustomCity)
                 IconButton(
                   icon: Icon(Icons.home),
                   onPressed: () async {
-                    // Recharger la météo par défaut via la géolocalisation
                     await getWeatherData();
                     setState(() {
-                      _isCustomCity = false; 
+                      _isCustomCity = false;
                     });
                   },
                 ),
@@ -465,10 +492,8 @@ class _HomePageState extends State<HomePage> {
                       _checkLoginStatus();
                       break;
                     case 'preferences':
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PreferencesPage()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => PreferencesPage()));
                       break;
                     case 'contact':
                       showDialog(
@@ -518,13 +543,10 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-
-              // On utilise une ListView pour pouvoir scroller
               child: (weatherData != null)
                   ? ListView(
                       children: [
                         const SizedBox(height: 80),
-                        // Affichage de la localisation
                         Center(
                           child: Text(
                             '$location',
@@ -537,8 +559,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Icône météo
                         Center(
                           child: Image.network(
                             'https:${weatherData!.condition.icon}',
@@ -546,8 +566,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
-                        // Température
                         Center(
                           child: Text(
                             Temperature.loadTemperatureText(
@@ -562,7 +580,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        // Condition météo
                         Center(
                           child: Text(
                             decodeUtf8(weatherData!.condition.text),
@@ -574,8 +591,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Infos vent / humidité / précipitations
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -612,8 +627,6 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         const SizedBox(height: 30),
-
-                        // Titre "Prévisions Hebdomadaires"
                         const Center(
                           child: Text(
                             'Prévisions Hebdomadaires',
@@ -626,18 +639,15 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
-                        // Liste des prévisions
                         if (weeklyForecast?.forecastDays != null)
                           ListView.builder(
-                            // nested ListView, on fixe shrinkWrap et physics
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: weeklyForecast!.forecastDays.length,
                             itemBuilder: (context, index) {
                               final day = weeklyForecast!.forecastDays[index];
                               final DateTime date = DateTime.parse(day.date);
-                              final String dayOfWeek = getJourSemaine(date);
+                              final String dayOfWeek = _getJourSemaine(date);
 
                               return Card(
                                 color: Colors.white.withOpacity(0.2),
@@ -651,6 +661,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -662,25 +673,25 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      Image.network(
-                                        'https:${day.condition.icon}',
-                                        width: 40,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: 
+
+                                      Row(
+                                        children: [
+                                          Image.network(
+                                            'https:${day.condition.icon}',
+                                            width: 40,
+                                          ),
+                                          const SizedBox(width: 8),  // un peu d’espace entre l’icône et la température
                                           Text(
                                             Temperature.loadTemperatureText(
-                                              day.avgTemp,
-                                              userPreferences
-                                                  .preferredTemperatureUnit,
+                                              day.avgTemp, 
+                                              userPreferences.preferredTemperatureUnit,
                                             ),
                                             style: const TextStyle(
                                               fontSize: 18,
-                                              fontFamily: 'Montserrat',
                                               color: Colors.white,
                                             ),
                                           ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -700,6 +711,30 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  String decodeUtf8(String input) {
+    try {
+      return utf8.decode(input.runes.toList());
+    } catch (e) {
+      return input;
+    }
+  }
+
+  // Liste des jours de la semaine en français
+  static const List<String> joursSemaine = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche"
+  ];
+
+  String _getJourSemaine(DateTime date) {
+    int dayOfWeek = date.weekday; 
+    return joursSemaine[dayOfWeek - 1];
   }
 
   Widget _buildWeatherInfo({

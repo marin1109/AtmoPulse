@@ -205,3 +205,57 @@ Future<Map<String, dynamic>> getPreferencesUnit(Email email) async {
   }
 }
 
+// Ajouter une ville favorite
+Future<void> addFavoriteCity(String email, String villeUrl) async {
+  final url = Uri.parse('$apiBaseUrl/add_favorite_city');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+      'ville_url': villeUrl,
+    }),
+  );
+
+  if (response.statusCode == 201) {
+    print('Ville favorite ajoutée.');
+  } else {
+    throw Exception('Erreur add favorite: ${response.body}');
+  }
+}
+
+// Récupérer les villes favorites
+Future<List<Map<String, dynamic>>> getFavoriteCities(String email) async {
+  final url = Uri.parse('$apiBaseUrl/get_favorite_cities');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'email': email}),
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map((item) => item as Map<String, dynamic>).toList();
+  } else {
+    throw Exception('Erreur get favorites: ${response.body}');
+  }
+}
+
+// Supprimer une ville favorite
+Future<void> removeFavoriteCity(String email, String villeUrl) async {
+  final url = Uri.parse('$apiBaseUrl/rm_favorite_city');
+  final response = await http.delete(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+      'ville_url': villeUrl,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Ville favorite supprimée.');
+  } else {
+    throw Exception('Erreur remove favorite: ${response.body}');
+  }
+}
