@@ -680,7 +680,7 @@ class _HomePageState extends State<HomePage> {
                                             'https:${day.condition.icon}',
                                             width: 40,
                                           ),
-                                          const SizedBox(width: 8),  // un peu d’espace entre l’icône et la température
+                                          const SizedBox(width: 8),
                                           Text(
                                             Temperature.loadTemperatureText(
                                               day.avgTemp, 
