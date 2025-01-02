@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../main.dart';
 
 class NotificationService {
   // Instance de FlutterLocalNotificationsPlugin
@@ -10,17 +11,33 @@ class NotificationService {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
-      // iOS, Linux, etc. si nécessaire
+      iOS: iosSettings,
     );
 
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: (notificationResponse) {
-        // Action lors d’un clic sur la notif
+      onDidReceiveNotificationResponse: (response) {
+        navigatorKey.currentState?.pushNamed('/');
       },
     );
+
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
   }
 
   // Méthode pour afficher une notification
@@ -55,5 +72,14 @@ class NotificationService {
     await _flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  // etc. (annuler une notif en particulier, planifier, etc.)
+  // Méthode pour annuler une notification
+  Future<void> cancelNotification(int id) async {
+    await _flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  // Méthode pour gérer la logique de la notification
+  void handleNotification() {
+
+  }
+  
 }

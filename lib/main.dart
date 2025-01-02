@@ -29,9 +29,7 @@ Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
     return;
   }
 
-  // TODO: Votre logique de background : par ex. fetch météo et notification
-  // print("[BackgroundFetch] Headless event reçu: $taskId");
-
+  // TODO: Votre logique de background
   // Ex.: NotificationService().showNotification(
   //   title: "Météo",
   //   body: "Limites dépassées !",
@@ -39,6 +37,8 @@ Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   BackgroundFetch.finish(taskId);
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,15 +63,11 @@ Future<void> main() async {
     prefs.setString('unite_humidite', HumidityUnit.relative.name);
   }
 
-  // 4. Initialiser le service de notifications (singleton ou instance normale)
   await NotificationService().init();
 
-  // 5. Enregistrer la fonction headless pour Android
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-    // Ici seulement sur Android ou iOS natif
     BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  }
-  else {
+  } else {
     print("Headless Task non enregistré : plateforme non supportée");
   }
 
@@ -79,7 +75,7 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => UserPreferences(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -100,7 +96,6 @@ class _MyAppState extends State<MyApp> {
 
   /// Configuration de background_fetch
   Future<void> _configureBackgroundFetch() async {
-
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
       print('background_fetch non initialisé : plateforme non supportée');
       return;
@@ -117,26 +112,20 @@ class _MyAppState extends State<MyApp> {
         _onBackgroundFetch,
         _onBackgroundFetchTimeout,
       );
-      // ignore: avoid_print
       print('[BackgroundFetch] configure success');
     } catch (e) {
-      // ignore: avoid_print
       print('[BackgroundFetch] configure ERROR: $e');
     }
   }
 
-  /// Callback standard quand background_fetch se déclenche (app en BG ou FG, mais pas killée).
+  /// Callback standard quand background_fetch se déclenche
   void _onBackgroundFetch(String taskId) async {
-    // TODO: Votre logique ex. Weather fetch, vérifier limites, déclencher notif
-    // print("[BackgroundFetch] Event reçu: $taskId");
-
-    // Ex. NotificationService().showNotification(title: ..., body: ...);
+    // TODO: Votre logique de fetch météo, etc.
 
     BackgroundFetch.finish(taskId);
   }
 
   void _onBackgroundFetchTimeout(String taskId) {
-    // ignore: avoid_print
     print("[BackgroundFetch] TIMEOUT: $taskId");
     BackgroundFetch.finish(taskId);
   }
@@ -144,6 +133,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'AtmoPulse',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
