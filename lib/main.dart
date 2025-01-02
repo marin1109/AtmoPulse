@@ -101,10 +101,17 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
+    final isLoggedIn =
+        await Provider.of<UserPreferences>(context, listen: false).isLogged;
+    if (!isLoggedIn) {
+      print('background_fetch désactivé : utilisateur non connecté');
+      return;
+    }
+
     try {
       await BackgroundFetch.configure(
         BackgroundFetchConfig(
-          minimumFetchInterval: 15,  // en minutes
+          minimumFetchInterval: 15, // en minutes
           stopOnTerminate: false,
           startOnBoot: true,
           enableHeadless: true,

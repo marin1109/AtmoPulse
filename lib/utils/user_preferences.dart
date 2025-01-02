@@ -17,6 +17,7 @@ class UserPreferences extends ChangeNotifier {
   PressureUnit _preferredPressureUnit = PressureUnit.hPa;
   PrecipitationUnit _preferredPrecipitationUnit = PrecipitationUnit.mm;
   HumidityUnit _preferredHumidityUnit = HumidityUnit.relative;
+  bool _isLogged = false;
 
   UserPreferences() {
     loadPreferences();
@@ -28,6 +29,7 @@ class UserPreferences extends ChangeNotifier {
   PressureUnit get preferredPressureUnit => _preferredPressureUnit;
   PrecipitationUnit get preferredPrecipitationUnit => _preferredPrecipitationUnit;
   HumidityUnit get preferredHumidityUnit => _preferredHumidityUnit;
+  bool get isLogged => _isLogged;
 
   // Load preferences from SharedPreferences
   Future<void> loadPreferences() async {
@@ -52,6 +54,7 @@ class UserPreferences extends ChangeNotifier {
       (e) => e.toString() == 'HumidityUnit.${prefs.getString('unite_humidite') ?? 'relative'}',
       orElse: () => HumidityUnit.relative,
     );
+    _isLogged = prefs.getBool('isLogged') ?? false;
     notifyListeners();
   }
 
@@ -90,4 +93,12 @@ class UserPreferences extends ChangeNotifier {
     _preferredHumidityUnit = unit;
     notifyListeners();
   }
+
+  Future<void> setIsLogged(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLogged', value);
+    _isLogged = value;
+    notifyListeners();
+  }
+  
 }

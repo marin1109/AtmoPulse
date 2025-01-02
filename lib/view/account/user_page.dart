@@ -109,8 +109,10 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _logout(BuildContext context) async {
+    // Suppression des préférences utilisateur
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => LSPage()),

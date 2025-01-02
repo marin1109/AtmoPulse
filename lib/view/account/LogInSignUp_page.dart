@@ -23,9 +23,9 @@ import '../../types/precipitation_type.dart';
 import '../../types/wind_type.dart';
 import '../../types/uv_type.dart';
 
-
 // Page imports
 import 'user_page.dart';
+import '../../main.dart';
 
 import '../../utils/user_preferences.dart';
 
@@ -137,7 +137,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         
         final data = await getPreferencesUnit(_email);
 
-        // Récupération de l'instance de UserPreferences fournie par le Provider
         final userPrefs = Provider.of<UserPreferences>(context, listen: false);
         userPrefs.setPreferredTemperatureUnit(
           Temperature.stringToTemperatureUnit(data['unite_temperature'])
@@ -154,6 +153,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         userPrefs.setPreferredPrecipitationUnit(
           Precipitation.stringToPrecipitationUnit(data['unite_precipitations'])
         );
+        userPrefs.setIsLogged(true);
 
         await _saveUserDataToPrefs(prefs, userData);
         _navigateToUserPage();
