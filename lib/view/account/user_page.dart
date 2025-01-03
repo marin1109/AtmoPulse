@@ -4,10 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // Types
-import '../../types/fname_type.dart';
-import '../../types/lname_type.dart';
-import '../../types/age_type.dart';
-import '../../types/email_type.dart';
 import '../../types/password_type.dart';
 
 // Page d'authentification

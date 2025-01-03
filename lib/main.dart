@@ -11,11 +11,6 @@ import 'utils/user_preferences.dart';
 import 'view/home/home_page.dart';
 
 // Import des types
-import 'types/temperature_type.dart';
-import 'types/wind_type.dart';
-import 'types/pressure_type.dart';
-import 'types/precipitation_type.dart';
-import 'types/humidity_type.dart';
 
 /// 1. Callback "headless" pour background_fetch (Android lorsque l’appli est tuée).
 @pragma('vm:entry-point')
