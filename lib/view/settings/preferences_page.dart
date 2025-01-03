@@ -1,13 +1,12 @@
-// Importations Flutter
-import 'package:flutter/material.dart';
+// preferences_page.dart
 
-// Importations de packages
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Importations utilitaires
+// Imports
 import '../../utils/user_preferences.dart';
 
-// Importations de types
+// Types
 import '../../types/humidity_type.dart';
 import '../../types/precipitation_type.dart';
 import '../../types/pressure_type.dart';
@@ -20,30 +19,30 @@ class PreferencesPage extends StatelessWidget {
   static const List<TemperatureUnit> _temperatureUnits = [
     TemperatureUnit.celsius,
     TemperatureUnit.fahrenheit,
-    TemperatureUnit.kelvin
+    TemperatureUnit.kelvin,
   ];
   static const List<WindUnit> _windSpeedUnits = [
     WindUnit.kmh,
     WindUnit.ms,
     WindUnit.mph,
     WindUnit.fts,
-    WindUnit.knots
+    WindUnit.knots,
   ];
   static const List<PressureUnit> _pressureUnits = [
     PressureUnit.hPa,
     PressureUnit.atm,
     PressureUnit.psi,
     PressureUnit.Pa,
-    PressureUnit.mmHg
+    PressureUnit.mmHg,
   ];
   static const List<PrecipitationUnit> _precipitationUnits = [
     PrecipitationUnit.inches,
     PrecipitationUnit.litersPerSquareMeter,
-    PrecipitationUnit.mm
+    PrecipitationUnit.mm,
   ];
   static const List<HumidityUnit> _humidityUnits = [
     HumidityUnit.relative,
-    HumidityUnit.absolute
+    HumidityUnit.absolute,
   ];
 
   @override
@@ -68,10 +67,7 @@ class PreferencesPage extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.blue.shade700,
-                  Colors.blue.shade200,
-                ],
+                colors: [Colors.blue.shade700, Colors.blue.shade200],
               ),
             ),
             child: Padding(
@@ -205,9 +201,7 @@ class PreferencesPage extends StatelessWidget {
   Widget _buildPreferenceSection({required String title, required Widget child}) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),

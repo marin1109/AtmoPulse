@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -45,36 +44,24 @@ Future<void> main() async {
 
   await dotenv.load(fileName: "assets/.env");
 
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  if (!prefs.containsKey('unite_temperature')) {
-    prefs.setString('unite_temperature', TemperatureUnit.celsius.name);
-  }
-  if (!prefs.containsKey('unite_vitesse')) {
-    prefs.setString('unite_vitesse', WindUnit.kmh.name);
-  }
-  if (!prefs.containsKey('unite_pression')) {
-    prefs.setString('unite_pression', PressureUnit.hPa.name);
-  }
-  if (!prefs.containsKey('unite_precipitations')) {
-    prefs.setString('unite_precipitations', PrecipitationUnit.mm.name);
-  }
-  if (!prefs.containsKey('unite_humidite')) {
-    prefs.setString('unite_humidite', HumidityUnit.relative.name);
-  }
-
+  // Initialiser le NotificationService
   await NotificationService().init();
 
+  final userPrefs = UserPreferences();
+  
+  await userPrefs.initializeDefaultUnits();
+
+  // Enregistrer la tâche headless si mobile
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   } else {
     print("Headless Task non enregistré : plateforme non supportée");
   }
 
-  // 6. Lancer l'application
+  // Lancer l'application
   runApp(
     ChangeNotifierProvider(
-      create: (_) => UserPreferences(),
+      create: (_) => userPrefs,
       child: const MyApp(),
     ),
   );
@@ -102,7 +89,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     final isLoggedIn =
-        await Provider.of<UserPreferences>(context, listen: false).isLogged;
+        Provider.of<UserPreferences>(context, listen: false).isLogged;
     if (!isLoggedIn) {
       print('background_fetch désactivé : utilisateur non connecté');
       return;

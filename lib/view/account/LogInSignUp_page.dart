@@ -1,16 +1,13 @@
-// Flutter imports
-import 'package:flutter/material.dart';
+// LSPage.dart
 
-// Package imports
+import 'package:flutter/material.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-// Service imports
 import '../../services/account_service.dart';
 
-// Type imports
+// Types (email, password, etc.)
 import '../../types/email_type.dart';
 import '../../types/password_type.dart';
 import '../../types/lname_type.dart';
@@ -25,8 +22,8 @@ import '../../types/uv_type.dart';
 
 // Page imports
 import 'user_page.dart';
-import '../../main.dart';
 
+// UserPreferences
 import '../../utils/user_preferences.dart';
 
 class LSPage extends StatefulWidget {
@@ -37,13 +34,26 @@ class LSPage extends StatefulWidget {
 }
 
 class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
+  // ================
+  // Clés des formulaires
+  // ================
   final _loginFormKey = GlobalKey<FormState>();
   final _signUpFormKey = GlobalKey<FormState>();
+
+  // ================
+  // Données pour le login
+  // ================
   late Email _email;
   late Password _password;
+
+  // ================
+  // Données pour le signup
+  // ================
   late FName _name;
   late LName _surname;
   late Age _age;
+
+  // Sensibilités (signup)
   late Humidity _humidity_min;
   late Humidity _humidity_max;
   late Precipitation _precipitation_min;
@@ -55,20 +65,18 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   late WindSpeed _wind_min;
   late WindSpeed _wind_max;
   late UV _uvValue;
+
   final FlipCardController _cardController = FlipCardController();
 
+  // Contrôleurs de texte pour la saisie de valeurs
   final _tempMinController = TextEditingController();
   final _tempMaxController = TextEditingController();
-
   final _humidityMinController = TextEditingController();
   final _humidityMaxController = TextEditingController();
-
   final _pressureMinController = TextEditingController();
   final _pressureMaxController = TextEditingController();
-
   final _precipitationMinController = TextEditingController();
   final _precipitationMaxController = TextEditingController();
-
   final _windMinController = TextEditingController();
   final _windMaxController = TextEditingController();
 
@@ -76,86 +84,89 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   void dispose() {
     _tempMinController.dispose();
     _tempMaxController.dispose();
-
     _humidityMinController.dispose();
     _humidityMaxController.dispose();
-
     _pressureMinController.dispose();
     _pressureMaxController.dispose();
-
     _precipitationMinController.dispose();
     _precipitationMaxController.dispose();
-
     _windMinController.dispose();
     _windMaxController.dispose();
-
     super.dispose();
   }
 
+  // ==============================
   // Navigation vers UserPage
+  // ==============================
   void _navigateToUserPage() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => UserPage()),
+      MaterialPageRoute(builder: (context) => const UserPage()),
     );
   }
 
-  // Sauvegarde des données utilisateur dans les préférences partagées
-  Future<void> _saveUserDataToPrefs(SharedPreferences prefs, Map<String, dynamic> userData) async {
-    print("userData: $userData");
-    await prefs.setString('email', userData['email']);
-    if (userData['nom'] != null) await prefs.setString('nom', userData['nom']);
-    if (userData['prenom'] != null) await prefs.setString('prenom', userData['prenom']);
-    if (userData['age'] != null) await prefs.setInt('age', userData['age']);
-    
-    if (userData['humidite_min'] != null) await prefs.setDouble('humidite_min', userData['humidite_min']);
-    if (userData['humidite_max'] != null) await prefs.setDouble('humidite_max', userData['humidite_max']);
-
-    if (userData['precipitations_min'] != null) await prefs.setDouble('precipitations_min', userData['precipitations_min']);
-    if (userData['precipitations_max'] != null) await prefs.setDouble('precipitations_max', userData['precipitations_max']);
-
-    if (userData['pression_min'] != null) await prefs.setDouble('pression_min', userData['pression_min']);
-    if (userData['pression_max'] != null) await prefs.setDouble('pression_max', userData['pression_max']);
-
-    if (userData['temperature_min'] != null) await prefs.setInt('temperature_min', userData['temperature_min']);
-    if (userData['temperature_max'] != null) await prefs.setInt('temperature_max', userData['temperature_max']);
-
-    if (userData['vent_min'] != null) await prefs.setDouble('vent_min', userData['vent_min']);
-    if (userData['vent_max'] != null) await prefs.setDouble('vent_max', userData['vent_max']);
-
-    if (userData['uv'] != null) await prefs.setInt('uv', userData['uv']);
-  }
-
-  // Gestion de la connexion utilisateur
+  // ==============================
+  // Connexion utilisateur
+  // ==============================
   void _loginUser() async {
     if (_loginFormKey.currentState!.validate()) {
       _loginFormKey.currentState!.save();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Récupérer l'instance du UserPreferences
+      final userPrefs = Provider.of<UserPreferences>(context, listen: false);
 
       try {
+        // 1. Vérifier l'authentification via API
         final userData = await loginUser(_email, _password);
-        
+        // userData = { 'email': ..., 'nom': ..., 'prenom': ..., 'age': ..., etc. }
+
+        // 2. Récupération des unités depuis l'API si nécessaire
         final data = await getPreferencesUnit(_email);
+        // data = { 'unite_temperature': 'celsius', 'unite_vent': 'kmh', ... }
 
-        final userPrefs = Provider.of<UserPreferences>(context, listen: false);
-        userPrefs.setPreferredTemperatureUnit(
-          Temperature.stringToTemperatureUnit(data['unite_temperature'])
+        // 3. Mettre à jour les unités
+        await userPrefs.setPreferredTemperatureUnit(
+          Temperature.stringToTemperatureUnit(data['unite_temperature']),
         );
-        userPrefs.setPreferredWindUnit(
-          WindSpeed.stringToWindUnit(data['unite_vent'])
+        await userPrefs.setPreferredWindUnit(
+          WindSpeed.stringToWindUnit(data['unite_vent']),
         );
-        userPrefs.setPreferredHumidityUnit(
-          Humidity.stringToHumidityUnit(data['unite_humidite'])
+        await userPrefs.setPreferredHumidityUnit(
+          Humidity.stringToHumidityUnit(data['unite_humidite']),
         );
-        userPrefs.setPreferredPressureUnit(
-          Pressure.stringToPressureUnit(data['unite_pression'])
+        await userPrefs.setPreferredPressureUnit(
+          Pressure.stringToPressureUnit(data['unite_pression']),
         );
-        userPrefs.setPreferredPrecipitationUnit(
-          Precipitation.stringToPrecipitationUnit(data['unite_precipitations'])
+        await userPrefs.setPreferredPrecipitationUnit(
+          Precipitation.stringToPrecipitationUnit(data['unite_precipitations']),
         );
-        userPrefs.setIsLogged(true);
 
-        await _saveUserDataToPrefs(prefs, userData);
+        // 4. Mémoriser qu'on est loggé
+        await userPrefs.setIsLogged(true);
+
+        // 5. Sauvegarde des infos perso
+        await userPrefs.setEmail(userData['email']);
+        if (userData['nom'] != null) {
+          await userPrefs.setNom(userData['nom']);
+        }
+        if (userData['prenom'] != null) {
+          await userPrefs.setPrenom(userData['prenom']);
+        }
+        if (userData['age'] != null) {
+          await userPrefs.setAge(userData['age']);
+        }
+
+        // 6. Sauvegarde des sensibilités si l'API les renvoie
+        // (exemple)
+        if (userData['humidite_min'] != null) {
+          await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
+        }
+        if (userData['humidite_max'] != null) {
+          await userPrefs.setHumidityMax(userData['humidite_max'].toDouble());
+        }
+        // etc. pour pression, température, etc.
+
+        // 7. Navigation vers la UserPage
         _navigateToUserPage();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -165,13 +176,18 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     }
   }
 
-  // Gestion de l'inscription utilisateur
+  // ==============================
+  // Inscription utilisateur
+  // ==============================
   void _registerUser() async {
     if (_signUpFormKey.currentState!.validate()) {
       _signUpFormKey.currentState!.save();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Récupérer l'instance du UserPreferences
+      final userPrefs = Provider.of<UserPreferences>(context, listen: false);
 
       try {
+        // 1. Création de l'utilisateur via l'API
         await addUser(
           _name,
           _surname,
@@ -191,9 +207,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           uv: _uvValue,
         );
 
-        final userPrefs = Provider.of<UserPreferences>(context, listen: false);
-
-        await updatePreferencesUnit(_email,
+        // 2. Mettre à jour les unités côté serveur si besoin
+        await updatePreferencesUnit(
+          _email,
           userPrefs.preferredTemperatureUnit,
           userPrefs.preferredWindUnit,
           userPrefs.preferredHumidityUnit,
@@ -201,8 +217,24 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           userPrefs.preferredPrecipitationUnit,
         );
 
+        // 3. Récupérer à nouveau userData via login (pour avoir ID, etc.)
         final userData = await loginUser(_email, _password);
-        await _saveUserDataToPrefs(prefs, userData);
+
+        // 4. Stocker les infos dans UserPreferences
+        await userPrefs.setEmail(userData['email'] ?? '');
+        await userPrefs.setNom(userData['nom'] ?? '');
+        await userPrefs.setPrenom(userData['prenom'] ?? '');
+        await userPrefs.setAge(userData['age'] ?? 0);
+        await userPrefs.setIsLogged(true);
+
+        // 5. Sauvegarde des sensibilités si l'API les renvoie
+        // (exemple)
+        if (userData['humidite_min'] != null) {
+          await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
+        }
+        // etc.
+
+        // 6. Navigation
         _navigateToUserPage();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -212,10 +244,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     }
   }
 
+  // ==============================
+  // UI
+  // ==============================
   @override
   Widget build(BuildContext context) {
-
-    // Récupération de l'instance de UserPreferences fournie par le Provider
+    // Récupération de l'instance UserPreferences
     final userPrefs = Provider.of<UserPreferences>(context);
 
     // Taille de l'écran
@@ -226,8 +260,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: const Text(
           'Compte Utilisateur',
-          style:
-              TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -258,7 +291,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction du formulaire de connexion
+  // ==============================
+  // Formulaire de connexion
+  // ==============================
   Widget _buildLoginForm() {
     return Container(
       height: MediaQuery.of(context).size.height,
@@ -296,7 +331,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction du formulaire d'inscription
+  // ==============================
+  // Formulaire d'inscription
+  // ==============================
   Widget _buildSignUpForm(UserPreferences userPrefs) {
     return Card(
       elevation: 12,
@@ -323,14 +360,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 const SizedBox(height: 20),
                 _buildPasswordField(),
                 const SizedBox(height: 30),
-                _buildSensibilityFields(userPrefs), 
+                _buildSensibilityFields(userPrefs),
                 const SizedBox(height: 30),
                 Center(child: _buildSubmitButton('Inscription', _registerUser)),
                 const SizedBox(height: 20),
                 Center(
-                  child: _buildToggleFormButton(
-                    'Déjà un compte ? Connectez-vous'
-                  ),
+                  child: _buildToggleFormButton('Déjà un compte ? Connectez-vous'),
                 ),
               ],
             ),
@@ -340,7 +375,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction des champs de sensibilité
+  // ==============================
+  // Sensibilité
+  // ==============================
   Widget _buildSensibilityFields(UserPreferences userPrefs) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +406,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction des champs de température
+  // ==============================
+  // Champs de température
+  // ==============================
   Widget _buildTemperatureFields(UserPreferences userPrefs) {
     final tempUnit = userPrefs.preferredTemperatureUnit;
     late String tempUnitLabel;
@@ -384,6 +423,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         tempUnitLabel = 'K';
         break;
     }
+
     return Row(
       children: [
         Expanded(
@@ -427,13 +467,13 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Température invalide';
               }
 
+              // Vérifier min < max
               if (_tempMinController.text.isNotEmpty) {
                 final minVal = int.tryParse(_tempMinController.text);
                 if (minVal != null && maxVal < minVal) {
-                  return 'La température maximale doit être >= à la minimale';
+                  return 'La température max doit être >= à la min';
                 }
               }
-
               return null;
             },
             onSaved: (value) => _temperature_max = Temperature(int.parse(value!), tempUnit),
@@ -443,7 +483,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction des champs d'humidité
+  // ==============================
+  // Champs d'humidité
+  // ==============================
   Widget _buildHumidityFields(UserPreferences userPrefs) {
     final humidityUnit = userPrefs.preferredHumidityUnit;
     late String humidityUnitLabel;
@@ -499,13 +541,13 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Humidité invalide';
               }
 
+              // Vérifier min < max
               if (_humidityMinController.text.isNotEmpty) {
                 final minVal = double.tryParse(_humidityMinController.text);
                 if (minVal != null && maxVal < minVal) {
-                  return 'L\'humidité maximale doit être >= à la minimale';
+                  return 'L\'humidité max doit être >= à la min';
                 }
               }
-
               return null;
             },
             onSaved: (value) => _humidity_max = Humidity(double.parse(value!), humidityUnit),
@@ -515,7 +557,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction des champs de pression
+  // ==============================
+  // Champs de pression
+  // ==============================
   Widget _buildPressureFields(UserPreferences userPrefs) {
     final pressureUnit = userPrefs.preferredPressureUnit;
     late String pressureUnitLabel;
@@ -580,13 +624,13 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Pression invalide';
               }
 
+              // Vérifier min < max
               if (_pressureMinController.text.isNotEmpty) {
                 final minVal = double.tryParse(_pressureMinController.text);
                 if (minVal != null && maxVal < minVal) {
-                  return 'La pression maximale doit être >= à la minimale';
+                  return 'La pression max doit être >= à la min';
                 }
               }
-
               return null;
             },
             onSaved: (value) => _pressure_max = Pressure(double.parse(value!), pressureUnit),
@@ -596,7 +640,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction des champs de précipitations
+  // ==============================
+  // Champs de précipitations
+  // ==============================
   Widget _buildPrecipitationFields(UserPreferences userPrefs) {
     final precipitationUnit = userPrefs.preferredPrecipitationUnit;
     late String precipitationUnitLabel;
@@ -611,6 +657,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         precipitationUnitLabel = 'l/m²';
         break;
     }
+
     return Row(
       children: [
         Expanded(
@@ -628,7 +675,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
               if (value == null || value.isEmpty) return 'Requis';
               final val = double.tryParse(value);
               if (val == null || !Precipitation.isValidPrecipitation(val, precipitationUnit)) {
-                return 'Précipitations invalide';
+                return 'Précipitations invalides';
               }
               return null;
             },
@@ -651,16 +698,16 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
               if (value == null || value.isEmpty) return 'Requis';
               final maxVal = double.tryParse(value);
               if (maxVal == null || !Precipitation.isValidPrecipitation(maxVal, precipitationUnit)) {
-                return 'Précipitations invalide';
+                return 'Précipitations invalides';
               }
 
+              // Vérifier min < max
               if (_precipitationMinController.text.isNotEmpty) {
                 final minVal = double.tryParse(_precipitationMinController.text);
                 if (minVal != null && maxVal < minVal) {
-                  return 'Les précipitations maximales doivent être >= aux minimales';
+                  return 'Les précipitations max doivent être >= min';
                 }
               }
-
               return null;
             },
             onSaved: (value) => _precipitation_max = Precipitation(double.parse(value!), precipitationUnit),
@@ -670,7 +717,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction des champs de vent
+  // ==============================
+  // Champs de vent
+  // ==============================
   Widget _buildWindFields(UserPreferences userPrefs) {
     final windUnit = userPrefs.preferredWindUnit;
     late String windUnitLabel;
@@ -691,6 +740,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         windUnitLabel = 'nœuds';
         break;
     }
+
     return Row(
       children: [
         Expanded(
@@ -734,13 +784,13 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Vitesse du vent invalide';
               }
 
+              // Vérifier min < max
               if (_windMinController.text.isNotEmpty) {
-                final minVal = double.tryParse(_windMinController.text);
+                final minVal = int.tryParse(_windMinController.text);
                 if (minVal != null && maxVal < minVal) {
-                  return 'La vitesse du vent maximale doit être >= à la minimale';
+                  return 'La vitesse du vent max doit être >= à la min';
                 }
               }
-
               return null;
             },
             onSaved: (value) => _wind_max = WindSpeed(int.parse(value!), windUnit),
@@ -750,7 +800,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction du champ d'UV
+  // ==============================
+  // Champ d'UV
+  // ==============================
   Widget _buildUVField() {
     return TextFormField(
       decoration: InputDecoration(
@@ -773,7 +825,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Fonctions communes pour le formulaire de connexion et d'inscription
+  // ==============================
+  // Champs communs
+  // ==============================
   Widget _buildAgeField() {
     return TextFormField(
       decoration: InputDecoration(
@@ -787,7 +841,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un âge';
         if (!Age.isValidAge(int.parse(value))) {
-          return 'L\'âge doit être compris entre 0 et 120 ans';
+          return 'L\'âge doit être entre 0 et 120 ans';
         }
         return null;
       },
@@ -820,7 +874,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un email';
         if (!Email.isValidEmail(Email(value))) {
-          return 'Format d\'email invalide. Exemple : exemple@domaine.com';
+          return 'Format d\'email invalide (ex: exemple@domaine.com)';
         }
         return null;
       },
@@ -844,7 +898,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           return 'Veuillez entrer un mot de passe';
         }
         if (!Password.isValidPassword(Password(value))) {
-          return 'Le mot de passe doit comporter au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.\nExemple : Abcdef1!';
+          return 'Le mot de passe doit comporter au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.\nEx: Abcdef1!';
         }
         return null;
       },
@@ -894,6 +948,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     );
   }
 
+  // ==============================
+  // Boutons
+  // ==============================
   Widget _buildSubmitButton(String label, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -907,7 +964,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       child: Text(
         label,
         style: const TextStyle(
-            fontSize: 20, fontFamily: 'Montserrat', color: Colors.white),
+          fontSize: 20,
+          fontFamily: 'Montserrat',
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -918,7 +978,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       child: Text(
         label,
         style: const TextStyle(
-            fontSize: 16, color: Colors.blueAccent, fontFamily: 'Montserrat'),
+          fontSize: 16,
+          color: Colors.blueAccent,
+          fontFamily: 'Montserrat',
+        ),
       ),
     );
   }
