@@ -478,6 +478,7 @@ class _HomePageState extends State<HomePage> {
                         Center(
                           child: Text(
                             '$location',
+                            textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
