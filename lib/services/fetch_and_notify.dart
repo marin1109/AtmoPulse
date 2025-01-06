@@ -44,7 +44,7 @@ WeatherSeverity evaluateHumidity({
 }) {
   if (actualHumidity < minHum) {
     final diff = (minHum - actualHumidity).abs();
-    if (diff > 20) { // Exemple: marge arbitraire
+    if (diff > 20) {
       return WeatherSeverity.critical;
     } else {
       return WeatherSeverity.moderate;
@@ -83,6 +83,36 @@ WeatherSeverity evaluateWind({
   return WeatherSeverity.low;
 }
 
+WeatherSeverity evaluatePrecipitation({
+  required double actualPrecipitation,
+  required double maxPrecipitation,
+}) {
+  if (actualPrecipitation > maxPrecipitation) {
+    final diff = (actualPrecipitation - maxPrecipitation).abs();
+    if (diff > 5) {
+      return WeatherSeverity.critical;
+    } else {
+      return WeatherSeverity.moderate;
+    }
+  }
+  return WeatherSeverity.low;
+}
+
+WeatherSeverity evaluateUV({
+  required double actualUV,
+  required double maxUV,
+}) {
+  if (actualUV > maxUV) {
+    final diff = (actualUV - maxUV).abs();
+    if (diff > 2) {
+      return WeatherSeverity.critical;
+    } else {
+      return WeatherSeverity.moderate;
+    }
+  }
+  return WeatherSeverity.low;
+}
+
 // --- 3. Fonction pour fusionner les sévérités ---
 WeatherSeverity combineSeverities(List<WeatherSeverity> severities) {
   // Si au moins un paramètre est Critical, on renvoie Critical
@@ -107,6 +137,8 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
   final int currentTemp = current.temp.value;       // ex: 23.0
   final double currentHum  = current.humidity.value;   // ex: 55.0
   final int currentWind = current.wind.value;       // ex: 12.0
+  final double currentPrecip = current.precipitation.value; // ex: 0.0
+  final double currentUV = current.uv.value;       // ex: 5.0
 
   // Récupération des min/max de l’utilisateur (déjà chargés via userPrefs)
   final int userTempMin  = prefs.tempMin?.value ?? -50;
@@ -115,7 +147,10 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
   final double userHumMax   = prefs.humidityMax?.value ?? 100;
   final int userWindMin  = prefs.windMin?.value ?? 0;
   final int userWindMax  = prefs.windMax?.value ?? 200;
-
+  final double userPrecipMin = prefs.precipMin?.value ?? 100;
+  final double userPrecipMax = prefs.precipMax?.value ?? 0;
+  final double userUVMax = prefs.uvValue?.value ?? 10;
+  
   // Evaluation séparée
   final tempSeverity = evaluateTemperature(
     actualTemp: currentTemp,
@@ -132,9 +167,17 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
     minWind: userWindMin,
     maxWind: userWindMax,
   );
+  final precipSeverity = evaluatePrecipitation(
+    actualPrecipitation: currentPrecip,
+    maxPrecipitation: userPrecipMax,
+  );
+  final uvSeverity = evaluateUV(
+    actualUV: currentUV,
+    maxUV: userUVMax,
+  );
 
   // Fusion
-  return combineSeverities([tempSeverity, humSeverity, windSeverity]);
+  return combineSeverities([tempSeverity, humSeverity, windSeverity, precipSeverity, uvSeverity]);
 }
 
 // --- 5. La fonction fetchAndNotify ---

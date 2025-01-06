@@ -1,8 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'weather_service.dart';
-import '../utils/user_preferences.dart';
 
 class NotificationService {
   // Instance de FlutterLocalNotificationsPlugin
