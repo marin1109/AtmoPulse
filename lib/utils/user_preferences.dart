@@ -8,7 +8,6 @@ import '../types/fname_type.dart';
 import '../types/age_type.dart';
 import '../types/temperature_type.dart';
 import '../types/wind_type.dart';
-import '../types/pressure_type.dart';
 import '../types/precipitation_type.dart';
 import '../types/humidity_type.dart';
 import '../types/uv_type.dart';
@@ -17,7 +16,6 @@ class UserPreferences extends ChangeNotifier {
   // Unités
   TemperatureUnit _preferredTemperatureUnit = TemperatureUnit.celsius;
   WindUnit _preferredWindUnit = WindUnit.kmh;
-  PressureUnit _preferredPressureUnit = PressureUnit.hPa;
   PrecipitationUnit _preferredPrecipitationUnit = PrecipitationUnit.mm;
   HumidityUnit _preferredHumidityUnit = HumidityUnit.relative;
 
@@ -35,8 +33,6 @@ class UserPreferences extends ChangeNotifier {
   Humidity? _humidityMax;
   Precipitation? _precipMin;
   Precipitation? _precipMax;
-  Pressure? _pressureMin;
-  Pressure? _pressureMax;
   Temperature? _tempMin;
   Temperature? _tempMax;
   WindSpeed? _windMin;
@@ -52,7 +48,6 @@ class UserPreferences extends ChangeNotifier {
   // ==============================
   TemperatureUnit get preferredTemperatureUnit => _preferredTemperatureUnit;
   WindUnit get preferredWindUnit => _preferredWindUnit;
-  PressureUnit get preferredPressureUnit => _preferredPressureUnit;
   PrecipitationUnit get preferredPrecipitationUnit => _preferredPrecipitationUnit;
   HumidityUnit get preferredHumidityUnit => _preferredHumidityUnit;
 
@@ -67,8 +62,6 @@ class UserPreferences extends ChangeNotifier {
   Humidity? get humidityMax => _humidityMax;
   Precipitation? get precipMin => _precipMin;
   Precipitation? get precipMax => _precipMax;
-  Pressure? get pressureMin => _pressureMin;
-  Pressure? get pressureMax => _pressureMax;
   Temperature? get tempMin => _tempMin;
   Temperature? get tempMax => _tempMax;
   WindSpeed? get windMin => _windMin;
@@ -89,10 +82,6 @@ class UserPreferences extends ChangeNotifier {
     _preferredWindUnit = WindUnit.values.firstWhere(
       (e) => e.name == (prefs.getString('unite_vitesse') ?? 'kmh'),
       orElse: () => WindUnit.kmh,
-    );
-    _preferredPressureUnit = PressureUnit.values.firstWhere(
-      (e) => e.name == (prefs.getString('unite_pression') ?? 'hPa'),
-      orElse: () => PressureUnit.hPa,
     );
     _preferredPrecipitationUnit = PrecipitationUnit.values.firstWhere(
       (e) => e.name == (prefs.getString('unite_precipitations') ?? 'mm'),
@@ -128,14 +117,6 @@ class UserPreferences extends ChangeNotifier {
     _precipMax = Precipitation(
       prefs.getDouble('precipitations_max') ?? 100.0,
       _preferredPrecipitationUnit
-    );
-    _pressureMin = Pressure(
-      prefs.getDouble('pression_min') ?? 0.0,
-      _preferredPressureUnit
-    );
-    _pressureMax = Pressure(
-      prefs.getDouble('pression_max') ?? 2000.0,
-      _preferredPressureUnit
     );
     _tempMin = Temperature(
       prefs.getInt('temperature_min') ?? -50,
@@ -175,9 +156,6 @@ class UserPreferences extends ChangeNotifier {
     if (!prefs.containsKey('unite_vitesse')) {
       await prefs.setString('unite_vitesse', WindUnit.kmh.name);
     }
-    if (!prefs.containsKey('unite_pression')) {
-      await prefs.setString('unite_pression', PressureUnit.hPa.name);
-    }
     if (!prefs.containsKey('unite_precipitations')) {
       await prefs.setString('unite_precipitations', PrecipitationUnit.mm.name);
     }
@@ -215,19 +193,6 @@ class UserPreferences extends ChangeNotifier {
     }
     if (_windMax != null) {
       _windMax = WindSpeed(_windMax!.value, _preferredWindUnit);
-    }
-    notifyListeners();
-  }
-
-  Future<void> setPreferredPressureUnit(PressureUnit unit) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('unite_pression', unit.name);
-    _preferredPressureUnit = unit;
-    if (_pressureMin != null) {
-      _pressureMin = Pressure(_pressureMin!.value, _preferredPressureUnit);
-    }
-    if (_pressureMax != null) {
-      _pressureMax = Pressure(_pressureMax!.value, _preferredPressureUnit);
     }
     notifyListeners();
   }
@@ -330,20 +295,6 @@ class UserPreferences extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('precipitations_max', val);
     _precipMax = Precipitation(val, _preferredPrecipitationUnit);
-    notifyListeners();
-  }
-
-  Future<void> setPressureMin(double val) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('pression_min', val);
-    _pressureMin = Pressure(val, _preferredPressureUnit);
-    notifyListeners();
-  }
-
-  Future<void> setPressureMax(double val) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('pression_max', val);
-    _pressureMax = Pressure(val, _preferredPressureUnit);
     notifyListeners();
   }
 

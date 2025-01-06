@@ -5,7 +5,6 @@ import 'lname_type.dart';
 import 'fname_type.dart';
 import 'humidity_type.dart';
 import 'precipitation_type.dart';
-import 'pressure_type.dart';
 import 'temperature_type.dart';
 import 'uv_type.dart';
 import 'wind_type.dart';
@@ -20,8 +19,6 @@ class User {
   final Humidity _humidity_min;
   final Precipitation _precipitation_max;
   final Precipitation _precipitation_min;
-  final Pressure _pressure_max;
-  final Pressure _pressure_min;
   final Temperature _temperature_max;
   final Temperature _temperature_min;
   final UV _uv_max;
@@ -38,8 +35,6 @@ class User {
       this._humidity_min,
       this._precipitation_max,
       this._precipitation_min,
-      this._pressure_max,
-      this._pressure_min,
       this._temperature_max,
       this._temperature_min,
       this._uv_max,
@@ -55,8 +50,6 @@ class User {
   Humidity get humidity_min => _humidity_min;
   Precipitation get precipitation_max => _precipitation_max;
   Precipitation get precipitation_min => _precipitation_min;
-  Pressure get pressure_max => _pressure_max;
-  Pressure get pressure_min => _pressure_min;
   Temperature get temperature_max => _temperature_max;
   Temperature get temperature_min => _temperature_min;
   UV get uv_max => _uv_max;

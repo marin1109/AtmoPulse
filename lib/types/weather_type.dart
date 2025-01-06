@@ -3,7 +3,6 @@ import 'package:AtmoPulse/types/uv_type.dart';
 
 import 'humidity_type.dart';
 import 'precipitation_type.dart';
-import 'pressure_type.dart';
 import 'temperature_type.dart';
 import 'wind_type.dart';
 import 'latitude_type.dart';
@@ -99,7 +98,6 @@ class Location {
 class CurrentWeather {
   final Temperature temp;
   final WindSpeed wind;
-  final Pressure pressure;
   final Precipitation precipitation;
   final Humidity humidity;
   final Condition condition;
@@ -108,7 +106,6 @@ class CurrentWeather {
   CurrentWeather({
     required this.temp,
     required this.wind,
-    required this.pressure,
     required this.precipitation,
     required this.humidity,
     required this.condition,
@@ -119,7 +116,6 @@ class CurrentWeather {
     return CurrentWeather(
       temp: Temperature(json['temp_c'].toInt(), TemperatureUnit.celsius),
       wind: WindSpeed(json['wind_kph'].toInt(), WindUnit.kmh),
-      pressure: Pressure(json['pressure_mb'].toDouble(), PressureUnit.hPa),
       precipitation:
           Precipitation(json['precip_mm'].toDouble(), PrecipitationUnit.mm),
       humidity: Humidity(json['humidity'].toDouble(), HumidityUnit.relative),
@@ -132,7 +128,6 @@ class CurrentWeather {
     return {
       'temp_c': temp.value,
       'wind_kph': wind.value,
-      'pressure_mb': pressure.value,  
       'precip_mm': precipitation.value,
       'humidity': humidity.value,
       'uv': uv.value,

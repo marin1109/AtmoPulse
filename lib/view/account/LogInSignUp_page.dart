@@ -15,7 +15,6 @@ import '../../types/fname_type.dart';
 import '../../types/age_type.dart';
 import '../../types/temperature_type.dart';
 import '../../types/humidity_type.dart';
-import '../../types/pressure_type.dart';
 import '../../types/precipitation_type.dart';
 import '../../types/wind_type.dart';
 import '../../types/uv_type.dart';
@@ -58,8 +57,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   late Humidity _humidity_max;
   late Precipitation _precipitation_min;
   late Precipitation _precipitation_max;
-  late Pressure _pressure_min;
-  late Pressure _pressure_max;
   late Temperature _temperature_min;
   late Temperature _temperature_max;
   late WindSpeed _wind_min;
@@ -134,9 +131,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         await userPrefs.setPreferredHumidityUnit(
           Humidity.stringToHumidityUnit(data['unite_humidite']),
         );
-        await userPrefs.setPreferredPressureUnit(
-          Pressure.stringToPressureUnit(data['unite_pression']),
-        );
         await userPrefs.setPreferredPrecipitationUnit(
           Precipitation.stringToPrecipitationUnit(data['unite_precipitations']),
         );
@@ -198,8 +192,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           humidity_max: _humidity_max,
           precipitation_min: _precipitation_min,
           precipitation_max: _precipitation_max,
-          pressure_min: _pressure_min,
-          pressure_max: _pressure_max,
           temperature_min: _temperature_min,
           temperature_max: _temperature_max,
           wind_min: _wind_min,
@@ -213,7 +205,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           userPrefs.preferredTemperatureUnit,
           userPrefs.preferredWindUnit,
           userPrefs.preferredHumidityUnit,
-          userPrefs.preferredPressureUnit,
           userPrefs.preferredPrecipitationUnit,
         );
 
@@ -395,8 +386,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         const SizedBox(height: 20),
         _buildHumidityFields(userPrefs),
         const SizedBox(height: 20),
-        _buildPressureFields(userPrefs),
-        const SizedBox(height: 20),
         _buildPrecipitationFields(userPrefs),
         const SizedBox(height: 20),
         _buildWindFields(userPrefs),
@@ -551,89 +540,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
               return null;
             },
             onSaved: (value) => _humidity_max = Humidity(double.parse(value!), humidityUnit),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ==============================
-  // Champs de pression
-  // ==============================
-  Widget _buildPressureFields(UserPreferences userPrefs) {
-    final pressureUnit = userPrefs.preferredPressureUnit;
-    late String pressureUnitLabel;
-    switch (pressureUnit) {
-      case PressureUnit.hPa:
-        pressureUnitLabel = 'hPa';
-        break;
-      case PressureUnit.atm:
-        pressureUnitLabel = 'atm';
-        break;
-      case PressureUnit.psi:
-        pressureUnitLabel = 'psi';
-        break;
-      case PressureUnit.Pa:
-        pressureUnitLabel = 'Pa';
-        break;
-      case PressureUnit.mmHg:
-        pressureUnitLabel = 'mmHg';
-        break;
-    }
-
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: _pressureMinController,
-            decoration: InputDecoration(
-              labelText: 'Pression min ($pressureUnitLabel)',
-              prefixIcon: const Icon(Icons.speed, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final val = double.tryParse(value);
-              if (val == null || !Pressure.isValidPressure(val, pressureUnit)) {
-                return 'Pression invalide';
-              }
-              return null;
-            },
-            onSaved: (value) => _pressure_min = Pressure(double.parse(value!), pressureUnit),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextFormField(
-            controller: _pressureMaxController,
-            decoration: InputDecoration(
-              labelText: 'Pression max ($pressureUnitLabel)',
-              prefixIcon: const Icon(Icons.speed, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = double.tryParse(value);
-              if (maxVal == null || !Pressure.isValidPressure(maxVal, pressureUnit)) {
-                return 'Pression invalide';
-              }
-
-              // Vérifier min < max
-              if (_pressureMinController.text.isNotEmpty) {
-                final minVal = double.tryParse(_pressureMinController.text);
-                if (minVal != null && maxVal < minVal) {
-                  return 'La pression max doit être >= à la min';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) => _pressure_max = Pressure(double.parse(value!), pressureUnit),
           ),
         ),
       ],

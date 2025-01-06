@@ -382,8 +382,6 @@ class _UserPageState extends State<UserPage> {
     // Exemple de récupération de vos sensibilités (valeurs brutes)
     final humidityMin = userPrefs.humidityMin?.value ?? 0.0;
     final humidityMax = userPrefs.humidityMax?.value ?? 100.0;
-    final pressureMin = userPrefs.pressureMin?.value ?? 0.0;
-    final pressureMax = userPrefs.pressureMax?.value ?? 2000.0;
     final temperatureMin = userPrefs.tempMin?.value ?? -50;
     final temperatureMax = userPrefs.tempMax?.value ?? 50;
     final windMin = userPrefs.windMin?.value ?? 0; 
@@ -490,8 +488,6 @@ class _UserPageState extends State<UserPage> {
                         '$temperatureMin / $temperatureMax', Icons.thermostat),
                     _buildInfoRow('Humidité min/max',
                         '$humidityMin / $humidityMax', Icons.water),
-                    _buildInfoRow('Pression min/max',
-                        '$pressureMin / $pressureMax', Icons.speed),
                     _buildInfoRow('Précipitations min/max',
                         '${userPrefs.precipMin?.value ?? 0} / ${userPrefs.precipMax?.value ?? 100}',
                         Icons.water_drop),

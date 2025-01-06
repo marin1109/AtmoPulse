@@ -4,7 +4,6 @@ import 'dart:convert';
 // Package imports
 import 'package:AtmoPulse/types/humidity_type.dart';
 import 'package:AtmoPulse/types/precipitation_type.dart';
-import 'package:AtmoPulse/types/pressure_type.dart';
 import 'package:AtmoPulse/types/temperature_type.dart';
 import 'package:AtmoPulse/types/uv_type.dart';
 import 'package:AtmoPulse/types/wind_type.dart';
@@ -32,8 +31,6 @@ Future<void> addUser(
   required Humidity humidity_max,
   required Precipitation precipitation_min,
   required Precipitation precipitation_max,
-  required Pressure pressure_min,
-  required Pressure pressure_max,
   required Temperature temperature_min,
   required Temperature temperature_max,
   required WindSpeed wind_min,
@@ -56,8 +53,6 @@ Future<void> addUser(
         'humidite_max': humidity_max.value,
         'precipitations_min': precipitation_min.value,
         'precipitations_max': precipitation_max.value,
-        'pression_min': pressure_min.value,
-        'pression_max': pressure_max.value,
         'temperature_min': temperature_min.value,
         'temperature_max': temperature_max.value,
         'vent_min': wind_min.value,
@@ -153,7 +148,6 @@ Future<void> updatePreferencesUnit(
   TemperatureUnit? uniteTemperature,
   WindUnit? uniteVent,
   HumidityUnit? uniteHumidite,
-  PressureUnit? unitePression,
   PrecipitationUnit? unitePrecipitations,
 ) async {
   final url = Uri.parse('$apiBaseUrl/update_preferences_unite');
@@ -166,7 +160,6 @@ Future<void> updatePreferencesUnit(
         'unite_temperature': uniteTemperature?.name,
         'unite_vent': uniteVent?.name,
         'unite_humidite': uniteHumidite?.name,
-        'unite_pression': unitePression?.name,
         'unite_precipitations': unitePrecipitations?.name,
       },
     }),

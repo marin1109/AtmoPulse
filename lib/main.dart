@@ -9,8 +9,7 @@ import 'dart:io' show Platform;
 import 'services/notification_service.dart';
 import 'utils/user_preferences.dart';
 import 'view/home/home_page.dart';
-
-// Import des types
+import 'services/fetch_and_notify.dart';
 
 /// 1. Callback "headless" pour background_fetch (Android lorsque l’appli est tuée).
 @pragma('vm:entry-point')
@@ -23,11 +22,7 @@ Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
     return;
   }
 
-  // TODO: Votre logique de background
-  // Ex.: NotificationService().showNotification(
-  //   title: "Météo",
-  //   body: "Limites dépassées !",
-  // );
+  await fetchAndNotify();
 
   BackgroundFetch.finish(taskId);
 }
@@ -109,7 +104,7 @@ class _MyAppState extends State<MyApp> {
 
   /// Callback standard quand background_fetch se déclenche
   void _onBackgroundFetch(String taskId) async {
-    // TODO: Votre logique de fetch météo, etc.
+    await fetchAndNotify();
 
     BackgroundFetch.finish(taskId);
   }

@@ -9,7 +9,6 @@ import '../../utils/user_preferences.dart';
 // Types
 import '../../types/humidity_type.dart';
 import '../../types/precipitation_type.dart';
-import '../../types/pressure_type.dart';
 import '../../types/temperature_type.dart';
 import '../../types/wind_type.dart';
 
@@ -27,13 +26,6 @@ class PreferencesPage extends StatelessWidget {
     WindUnit.mph,
     WindUnit.fts,
     WindUnit.knots,
-  ];
-  static const List<PressureUnit> _pressureUnits = [
-    PressureUnit.hPa,
-    PressureUnit.atm,
-    PressureUnit.psi,
-    PressureUnit.Pa,
-    PressureUnit.mmHg,
   ];
   static const List<PrecipitationUnit> _precipitationUnits = [
     PrecipitationUnit.inches,
@@ -111,29 +103,6 @@ class PreferencesPage extends StatelessWidget {
                           value: value,
                           child: Text(
                             WindSpeed.unitToString(value),
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 16,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  _buildPreferenceSection(
-                    title: 'Unité de Pression',
-                    child: DropdownButton<PressureUnit>(
-                      value: prefs.preferredPressureUnit,
-                      onChanged: (PressureUnit? newValue) {
-                        if (newValue != null) {
-                          prefs.setPreferredPressureUnit(newValue);
-                        }
-                      },
-                      items: _pressureUnits.map((PressureUnit value) {
-                        return DropdownMenuItem<PressureUnit>(
-                          value: value,
-                          child: Text(
-                            Pressure.unitToString(value),
                             style: const TextStyle(
                               fontFamily: 'Montserrat',
                               fontSize: 16,
