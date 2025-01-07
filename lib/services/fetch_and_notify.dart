@@ -85,9 +85,17 @@ WeatherSeverity evaluateWind({
 
 WeatherSeverity evaluatePrecipitation({
   required double actualPrecipitation,
+  required double minPrecipitation,
   required double maxPrecipitation,
 }) {
-  if (actualPrecipitation > maxPrecipitation) {
+  if (actualPrecipitation < minPrecipitation) {
+    final diff = (minPrecipitation - actualPrecipitation).abs();
+    if (diff > 5) {
+      return WeatherSeverity.critical;
+    } else {
+      return WeatherSeverity.moderate;
+    }
+  } else if (actualPrecipitation > maxPrecipitation) {
     final diff = (actualPrecipitation - maxPrecipitation).abs();
     if (diff > 5) {
       return WeatherSeverity.critical;
@@ -169,6 +177,7 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
   );
   final precipSeverity = evaluatePrecipitation(
     actualPrecipitation: currentPrecip,
+    minPrecipitation: userPrecipMin,
     maxPrecipitation: userPrecipMax,
   );
   final uvSeverity = evaluateUV(
