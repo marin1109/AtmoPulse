@@ -15,6 +15,14 @@ import '../../types/wind_type.dart';
 class PreferencesPage extends StatelessWidget {
   const PreferencesPage({super.key});
 
+  static const Map<int, String> intervalsMap = {
+    15:  '15 minutes',
+    30:  '30 minutes',
+    60:  '1 heure',
+    120: '2 heures',
+    240: '4 heures',
+    480: '8 heures',
+  };
   static const List<TemperatureUnit> _temperatureUnits = [
     TemperatureUnit.celsius,
     TemperatureUnit.fahrenheit,
@@ -154,6 +162,24 @@ class PreferencesPage extends StatelessWidget {
                               fontSize: 16,
                             ),
                           ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  if (prefs.isLogged)
+                  _buildPreferenceSection(
+                    title: "Fréquence de mise à jour",
+                    child: DropdownButton<int>(
+                      value: prefs.fetchIntervalInMinutes,
+                      onChanged: (int? newVal) async {
+                        if (newVal != null) {
+                          await prefs.setFetchIntervalInMinutes(newVal);
+                        }
+                      },
+                      items: intervalsMap.entries.map((entry) {
+                        return DropdownMenuItem<int>(
+                          value: entry.key,
+                          child: Text(entry.value),
                         );
                       }).toList(),
                     ),

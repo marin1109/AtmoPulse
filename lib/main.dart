@@ -69,6 +69,10 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _configureBackgroundFetch();
+    final userPrefs = Provider.of<UserPreferences>(context, listen: false);
+    userPrefs.addListener(() {
+      _configureBackgroundFetch();
+    });
   }
 
   /// Configuration de background_fetch
@@ -85,10 +89,13 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
+    final fetchInterval = 
+        Provider.of<UserPreferences>(context, listen: false).fetchIntervalInMinutes;
+
     try {
       await BackgroundFetch.configure(
         BackgroundFetchConfig(
-          minimumFetchInterval: 15, // en minutes
+          minimumFetchInterval: fetchInterval,
           stopOnTerminate: false,
           startOnBoot: true,
           enableHeadless: true,
@@ -96,7 +103,7 @@ class _MyAppState extends State<MyApp> {
         _onBackgroundFetch,
         _onBackgroundFetchTimeout,
       );
-      print('[BackgroundFetch] configure success');
+      print('[BackgroundFetch] configure success avec intervalle = $fetchInterval min');
     } catch (e) {
       print('[BackgroundFetch] configure ERROR: $e');
     }

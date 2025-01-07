@@ -39,6 +39,9 @@ class UserPreferences extends ChangeNotifier {
   WindSpeed? _windMax;
   UV? _uvValue;
 
+  // Interval de fetch
+  int _fetchIntervalInMinutes = 15;
+
   UserPreferences() {
     loadPreferences();
   }
@@ -68,13 +71,14 @@ class UserPreferences extends ChangeNotifier {
   WindSpeed? get windMax => _windMax;
   UV? get uvValue => _uvValue;
 
+  int get fetchIntervalInMinutes => _fetchIntervalInMinutes;
+
   // ==============================
-  // Méthodes de chargement (inchangées)
+  // Méthodes de chargement
   // ==============================
   Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Chargement des unités
     _preferredTemperatureUnit = TemperatureUnit.values.firstWhere(
       (e) => e.name == (prefs.getString('unite_temperature') ?? 'celsius'),
       orElse: () => TemperatureUnit.celsius,
@@ -92,16 +96,13 @@ class UserPreferences extends ChangeNotifier {
       orElse: () => HumidityUnit.relative,
     );
 
-    // Indicateur de connexion
     _isLogged = prefs.getBool('isLogged') ?? false;
 
-    // Données utilisateur de base
     _email = Email(prefs.getString('email') ?? '');
     _nom = LName(prefs.getString('nom') ?? '');
     _prenom = FName(prefs.getString('prenom') ?? '');
     _age = Age(prefs.getInt('age') ?? 0);
 
-    // Sensibilités
     _humidityMin = Humidity(
       prefs.getDouble('humidite_min') ?? 0.0,
       _preferredHumidityUnit
@@ -127,8 +128,6 @@ class UserPreferences extends ChangeNotifier {
       _preferredTemperatureUnit
     );
 
-    // Ici on stocke vent_min et vent_max en double. 
-    // Donc on fait un getDouble, et on instancie WindSpeed avec double (à adapter si vous souhaitez un int).
     _windMin = WindSpeed(
       (prefs.getInt('vent_min') ?? 0), 
       _preferredWindUnit
@@ -138,10 +137,11 @@ class UserPreferences extends ChangeNotifier {
       _preferredWindUnit
     );
 
-    // L'UV est stocké sous forme de double
     _uvValue = UV(
       prefs.getDouble('uv') ?? 0.0
     );
+
+    _fetchIntervalInMinutes = prefs.getInt('fetchIntervalInMinutes') ?? 15;
 
     notifyListeners();
   }
@@ -173,8 +173,6 @@ class UserPreferences extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('unite_temperature', unit.name);
     _preferredTemperatureUnit = unit;
-    // Réinstancier aussi les valeurs existantes de _tempMin/_tempMax 
-    // (optionnel, si vous voulez immédiatement refléter la nouvelle unité)
     if (_tempMin != null) {
       _tempMin = Temperature(_tempMin!.value, _preferredTemperatureUnit);
     }
@@ -268,8 +266,6 @@ class UserPreferences extends ChangeNotifier {
   // Setters pour les sensibilités
   // ==============================
 
-  /// Stocke l'humidité min en double, 
-  /// et réinstancie `_humidityMin = Humidity(val, _preferredHumidityUnit)`.
   Future<void> setHumidityMin(double val) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('humidite_min', val);
@@ -298,8 +294,6 @@ class UserPreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Ici, on stocke la température min en int dans SharedPreferences,
-  /// puis on crée un objet `Temperature`.
   Future<void> setTempMin(int val) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('temperature_min', val);
@@ -314,8 +308,6 @@ class UserPreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Si vous voulez stocker le vent en double, 
-  /// alors assurez-vous que `WindSpeed` accepte un double.
   Future<void> setWindMin(int val) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('vent_min', val);
@@ -330,11 +322,17 @@ class UserPreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Si vous souhaitez un UV en double, vous pouvez le stocker en double.
   Future<void> setUV(double val) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('uv', val);
     _uvValue = UV(val);
+    notifyListeners();
+  }
+
+  Future<void> setFetchIntervalInMinutes(int val) async {
+    final prefs = await SharedPreferences.getInstance();
+    _fetchIntervalInMinutes = val;
+    await prefs.setInt('fetchIntervalInMinutes', val);
     notifyListeners();
   }
 
@@ -344,7 +342,7 @@ class UserPreferences extends ChangeNotifier {
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    await loadPreferences(); // recharge depuis zéro
+    await loadPreferences();
     notifyListeners();
   }
 }
