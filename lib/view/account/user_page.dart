@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Types
-import '../../types/password_type.dart';
-
 // Page d'authentification
-import 'LogInSignUp_page.dart';
+import 'log_in_sign_up_page.dart';
 
 // UserPreferences
 import '../../utils/user_preferences.dart';
-
-// Services (optionnel si vous gérez changement de mdp, suppression de compte, etc.)
-import '../../services/account_service.dart';
 
 // Dialogs
 import '../dialogs/editPreferences_dialog.dart';
 import '../dialogs/changePassword_dialog.dart';
 import '../dialogs/deleteAccount_dialog.dart';
+import '../dialogs/logout_dialog.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -42,20 +37,6 @@ class _UserPageState extends State<UserPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LSPage()),
-    );
-  }
-
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: Colors.transparent,
-          child: contentBox(context),
-        );
-      },
     );
   }
 
@@ -196,7 +177,14 @@ class _UserPageState extends State<UserPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _confirmLogout(context),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const LogoutDialog();
+                },
+              );
+            },
             tooltip: 'Déconnexion',
           ),
           PopupMenuButton<int>(

@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import '../../types/password_type.dart';
 import '../../utils/user_preferences.dart';
 import '../../services/account_service.dart';
-import '../account/LogInSignUp_page.dart';
+import '../account/log_in_sign_up_page.dart';
 
 class DeleteAccountDialog extends StatefulWidget {
-  const DeleteAccountDialog({Key? key}) : super(key: key);
+  const DeleteAccountDialog({super.key});
 
   @override
   _DeleteAccountDialogState createState() => _DeleteAccountDialogState();

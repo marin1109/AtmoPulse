@@ -11,7 +11,7 @@ import '../../services/account_service.dart';
 
 import '../../utils/user_preferences.dart';
 
-import '../account/LogInSignUp_page.dart';
+import '../account/log_in_sign_up_page.dart';
 import '../account/user_page.dart';
 import '../settings/preferences_page.dart';
 

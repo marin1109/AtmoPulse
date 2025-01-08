@@ -5,7 +5,7 @@ import '../../utils/user_preferences.dart';
 import '../../services/account_service.dart';
 
 class ChangePasswordDialog extends StatefulWidget {
-  const ChangePasswordDialog({Key? key}) : super(key: key);
+  const ChangePasswordDialog({super.key});
 
   @override
   _ChangePasswordDialogState createState() => _ChangePasswordDialogState();
