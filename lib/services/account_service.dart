@@ -106,7 +106,7 @@ Future<void> updatePassword(Email email, Password oldPassword, Password newPassw
     url,
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
-      'email': email,
+      'email': email.toString(),
       'old_password': oldPassword.toString(),
       'new_password': newPassword.toString(),
     }),
