@@ -13,7 +13,6 @@ class EditPreferencesDialog extends StatefulWidget {
 class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
   final _editPrefsFormKey = GlobalKey<FormState>();
 
-  // Champs de texte
   final tempMinController = TextEditingController();
   final tempMaxController = TextEditingController();
   final humidityMinController = TextEditingController();
@@ -68,7 +67,6 @@ class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
               ),
             ],
           ),
-          // Le corps de la dialog
           child: Form(
             key: _editPrefsFormKey,
             child: SingleChildScrollView(
@@ -287,7 +285,6 @@ class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
                       TextButton(
                         onPressed: () async {
                           if (_editPrefsFormKey.currentState!.validate()) {
-                            // 1. Récupérer les valeurs saisies
                             final newTempMin = int.parse(tempMinController.text);
                             final newTempMax = int.parse(tempMaxController.text);
                             final newHumidityMin = double.parse(humidityMinController.text);
@@ -298,7 +295,6 @@ class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
                             final newWindMax = int.parse(windMaxController.text);
                             final newUvValue = double.parse(uvMinController.text);
 
-                            // 2. Mettre à jour localement (SharedPreferences)
                             await userPrefs.setTempMin(newTempMin);
                             await userPrefs.setTempMax(newTempMax);
                             await userPrefs.setHumidityMin(newHumidityMin);
@@ -309,10 +305,8 @@ class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
                             await userPrefs.setWindMax(newWindMax);
                             await userPrefs.setUV(newUvValue);
 
-                            // 3. Mettre à jour aussi dans la base de données
                             try {
-                              // On récupère l'email de l'utilisateur actuel
-                              final userEmail = userPrefs.email; // Email type
+                              final userEmail = userPrefs.email;
                               await updateSensibilites(
                                 userEmail,
                                 humiditeMin: newHumidityMin,
@@ -326,10 +320,8 @@ class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
                                 uv: newUvValue,
                               );
 
-                              // Success: On ferme la dialog
                               Navigator.of(context).pop();
                             } catch (e) {
-                              // En cas d'erreur, vous pouvez afficher un SnackBar ou un AlertDialog
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Erreur lors de la mise à jour: $e')),
                               );

@@ -1,12 +1,11 @@
-// logout_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/user_preferences.dart';
-import '../account/log_in_sign_up_page.dart'; // Ajustez le chemin si nécessaire
+import '../account/log_in_sign_up_page.dart';
 
 class LogoutDialog extends StatelessWidget {
-  const LogoutDialog({Key? key}) : super(key: key);
+  const LogoutDialog({super.key});
 
   void _logout(BuildContext context) async {
     final userPrefs = Provider.of<UserPreferences>(context, listen: false);
