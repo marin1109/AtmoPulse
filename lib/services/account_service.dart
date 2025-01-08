@@ -144,6 +144,48 @@ Future<void> deleteUser(Email email, Password password) async {
   }
 }
 
+Future<void> updateSensibilites(
+  Email email, {
+  required double humiditeMin,
+  required double humiditeMax,
+  required double precipitationsMin,
+  required double precipitationsMax,
+  required int temperatureMin,
+  required int temperatureMax,
+  required int ventMin,
+  required int ventMax,
+  required double uv,
+}) async {
+  final url = Uri.parse('$apiBaseUrl/update_sensibilites_utilisateur');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email.toString(),
+      'humidite_min': humiditeMin,
+      'humidite_max': humiditeMax,
+      'precipitations_min': precipitationsMin,
+      'precipitations_max': precipitationsMax,
+      'temperature_min': temperatureMin,
+      'temperature_max': temperatureMax,
+      'vent_min': ventMin,
+      'vent_max': ventMax,
+      'uv': uv,
+    }),
+  );
+
+  print('Status Code (updateSensibilites): ${response.statusCode}');
+  print('Response Body (updateSensibilites): ${response.body}');
+
+  if (response.statusCode == 200) {
+    print('Sensibilités mises à jour avec succès dans la DB.');
+  } else {
+    throw Exception(
+      'Erreur lors de la mise à jour des sensibilités: ${response.body}',
+    );
+  }
+}
+
 // Fonction pour mettre à jour ou ajouter les préférences d'unités
 Future<void> updatePreferencesUnit(
   Email email, 

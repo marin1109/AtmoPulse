@@ -1,5 +1,3 @@
-// LSPage.dart
-
 import 'package:flutter/material.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
@@ -109,17 +107,13 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     if (_loginFormKey.currentState!.validate()) {
       _loginFormKey.currentState!.save();
 
-      // Récupérer l'instance du UserPreferences
       final userPrefs = Provider.of<UserPreferences>(context, listen: false);
 
       try {
-        // 1. Vérifier l'authentification via API
         final userData = await loginUser(_email, _password);
         
-        // 2. Récupération des unités depuis l'API si nécessaire
         final data = await getPreferencesUnit(_email);
         
-        // 3. Mettre à jour les unités
         await userPrefs.setPreferredTemperatureUnit(
           Temperature.stringToTemperatureUnit(data['unite_temperature']),
         );
@@ -192,11 +186,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
     if (_signUpFormKey.currentState!.validate()) {
       _signUpFormKey.currentState!.save();
 
-      // Récupérer l'instance du UserPreferences
       final userPrefs = Provider.of<UserPreferences>(context, listen: false);
 
       try {
-        // 1. Création de l'utilisateur via l'API
         await addUser(
           _name,
           _surname,
@@ -214,7 +206,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           uv: _uvValue,
         );
 
-        // 2. Mettre à jour les unités côté serveur si besoin
         await updatePreferencesUnit(
           _email,
           userPrefs.preferredTemperatureUnit,
@@ -223,17 +214,14 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           userPrefs.preferredPrecipitationUnit,
         );
 
-        // 3. Récupérer à nouveau userData via login (pour avoir ID, etc.)
         final userData = await loginUser(_email, _password);
 
-        // 4. Stocker les infos dans UserPreferences
         await userPrefs.setEmail(userData['email'] ?? '');
         await userPrefs.setNom(userData['nom'] ?? '');
         await userPrefs.setPrenom(userData['prenom'] ?? '');
         await userPrefs.setAge(userData['age'] ?? 0);
         await userPrefs.setIsLogged(true);
 
-        // 5. Sauvegarde des sensibilités si l'API les renvoie
         if (userData['temperature_min'] != null) {
           await userPrefs.setTempMin(userData['temperature_min'].toDouble());
         }
@@ -277,10 +265,8 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   // ==============================
   @override
   Widget build(BuildContext context) {
-    // Récupération de l'instance UserPreferences
     final userPrefs = Provider.of<UserPreferences>(context);
 
-    // Taille de l'écran
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -493,7 +479,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Température invalide';
               }
 
-              // Vérifier min < max
               if (_tempMinController.text.isNotEmpty) {
                 final minVal = int.tryParse(_tempMinController.text);
                 if (minVal != null && maxVal < minVal) {
@@ -567,7 +552,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Humidité invalide';
               }
 
-              // Vérifier min < max
               if (_humidityMinController.text.isNotEmpty) {
                 final minVal = double.tryParse(_humidityMinController.text);
                 if (minVal != null && maxVal < minVal) {
@@ -644,7 +628,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Précipitations invalides';
               }
 
-              // Vérifier min < max
               if (_precipitationMinController.text.isNotEmpty) {
                 final minVal = double.tryParse(_precipitationMinController.text);
                 if (minVal != null && maxVal < minVal) {
@@ -727,7 +710,6 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 return 'Vitesse du vent invalide';
               }
 
-              // Vérifier min < max
               if (_windMinController.text.isNotEmpty) {
                 final minVal = int.tryParse(_windMinController.text);
                 if (minVal != null && maxVal < minVal) {

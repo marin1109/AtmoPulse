@@ -1,5 +1,3 @@
-// user_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +12,11 @@ import '../../utils/user_preferences.dart';
 
 // Services (optionnel si vous gérez changement de mdp, suppression de compte, etc.)
 import '../../services/account_service.dart';
+
+// Dialogs
+import '../dialogs/editPreferences_dialog.dart';
+import '../dialogs/changePassword_dialog.dart';
+import '../dialogs/deleteAccount_dialog.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -494,10 +497,10 @@ class _UserPageState extends State<UserPage> {
                       icon: const Icon(Icons.edit),
                       label: const Text('Modifier mes préférences'),
                       onPressed: () {
-                        // À vous de créer la logique pour éditer
-                        // (ex. showEditPreferencesDialog, ou aller sur une page, etc.)
-                        // Ex.:
-                        // _showEditPreferencesDialog(context);
+                        showDialog(
+                          context: context,
+                          builder: (_) => const EditPreferencesDialog(),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
