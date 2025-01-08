@@ -26,6 +26,9 @@ import '../../types/wind_type.dart';
 import '../../types/precipitation_type.dart';
 import '../../types/humidity_type.dart';
 import '../../types/villeSugg_type.dart';
+import '../../types/city_type.dart';
+import '../../types/region_type.dart';
+import '../../types/country_type.dart';
 
 class CitySearchDelegate extends SearchDelegate<String> {
   final WeatherService weatherService;
@@ -131,7 +134,8 @@ class _HomePageState extends State<HomePage> {
     if (favString != null) {
       final List<dynamic> decoded = jsonDecode(favString);
       setState(() {
-        _favorites = decoded.map((item) => Map<String, String>.from(item)).toList();
+        _favorites =
+            decoded.map((item) => Map<String, String>.from(item)).toList();
       });
     }
   }
@@ -152,6 +156,9 @@ class _HomePageState extends State<HomePage> {
           return {
             'id': fav['id'].toString(),
             'url': fav['ville_url'].toString(),
+            'name': fav['ville_nom']?.toString() ?? 'Inconnu',
+            'region': fav['ville_region_nom']?.toString() ?? 'Inconnue',
+            'country': fav['ville_pays_nom']?.toString() ?? 'Inconnu',
           };
         }).toList();
         setState(() {
@@ -164,14 +171,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _addToFavorites(String name, String cityUrl) async {
+  Future<void> _addToFavorites(City name, String cityUrl,
+      Region villeRegionNom, Country villePaysNom) async {
     final prefs = await SharedPreferences.getInstance();
     final String? storedEmail = prefs.getString('email');
 
     final bool alreadyExists = _favorites.any((item) => item['url'] == cityUrl);
     if (!alreadyExists) {
       setState(() {
-        _favorites.add({'name': name, 'url': cityUrl});
+        _favorites.add({
+          'name': name.name,
+          'url': cityUrl,
+          'region': villeRegionNom.name,
+          'country': villePaysNom.name,
+        });
       });
       await _saveFavoritesLocally();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +198,8 @@ class _HomePageState extends State<HomePage> {
     // Envoi au serveur si loggedIn
     if (storedEmail != null && storedEmail.isNotEmpty) {
       try {
-        await addFavoriteCity(storedEmail, cityUrl);
+        await addFavoriteCity(
+            storedEmail, cityUrl, name, villeRegionNom, villePaysNom);
       } catch (e) {
         print('Erreur côté serveur : $e');
       }
@@ -215,7 +229,9 @@ class _HomePageState extends State<HomePage> {
     final String? storedEmail = prefs.getString('email');
     if (storedEmail == null || storedEmail.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vous devez être connecté pour accéder à vos favoris.')),
+        const SnackBar(
+            content:
+                Text('Vous devez être connecté pour accéder à vos favoris.')),
       );
       return;
     }
@@ -231,10 +247,14 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: _favorites.map((fav) {
-                      final cityName = fav['name'] ?? fav['url'] ?? 'Inconnu';
                       final cityUrl = fav['url'] ?? '';
+                      final cityName = fav['name'] ?? 'Inconnu';
+                      final regionName = fav['region'] ?? 'Inconnue';
+                      final countryName = fav['country'] ?? 'Inconnu';
+
                       return ListTile(
                         title: Text(cityName),
+                        subtitle: Text('$regionName, $countryName'),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () async {
@@ -279,7 +299,9 @@ class _HomePageState extends State<HomePage> {
       _isCustomCity = true;
     });
 
-    final cityName = currentData.location.city.name;
+    final city = currentData.location.city;
+    final cityRegion = currentData.location.region;
+    final cityCountry = currentData.location.country;
     final bool isLoggedIn = await _isUserLoggedIn();
     if (isLoggedIn) {
       showDialog(
@@ -287,7 +309,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context) {
           return AlertDialog(
             title: Text('Ajouter aux favoris ?'),
-            content: Text('Voulez-vous ajouter $cityName à vos favoris ?'),
+            content: Text('Voulez-vous ajouter $city à vos favoris ?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -296,7 +318,8 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  await _addToFavorites(cityName, cityUrl);
+                  await _addToFavorites(
+                      city, cityUrl, cityRegion, cityCountry);
                 },
                 child: const Text('Oui'),
               ),
@@ -318,9 +341,11 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     final String? storedEmail = prefs.getString('email');
     if (storedEmail != null && storedEmail.isNotEmpty) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const UserPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const UserPage()));
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const LSPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const LSPage()));
     }
   }
 
@@ -330,11 +355,13 @@ class _HomePageState extends State<HomePage> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.deniedForever) {
-          print('Les permissions de localisation sont refusées de façon permanente.');
+          print(
+              'Les permissions de localisation sont refusées de façon permanente.');
           return;
         }
       }
-      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
         final position = await locationService.getUserLocation();
         final currentData = await weatherService.fetchCurrentWeather(position);
         final forecastData = await weatherService.fetchWeeklyForecast(position);
@@ -372,10 +399,12 @@ class _HomePageState extends State<HomePage> {
     final String? forecastString = prefs.getString('forecastWeather');
     if (weatherString != null && forecastString != null) {
       final decodedJson = jsonDecode(weatherString) as Map<String, dynamic>;
-      final decodedForecastJson = jsonDecode(forecastString) as Map<String, dynamic>;
+      final decodedForecastJson =
+          jsonDecode(forecastString) as Map<String, dynamic>;
       final locationObj = Location.fromJson(decodedJson['location']);
       final currentObj = CurrentWeather.fromJson(decodedJson['current']);
-      final weeklyForecastObj = ForecastWeather.fromJson(decodedForecastJson['forecast']);
+      final weeklyForecastObj =
+          ForecastWeather.fromJson(decodedForecastJson['forecast']);
       setState(() {
         location = locationObj;
         weatherData = currentObj;
@@ -395,7 +424,8 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             title: const Text(
               'AtmoPulse',
-              style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
             ),
             actions: [
               IconButton(
@@ -403,7 +433,8 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   final cityUrl = await showSearch<String>(
                     context: context,
-                    delegate: CitySearchDelegate(weatherService: weatherService),
+                    delegate:
+                        CitySearchDelegate(weatherService: weatherService),
                   );
                   if (cityUrl != null && cityUrl.isNotEmpty) {
                     await _onCitySelected(cityUrl);
@@ -432,28 +463,36 @@ class _HomePageState extends State<HomePage> {
                       _checkLoginStatus();
                       break;
                     case 'preferences':
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => const PreferencesPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PreferencesPage()));
                       break;
                     case 'contact':
                       showDialog(
                         context: context,
-                        builder: (BuildContext context) => const ContactDialog(),
+                        builder: (BuildContext context) =>
+                            const ContactDialog(),
                       );
                       break;
                     case 'a_propos':
                       showDialog(
                         context: context,
-                        builder: (BuildContext context) => const custom.AboutDialog(),
+                        builder: (BuildContext context) =>
+                            const custom.AboutDialog(),
                       );
                       break;
                   }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(value: 'compte', child: Text('Compte')),
-                  const PopupMenuItem<String>(value: 'preferences', child: Text('Préférences')),
-                  const PopupMenuItem<String>(value: 'a_propos', child: Text('À propos')),
-                  const PopupMenuItem<String>(value: 'contact', child: Text('Contact')),
+                  const PopupMenuItem<String>(
+                      value: 'compte', child: Text('Compte')),
+                  const PopupMenuItem<String>(
+                      value: 'preferences', child: Text('Préférences')),
+                  const PopupMenuItem<String>(
+                      value: 'a_propos', child: Text('À propos')),
+                  const PopupMenuItem<String>(
+                      value: 'contact', child: Text('Contact')),
                 ],
               ),
             ],
@@ -590,7 +629,8 @@ class _HomePageState extends State<HomePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -612,7 +652,8 @@ class _HomePageState extends State<HomePage> {
                                           Text(
                                             Temperature.loadTemperatureText(
                                               day.avgTemp,
-                                              userPreferences.preferredTemperatureUnit,
+                                              userPreferences
+                                                  .preferredTemperatureUnit,
                                             ),
                                             style: const TextStyle(
                                               fontSize: 18,

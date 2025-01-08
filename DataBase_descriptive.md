@@ -61,6 +61,9 @@ ________________________________________________________________________________
 | `id`                  | INT (PK)         | Identifiant unique de la ville favorite.   |
 | `id_utilisateur`      | INT (FK)         | Référence à l'utilisateur.                 |
 | `ville_url`           | VARCHAR(200)     | URL de la ville favorite.                  |
+| `ville_nom`           | VARCHAR(50)      | Nom de la ville favorite.                  |
+| `ville_region_nom`    | VARCHAR(50)      | Nom de la région de la ville favorite.     |
+| `ville_pays_nom`      | VARCHAR(50)      | Nom du pays de la ville favorite.          |
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 **Relation :**
 - `villes_favories.id_utilisateur` est une clé étrangère vers `utilisateurs.id`.

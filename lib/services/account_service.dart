@@ -16,7 +16,9 @@ import '../types/password_type.dart';
 import '../types/fname_type.dart';
 import '../types/lname_type.dart';
 import '../types/age_type.dart';
-
+import '../types/city_type.dart';
+import '../types/region_type.dart';
+import '../types/country_type.dart';
 
 final String apiBaseUrl = dotenv.env['GCLOUD_API_BASE_URL']!;
 
@@ -199,7 +201,7 @@ Future<Map<String, dynamic>> getPreferencesUnit(Email email) async {
 }
 
 // Ajouter une ville favorite
-Future<void> addFavoriteCity(String email, String villeUrl) async {
+Future<void> addFavoriteCity(String email, String villeUrl, City villeNom, Region villeRegionNom, Country villePaysNom) async {
   final url = Uri.parse('$apiBaseUrl/add_favorite_city');
   final response = await http.post(
     url,
@@ -207,6 +209,9 @@ Future<void> addFavoriteCity(String email, String villeUrl) async {
     body: jsonEncode({
       'email': email,
       'ville_url': villeUrl,
+      'ville_nom': villeNom.name,
+      'ville_region_nom': villeRegionNom.name,
+      'ville_pays_nom': villePaysNom.name,
     }),
   );
 
