@@ -26,7 +26,6 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     super.initState();
-    // Si besoin, vous pouvez charger autre chose ici
   }
 
   // ==============================
@@ -35,11 +34,7 @@ class _UserPageState extends State<UserPage> {
   void _logout(BuildContext context) async {
     final userPrefs = Provider.of<UserPreferences>(context, listen: false);
 
-    // Option 1 : tout effacer des prefs (isLogged, email, etc.)
     await userPrefs.clearAll();
-
-    // Option 2 : seulement setIsLogged(false) si vous voulez garder le reste
-    // await userPrefs.setIsLogged(false);
 
     Navigator.pushReplacement(
       context,

@@ -115,12 +115,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       try {
         // 1. Vérifier l'authentification via API
         final userData = await loginUser(_email, _password);
-        // userData = { 'email': ..., 'nom': ..., 'prenom': ..., 'age': ..., etc. }
-
+        
         // 2. Récupération des unités depuis l'API si nécessaire
         final data = await getPreferencesUnit(_email);
-        // data = { 'unite_temperature': 'celsius', 'unite_vent': 'kmh', ... }
-
+        
         // 3. Mettre à jour les unités
         await userPrefs.setPreferredTemperatureUnit(
           Temperature.stringToTemperatureUnit(data['unite_temperature']),
@@ -150,17 +148,34 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setAge(userData['age']);
         }
 
-        // 6. Sauvegarde des sensibilités si l'API les renvoie
-        // (exemple)
+        if (userData['temperature_min'] != null) {
+          await userPrefs.setTempMin(userData['temperature_min'].toDouble());
+        }
+        if (userData['temperature_max'] != null) {
+          await userPrefs.setTempMax(userData['temperature_max'].toDouble());
+        }
         if (userData['humidite_min'] != null) {
           await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
         }
         if (userData['humidite_max'] != null) {
           await userPrefs.setHumidityMax(userData['humidite_max'].toDouble());
         }
-        // etc. pour pression, température, etc.
+        if (userData['precipitations_min'] != null) {
+          await userPrefs.setPrecipMin(userData['precipitations_min'].toDouble());
+        }
+        if (userData['precipitations_max'] != null) {
+          await userPrefs.setPrecipMax(userData['precipitations_max'].toDouble());
+        }
+        if (userData['vent_min'] != null) {
+          await userPrefs.setWindMin(userData['vent_min'].toDouble());
+        }
+        if (userData['vent_max'] != null) {
+          await userPrefs.setWindMax(userData['vent_max'].toDouble());
+        }
+        if (userData['uv'] != null) {
+          await userPrefs.setUV(userData['uv'].toDouble());
+        }
 
-        // 7. Navigation vers la UserPage
         _navigateToUserPage();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -219,11 +234,33 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         await userPrefs.setIsLogged(true);
 
         // 5. Sauvegarde des sensibilités si l'API les renvoie
-        // (exemple)
+        if (userData['temperature_min'] != null) {
+          await userPrefs.setTempMin(userData['temperature_min'].toDouble());
+        }
+        if (userData['temperature_max'] != null) {
+          await userPrefs.setTempMax(userData['temperature_max'].toDouble());
+        }
         if (userData['humidite_min'] != null) {
           await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
         }
-        // etc.
+        if (userData['humidite_max'] != null) {
+          await userPrefs.setHumidityMax(userData['humidite_max'].toDouble());
+        }
+        if (userData['precipitations_min'] != null) {
+          await userPrefs.setPrecipMin(userData['precipitations_min'].toDouble());
+        }
+        if (userData['precipitations_max'] != null) {
+          await userPrefs.setPrecipMax(userData['precipitations_max'].toDouble());
+        }
+        if (userData['vent_min'] != null) {
+          await userPrefs.setWindMin(userData['vent_min'].toDouble());
+        }
+        if (userData['vent_max'] != null) {
+          await userPrefs.setWindMax(userData['vent_max'].toDouble());
+        }
+        if (userData['uv'] != null) {
+          await userPrefs.setUV(userData['uv'].toDouble());
+        }
 
         // 6. Navigation
         _navigateToUserPage();
