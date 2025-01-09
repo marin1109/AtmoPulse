@@ -117,9 +117,9 @@ class CurrentWeather {
       temp: Temperature(json['temp_c'].toInt(), TemperatureUnit.celsius),
       wind: WindSpeed(json['wind_kph'].toInt(), WindUnit.kmh),
       precipitation:
-          Precipitation(json['precip_mm'].toDouble(), PrecipitationUnit.mm),
+          Precipitation(json['precip_mm'].toInt(), PrecipitationUnit.mm),
       humidity: Humidity(json['humidity'].toDouble(), HumidityUnit.relative),
-      uv: UV(json['uv'].toDouble()),
+      uv: UV(json['uv'].toInt()),
       condition: Condition.fromJson(json['condition']),
     );
   }
@@ -188,10 +188,10 @@ class ForecastDay {
       minTemp: Temperature(json['day']['mintemp_c'].toInt(), TemperatureUnit.celsius),
       avgTemp: Temperature(json['day']['avgtemp_c'].toInt(), TemperatureUnit.celsius),
       maxWind: WindSpeed(json['day']['maxwind_kph'].toInt(), WindUnit.kmh),
-      totalPrecipitation: Precipitation(json['day']['totalprecip_mm'].toDouble(), PrecipitationUnit.mm),
+      totalPrecipitation: Precipitation(json['day']['totalprecip_mm'].toInt(), PrecipitationUnit.mm),
       avgHumidity: Humidity(json['day']['avghumidity'].toDouble(), HumidityUnit.relative),
       condition: Condition.fromJson(json['day']['condition']),
-      uv: UV(json['day']['uv'].toDouble()),
+      uv: UV(json['day']['uv'].toInt()),
       );
   }
 

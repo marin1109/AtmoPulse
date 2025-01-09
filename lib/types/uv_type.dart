@@ -1,7 +1,7 @@
 enum UVUnit { UV }
 
 class UV {
-  final double value;
+  final int value;
 
   UV(this.value);
 

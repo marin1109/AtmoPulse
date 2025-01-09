@@ -25,13 +25,11 @@ ________________________________________________________________________________
 | `humidite_min`        | FLOAT            | Humidité minimale souhaitée (en %).            |
 | `temperature_max`     | SMALLINT         | Température maximale souhaitée (en C).         |
 | `temperature_min`     | SMALLINT         | Température minimale souhaitée (en C).         |
-| `pression_max`        | FLOAT            | Pression maximale souhaitée (en hPa).          |
-| `pression_min`        | FLOAT            | Pression minimale souhaitée (en hPa).          |
-| `vent_max`            | FLOAT            | Vitesse du vent maximale souhaitée (en km/h)   |
-| `vent_min`            | FLOAT            | Vitesse du vent minimale souhaitée (en km/h)   |
+| `vent_max`            | SMALLINT         | Vitesse du vent maximale souhaitée (en km/h)   |
+| `vent_min`            | SMALLINT         | Vitesse du vent minimale souhaitée (en km/h)   |
 | `uv`                  | TINYINT          | Index UV maximal souhaité.                     |
-| `precipitations_max`  | FLOAT            | Précipitations maximales souhaitées (en mm).   |
-| `precipitations_min`  | FLOAT            | Précipitations minimales souhaitées (en mm).   |
+| `precipitations_max`  | SMALLINT         | Précipitations maximales souhaitées (en mm).   |
+| `precipitations_min`  | SMALLINT         | Précipitations minimales souhaitées (en mm).   |
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ---
 

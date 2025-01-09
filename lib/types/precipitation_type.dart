@@ -1,42 +1,42 @@
 enum PrecipitationUnit { mm, inches, litersPerSquareMeter }
 
 class Precipitation {
-  final double value;
+  final int value;
   final PrecipitationUnit unit;
 
   Precipitation(this.value, this.unit);
 
   // Conversion en millimètres (mm)
-  double toMillimeters() {
+  int toMillimeters() {
     switch (unit) {
       case PrecipitationUnit.mm:
         return value;
       case PrecipitationUnit.inches:
-        return value * 25.4;
+        return (value * 25.4).round();
       case PrecipitationUnit.litersPerSquareMeter:
         return value;
     }
   }
 
   // Conversion en pouces (inches)
-  double toInches() {
+  int toInches() {
     switch (unit) {
       case PrecipitationUnit.mm:
-        return value / 25.4;
+        return (value / 25.4).round();
       case PrecipitationUnit.inches:
         return value;
       case PrecipitationUnit.litersPerSquareMeter:
-        return value / 25.4;
+        return (value / 25.4).round();
     }
   }
 
   // Conversion en litres par mètre carré (l/m²)
-  double toLitersPerSquareMeter() {
+  int toLitersPerSquareMeter() {
     switch (unit) {
       case PrecipitationUnit.mm:
         return value;
       case PrecipitationUnit.inches:
-        return value * 25.4;
+        return (value * 25.4).round();
       case PrecipitationUnit.litersPerSquareMeter:
         return value;
     }
@@ -91,7 +91,7 @@ class Precipitation {
     }
   }
 
-  static bool isValidPrecipitation(double value, PrecipitationUnit unit) {
+  static bool isValidPrecipitation(int value, PrecipitationUnit unit) {
     Precipitation precipitation = Precipitation(value, unit);
     return precipitation.toMillimeters() >= 0 && precipitation.toMillimeters() <= 305;
   }

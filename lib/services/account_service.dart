@@ -148,13 +148,13 @@ Future<void> updateSensibilites(
   Email email, {
   required double humiditeMin,
   required double humiditeMax,
-  required double precipitationsMin,
-  required double precipitationsMax,
+  required int precipitationsMin,
+  required int precipitationsMax,
   required int temperatureMin,
   required int temperatureMax,
   required int ventMin,
   required int ventMax,
-  required double uv,
+  required int uv,
 }) async {
   final url = Uri.parse('$apiBaseUrl/update_sensibilites_utilisateur');
   final response = await http.post(

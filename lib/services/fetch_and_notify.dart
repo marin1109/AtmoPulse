@@ -84,9 +84,9 @@ WeatherSeverity evaluateWind({
 }
 
 WeatherSeverity evaluatePrecipitation({
-  required double actualPrecipitation,
-  required double minPrecipitation,
-  required double maxPrecipitation,
+  required int actualPrecipitation,
+  required int minPrecipitation,
+  required int maxPrecipitation,
 }) {
   if (actualPrecipitation < minPrecipitation) {
     final diff = (minPrecipitation - actualPrecipitation).abs();
@@ -107,8 +107,8 @@ WeatherSeverity evaluatePrecipitation({
 }
 
 WeatherSeverity evaluateUV({
-  required double actualUV,
-  required double maxUV,
+  required int actualUV,
+  required int maxUV,
 }) {
   if (actualUV > maxUV) {
     final diff = (actualUV - maxUV).abs();
@@ -145,8 +145,8 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
   final int currentTemp = current.temp.value;       // ex: 23.0
   final double currentHum  = current.humidity.value;   // ex: 55.0
   final int currentWind = current.wind.value;       // ex: 12.0
-  final double currentPrecip = current.precipitation.value; // ex: 0.0
-  final double currentUV = current.uv.value;       // ex: 5.0
+  final int currentPrecip = current.precipitation.value; // ex: 0.0
+  final int currentUV = current.uv.value;       // ex: 5.0
 
   // Récupération des min/max de l’utilisateur (déjà chargés via userPrefs)
   final int userTempMin  = prefs.tempMin?.value ?? -50;
@@ -155,9 +155,9 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
   final double userHumMax   = prefs.humidityMax?.value ?? 100;
   final int userWindMin  = prefs.windMin?.value ?? 0;
   final int userWindMax  = prefs.windMax?.value ?? 200;
-  final double userPrecipMin = prefs.precipMin?.value ?? 100;
-  final double userPrecipMax = prefs.precipMax?.value ?? 0;
-  final double userUVMax = prefs.uvValue?.value ?? 10;
+  final int userPrecipMin = prefs.precipMin?.value ?? 100;
+  final int userPrecipMax = prefs.precipMax?.value ?? 0;
+  final int userUVMax = prefs.uvValue?.value ?? 10;
   
   // Evaluation séparée
   final tempSeverity = evaluateTemperature(

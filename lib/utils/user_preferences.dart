@@ -112,11 +112,11 @@ class UserPreferences extends ChangeNotifier {
       _preferredHumidityUnit
     );
     _precipMin = Precipitation(
-      prefs.getDouble('precipitations_min') ?? 0.0,
+      prefs.getInt('precipitations_min') ?? 0,
       _preferredPrecipitationUnit
     );
     _precipMax = Precipitation(
-      prefs.getDouble('precipitations_max') ?? 100.0,
+      prefs.getInt('precipitations_max') ?? 100,
       _preferredPrecipitationUnit
     );
     _tempMin = Temperature(
@@ -138,7 +138,7 @@ class UserPreferences extends ChangeNotifier {
     );
 
     _uvValue = UV(
-      prefs.getDouble('uv') ?? 0.0
+      prefs.getInt('uv') ?? 0
     );
 
     _fetchIntervalInMinutes = prefs.getInt('fetchIntervalInMinutes') ?? 15;
@@ -280,16 +280,16 @@ class UserPreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setPrecipMin(double val) async {
+  Future<void> setPrecipMin(int val) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('precipitations_min', val);
+    await prefs.setInt('precipitations_min', val);
     _precipMin = Precipitation(val, _preferredPrecipitationUnit);
     notifyListeners();
   }
 
-  Future<void> setPrecipMax(double val) async {
+  Future<void> setPrecipMax(int val) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('precipitations_max', val);
+    await prefs.setInt('precipitations_max', val);
     _precipMax = Precipitation(val, _preferredPrecipitationUnit);
     notifyListeners();
   }
@@ -322,9 +322,9 @@ class UserPreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setUV(double val) async {
+  Future<void> setUV(int val) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('uv', val);
+    await prefs.setInt('uv', val);
     _uvValue = UV(val);
     notifyListeners();
   }

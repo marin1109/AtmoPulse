@@ -600,13 +600,13 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
-              final val = double.tryParse(value);
+              final val = int.tryParse(value);
               if (val == null || !Precipitation.isValidPrecipitation(val, precipitationUnit)) {
                 return 'Précipitations invalides';
               }
               return null;
             },
-            onSaved: (value) => _precipitation_min = Precipitation(double.parse(value!), precipitationUnit),
+            onSaved: (value) => _precipitation_min = Precipitation(int.parse(value!), precipitationUnit),
           ),
         ),
         const SizedBox(width: 10),
@@ -623,7 +623,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = double.tryParse(value);
+              final maxVal = int.tryParse(value);
               if (maxVal == null || !Precipitation.isValidPrecipitation(maxVal, precipitationUnit)) {
                 return 'Précipitations invalides';
               }
@@ -636,7 +636,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
               }
               return null;
             },
-            onSaved: (value) => _precipitation_max = Precipitation(double.parse(value!), precipitationUnit),
+            onSaved: (value) => _precipitation_max = Precipitation(int.parse(value!), precipitationUnit),
           ),
         ),
       ],
@@ -746,7 +746,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         }
         return null;
       },
-      onSaved: (value) => _uvValue = UV(double.parse(value!)),
+      onSaved: (value) => _uvValue = UV(int.parse(value!)),
     );
   }
 
