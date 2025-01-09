@@ -143,10 +143,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         }
 
         if (userData['temperature_min'] != null) {
-          await userPrefs.setTempMin(userData['temperature_min'].toDouble());
+          await userPrefs.setTempMin(userData['temperature_min'].toInt());
         }
         if (userData['temperature_max'] != null) {
-          await userPrefs.setTempMax(userData['temperature_max'].toDouble());
+          await userPrefs.setTempMax(userData['temperature_max'].toInt());
         }
         if (userData['humidite_min'] != null) {
           await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
@@ -161,10 +161,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setPrecipMax(userData['precipitations_max'].toDouble());
         }
         if (userData['vent_min'] != null) {
-          await userPrefs.setWindMin(userData['vent_min'].toDouble());
+          await userPrefs.setWindMin(userData['vent_min'].toInt());
         }
         if (userData['vent_max'] != null) {
-          await userPrefs.setWindMax(userData['vent_max'].toDouble());
+          await userPrefs.setWindMax(userData['vent_max'].toInt());
         }
         if (userData['uv'] != null) {
           await userPrefs.setUV(userData['uv'].toDouble());
@@ -223,10 +223,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         await userPrefs.setIsLogged(true);
 
         if (userData['temperature_min'] != null) {
-          await userPrefs.setTempMin(userData['temperature_min'].toDouble());
+          await userPrefs.setTempMin(userData['temperature_min'].toInt());
         }
         if (userData['temperature_max'] != null) {
-          await userPrefs.setTempMax(userData['temperature_max'].toDouble());
+          await userPrefs.setTempMax(userData['temperature_max'].toInt());
         }
         if (userData['humidite_min'] != null) {
           await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
@@ -241,10 +241,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setPrecipMax(userData['precipitations_max'].toDouble());
         }
         if (userData['vent_min'] != null) {
-          await userPrefs.setWindMin(userData['vent_min'].toDouble());
+          await userPrefs.setWindMin(userData['vent_min'].toInt());
         }
         if (userData['vent_max'] != null) {
-          await userPrefs.setWindMax(userData['vent_max'].toDouble());
+          await userPrefs.setWindMax(userData['vent_max'].toInt());
         }
         if (userData['uv'] != null) {
           await userPrefs.setUV(userData['uv'].toDouble());
