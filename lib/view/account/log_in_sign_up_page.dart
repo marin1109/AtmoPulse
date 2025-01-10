@@ -524,13 +524,17 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
-              final val = double.tryParse(value);
-              if (val == null || !Humidity.isValidHumidity(val, humidityUnit, 25)) {
+              final intVal = int.tryParse(value);
+              if (intVal == null || !Humidity.isValidHumidity(intVal, humidityUnit, 25)) {
                 return 'Humidité invalide';
               }
               return null;
             },
-            onSaved: (value) => _humidity_min = Humidity(double.parse(value!), humidityUnit),
+            onSaved: (value) {
+              if (value != null) {
+                _humidity_min = Humidity(int.parse(value), humidityUnit);
+              }
+            },
           ),
         ),
         const SizedBox(width: 10),
@@ -547,20 +551,24 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = double.tryParse(value);
+              final maxVal = int.tryParse(value);
               if (maxVal == null || !Humidity.isValidHumidity(maxVal, humidityUnit, 25)) {
                 return 'Humidité invalide';
               }
 
               if (_humidityMinController.text.isNotEmpty) {
-                final minVal = double.tryParse(_humidityMinController.text);
+                final minVal = int.tryParse(_humidityMinController.text);
                 if (minVal != null && maxVal < minVal) {
                   return 'L\'humidité max doit être >= à la min';
                 }
               }
               return null;
             },
-            onSaved: (value) => _humidity_max = Humidity(double.parse(value!), humidityUnit),
+            onSaved: (value) {
+              if (value != null) {
+                _humidity_max = Humidity(int.parse(value), humidityUnit);
+              }
+            },
           ),
         ),
       ],

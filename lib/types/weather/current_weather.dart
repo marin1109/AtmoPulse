@@ -35,9 +35,9 @@ class CurrentWeather extends ValueObject<Map<String, dynamic>> {
     return CurrentWeather(
       temp: Temperature(json['temp_c'].toInt(), TemperatureUnit.celsius),
       wind: WindSpeed(json['wind_kph'].toInt(), WindUnit.kmh),
-      precipitation: Precipitation(json['precip_mm'].toDouble(), PrecipitationUnit.mm),
-      humidity: Humidity(json['humidity'].toDouble(), HumidityUnit.relative),
-      uv: UV(json['uv'].toDouble()),
+      precipitation: Precipitation(json['precip_mm'].toInt(), PrecipitationUnit.mm),
+      humidity: Humidity(json['humidity'].toInt(), HumidityUnit.relative),
+      uv: UV(json['uv'].toInt()),
       condition: Condition.fromJson(json['condition']),
     );
   }

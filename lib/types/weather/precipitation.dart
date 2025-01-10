@@ -84,15 +84,14 @@ class Precipitation extends ValueObject<int> {
     }
   }
 
-  static String loadPrecipitationText(
-      Precipitation precipitation, PrecipitationUnit unit) {
+  static String loadPrecipitationText(Precipitation precipitation, PrecipitationUnit unit) {
     switch (unit) {
       case PrecipitationUnit.mm:
-        return "${precipitation.toMillimeters().toStringAsFixed(1)} mm";
+        return "${precipitation.value} mm";
       case PrecipitationUnit.inches:
-        return "${precipitation.toInches().toStringAsFixed(2)} inches";
+        return "${precipitation.value} inches";
       case PrecipitationUnit.litersPerSquareMeter:
-        return "${precipitation.toLitersPerSquareMeter().toStringAsFixed(1)} l/m²";
+        return "${precipitation.value} l/m²";
     }
   }
 

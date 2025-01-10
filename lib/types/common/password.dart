@@ -1,18 +1,12 @@
 import '../../utils/value_object.dart';
+import '../../utils/regex_validation.dart';
 
-class Password extends ValueObject<String> {
+class Password extends ValueObject<String> with RegexValidation {
   static final RegExp _passwordRegex = RegExp(
     r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$',
   );
 
-  const Password(String value) : super(value);
-
-  @override
-  bool isValid() {
-    final result = _passwordRegex.hasMatch(value);
-    if (!result) {
-      print("Validation échouée pour le mot de passe: $value");
-    }
-    return result;
+  Password(super.value) {
+    regex = _passwordRegex;
   }
 }

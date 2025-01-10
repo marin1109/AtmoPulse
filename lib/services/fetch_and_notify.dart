@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../services/weather_service.dart';
 import '../services/notification_service.dart';
 import '../utils/user_preferences.dart';
-import '../types/weather/weather.dart';
+import '../models/weather_data.dart';
 
 // --- 1. Enum pour le niveau de sévérité ---
 enum WeatherSeverity {
@@ -38,9 +38,9 @@ WeatherSeverity evaluateTemperature({
 }
 
 WeatherSeverity evaluateHumidity({
-  required double actualHumidity,
-  required double minHum,
-  required double maxHum,
+  required int actualHumidity,
+  required int minHum,
+  required int maxHum,
 }) {
   if (actualHumidity < minHum) {
     final diff = (minHum - actualHumidity).abs();
@@ -143,7 +143,7 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
 
   // Récupération des valeurs *actuelles* (selon votre type).
   final int currentTemp = current.temp.value;       // ex: 23.0
-  final double currentHum  = current.humidity.value;   // ex: 55.0
+  final int currentHum  = current.humidity.value;   // ex: 55.0
   final int currentWind = current.wind.value;       // ex: 12.0
   final int currentPrecip = current.precipitation.value; // ex: 0.0
   final int currentUV = current.uv.value;       // ex: 5.0
@@ -151,8 +151,8 @@ WeatherSeverity evaluateWeatherSeverity(WeatherData weatherData, UserPreferences
   // Récupération des min/max de l’utilisateur (déjà chargés via userPrefs)
   final int userTempMin  = prefs.tempMin?.value ?? -50;
   final int userTempMax  = prefs.tempMax?.value ?? 50;
-  final double userHumMin   = prefs.humidityMin?.value ?? 0;
-  final double userHumMax   = prefs.humidityMax?.value ?? 100;
+  final int userHumMin   = prefs.humidityMin?.value ?? 0;
+  final int userHumMax   = prefs.humidityMax?.value ?? 100;
   final int userWindMin  = prefs.windMin?.value ?? 0;
   final int userWindMax  = prefs.windMax?.value ?? 200;
   final int userPrecipMin = prefs.precipMin?.value ?? 100;

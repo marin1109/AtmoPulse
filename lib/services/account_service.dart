@@ -146,8 +146,8 @@ Future<void> deleteUser(Email email, Password password) async {
 
 Future<void> updateSensibilites(
   Email email, {
-  required double humiditeMin,
-  required double humiditeMax,
+  required int humiditeMin,
+  required int humiditeMax,
   required int precipitationsMin,
   required int precipitationsMax,
   required int temperatureMin,

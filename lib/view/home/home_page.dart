@@ -18,7 +18,7 @@ import '../settings/preferences_page.dart';
 import '../dialogs/contact_dialog.dart';
 import '../dialogs/about_dialog.dart' as custom;
 
-import '../../types/weather/weather.dart';
+import '../../models/weather_data.dart';
 import '../../types/weather/temperature.dart';
 import '../../types/weather/wind_speed.dart';
 import '../../types/weather/precipitation.dart';
@@ -27,6 +27,8 @@ import '../../types/common/vs.dart';
 import '../../types/common/city.dart';
 import '../../types/common/region.dart';
 import '../../types/common/country.dart';
+import '../../types/weather/forecast_weather.dart';
+import '../../types/weather/current_weather.dart';
 
 class CitySearchDelegate extends SearchDelegate<String> {
   final WeatherService weatherService;

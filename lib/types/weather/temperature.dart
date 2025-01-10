@@ -87,11 +87,11 @@ class Temperature extends ValueObject<int> {
   static String loadTemperatureText(Temperature temperature, TemperatureUnit unit) {
     switch (unit) {
       case TemperatureUnit.celsius:
-        return "${temperature.toCelsius()} ${unitToString(unit)}";
+        return "${temperature.value} °C";
       case TemperatureUnit.fahrenheit:
-        return "${temperature.toFahrenheit()} ${unitToString(unit)}";
+        return "${temperature.value} °F";
       case TemperatureUnit.kelvin:
-        return "${temperature.toKelvin()} ${unitToString(unit)}";
+        return "${temperature.value} K";
     }
   }
 

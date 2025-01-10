@@ -3,16 +3,16 @@ import 'dart:math';
 
 enum HumidityUnit { relative, absolute }
 
-class Humidity extends ValueObject<double> {
-  static const double minHumidity = 0.0;
-  static const double maxHumidity = 100.0;
+class Humidity extends ValueObject<int> {
+  static const int minHumidity = 0;
+  static const int maxHumidity = 100;
   final HumidityUnit unit;
 
   const Humidity(super.value, this.unit);
 
   double toAbsolute(double temperatureCelsius) {
     if (unit == HumidityUnit.absolute) {
-      return value;
+      return value.toDouble();
     } else {
       const double mwWater = 18.01528;
       const double r = 8.314462618;
@@ -21,7 +21,8 @@ class Humidity extends ValueObject<double> {
           100 *
           pow(10, (7.5 * temperatureCelsius) / (temperatureCelsius + 237.3));
 
-      double partialPressure = (value * saturationPressure) / 100;
+      // Conversion de la valeur entière en double pour le calcul
+      double partialPressure = (value.toDouble() * saturationPressure) / 100;
 
       return (partialPressure * mwWater) / (r * (temperatureCelsius + 273.15));
     }
@@ -29,7 +30,7 @@ class Humidity extends ValueObject<double> {
 
   double toRelative(double temperatureCelsius) {
     if (unit == HumidityUnit.relative) {
-      return value;
+      return value.toDouble();
     } else {
       const double mwWater = 18.01528;
       const double r = 8.314462618;
@@ -39,7 +40,7 @@ class Humidity extends ValueObject<double> {
           pow(10, (7.5 * temperatureCelsius) / (temperatureCelsius + 237.3));
 
       double partialPressure =
-          (value * r * (temperatureCelsius + 273.15)) / mwWater;
+          (value.toDouble() * r * (temperatureCelsius + 273.15)) / mwWater;
 
       return (partialPressure / saturationPressure) * 100;
     }
@@ -51,16 +52,6 @@ class Humidity extends ValueObject<double> {
       return value >= minHumidity && value <= maxHumidity;
     } else {
       return value >= 0;
-    }
-  }
-
-  @override
-  String toString() {
-    switch (unit) {
-      case HumidityUnit.relative:
-        return "${value.toStringAsFixed(1)} %RH";
-      case HumidityUnit.absolute:
-        return "${value.toStringAsFixed(2)} g/m³";
     }
   }
 
@@ -87,14 +78,15 @@ class Humidity extends ValueObject<double> {
   static String loadHumidityText(Humidity humidity, HumidityUnit unit) {
     switch (unit) {
       case HumidityUnit.relative:
-        return "${humidity.value.toStringAsFixed(1)} %RH";
+        return "${humidity.value} %";
       case HumidityUnit.absolute:
-        return "${humidity.value.toStringAsFixed(2)} g/m³";
+        return "${humidity.value} g/m³";
     }
   }
 
-  static bool isValidHumidity(double value, HumidityUnit unit, double temperatureCelsius) {
+  static bool isValidHumidity(int value, HumidityUnit unit, double temperatureCelsius) {
     Humidity humidity = Humidity(value, unit);
-    return humidity.toRelative(temperatureCelsius) >= 0 && humidity.toRelative(temperatureCelsius) <= 100;
+    double relativeHumidity = humidity.toRelative(temperatureCelsius);
+    return relativeHumidity >= 0 && relativeHumidity <= 100;
   }
 }

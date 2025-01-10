@@ -287,8 +287,8 @@ class _EditPreferencesDialogState extends State<EditPreferencesDialog> {
                           if (_editPrefsFormKey.currentState!.validate()) {
                             final newTempMin = int.parse(tempMinController.text);
                             final newTempMax = int.parse(tempMaxController.text);
-                            final newHumidityMin = double.parse(humidityMinController.text);
-                            final newHumidityMax = double.parse(humidityMaxController.text);
+                            final newHumidityMin = int.parse(humidityMinController.text);
+                            final newHumidityMax = int.parse(humidityMaxController.text);
                             final newPrecipMin = int.parse(precipitationMinController.text);
                             final newPrecipMax = int.parse(precipitationMaxController.text);
                             final newWindMin = int.parse(windMinController.text);

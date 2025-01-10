@@ -104,11 +104,11 @@ class UserPreferences extends ChangeNotifier {
     _age = Age(prefs.getInt('age') ?? 0);
 
     _humidityMin = Humidity(
-      prefs.getDouble('humidite_min') ?? 0.0,
+      prefs.getInt('humidite_min') ?? 0,
       _preferredHumidityUnit
     );
     _humidityMax = Humidity(
-      prefs.getDouble('humidite_max') ?? 100.0,
+      prefs.getInt('humidite_max') ?? 100,
       _preferredHumidityUnit
     );
     _precipMin = Precipitation(
@@ -266,16 +266,16 @@ class UserPreferences extends ChangeNotifier {
   // Setters pour les sensibilités
   // ==============================
 
-  Future<void> setHumidityMin(double val) async {
+  Future<void> setHumidityMin(int val) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('humidite_min', val);
+    await prefs.setInt('humidite_min', val);
     _humidityMin = Humidity(val, _preferredHumidityUnit);
     notifyListeners();
   }
 
-  Future<void> setHumidityMax(double val) async {
+  Future<void> setHumidityMax(int val) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('humidite_max', val);
+    await prefs.setInt('humidite_max', val);
     _humidityMax = Humidity(val, _preferredHumidityUnit);
     notifyListeners();
   }
