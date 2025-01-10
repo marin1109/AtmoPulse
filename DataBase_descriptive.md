@@ -21,8 +21,8 @@ ________________________________________________________________________________
 | `mot_de_passe`        | VARBINARY(255)   | Mot de passe (haché).                          |
 | `age`                 | INT              | Âge de l'utilisateur.                          |
 | `date_inscription`    | TIMESTAMP        | Date et heure d'inscription.                   |
-| `humidite_max`        | FLOAT            | Humidité maximale souhaitée (en %).            |
-| `humidite_min`        | FLOAT            | Humidité minimale souhaitée (en %).            |
+| `humidite_max`        | SMALLINT         | Humidité maximale souhaitée (en %).            |
+| `humidite_min`        | SMALLINT         | Humidité minimale souhaitée (en %).            |
 | `temperature_max`     | SMALLINT         | Température maximale souhaitée (en C).         |
 | `temperature_min`     | SMALLINT         | Température minimale souhaitée (en C).         |
 | `vent_max`            | SMALLINT         | Vitesse du vent maximale souhaitée (en km/h)   |

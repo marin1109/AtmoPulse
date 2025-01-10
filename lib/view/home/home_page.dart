@@ -616,6 +616,14 @@ class _HomePageState extends State<HomePage> {
                               final date = DateTime.parse(day.date);
                               final dayOfWeek = _getJourSemaine(date);
 
+                              final String minMaxTemp = '${Temperature.loadTemperatureText(
+                                day.minTemp,
+                                userPreferences.preferredTemperatureUnit,
+                              )} / ${Temperature.loadTemperatureText(
+                                day.maxTemp,
+                                userPreferences.preferredTemperatureUnit,
+                              )}';
+
                               return Card(
                                 color: Colors.white.withOpacity(0.2),
                                 margin: const EdgeInsets.symmetric(
@@ -628,8 +636,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -649,11 +656,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
-                                            Temperature.loadTemperatureText(
-                                              day.avgTemp,
-                                              userPreferences
-                                                  .preferredTemperatureUnit,
-                                            ),
+                                            minMaxTemp,
                                             style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.white,
