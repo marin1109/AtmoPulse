@@ -859,7 +859,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un prénom';
         
-        if (FName(value).isValid()) {
+        if (!FName(value).isValid()) {
           return 'Le prénom doit comporter au moins 2 lettres';
         }
         return null;
@@ -880,7 +880,8 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un nom';
-        if (LName(value).isValid()) {
+        
+        if (!LName(value).isValid()) {
           return 'Le nom doit comporter au moins 2 lettres';
         }
         return null;
