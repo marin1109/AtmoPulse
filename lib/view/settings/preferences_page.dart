@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import '../../utils/user_preferences.dart';
 
 // Types
-import '../../types/humidity_type.dart';
-import '../../types/precipitation_type.dart';
-import '../../types/temperature_type.dart';
-import '../../types/wind_type.dart';
+import '../../types/weather/humidity.dart';
+import '../../types/weather/precipitation.dart';
+import '../../types/weather/temperature.dart';
+import '../../types/weather/wind_speed.dart';
 
 class PreferencesPage extends StatelessWidget {
   const PreferencesPage({super.key});

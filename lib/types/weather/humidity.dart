@@ -1,15 +1,15 @@
-// Dart imports
+import '../../utils/value_object.dart';
 import 'dart:math';
 
 enum HumidityUnit { relative, absolute }
 
-class Humidity {
-  final double value;
+class Humidity extends ValueObject<double> {
+  static const double minHumidity = 0.0;
+  static const double maxHumidity = 100.0;
   final HumidityUnit unit;
 
-  Humidity(this.value, this.unit);
+  const Humidity(super.value, this.unit);
 
-  // Conversion en %RH
   double toAbsolute(double temperatureCelsius) {
     if (unit == HumidityUnit.absolute) {
       return value;
@@ -21,14 +21,12 @@ class Humidity {
           100 *
           pow(10, (7.5 * temperatureCelsius) / (temperatureCelsius + 237.3));
 
-      double partialPressure =
-          (value * saturationPressure) / 100;
+      double partialPressure = (value * saturationPressure) / 100;
 
       return (partialPressure * mwWater) / (r * (temperatureCelsius + 273.15));
     }
   }
 
-  // Conversion en g/m³
   double toRelative(double temperatureCelsius) {
     if (unit == HumidityUnit.relative) {
       return value;
@@ -47,7 +45,15 @@ class Humidity {
     }
   }
 
-  // Renvoie la valeur de l'humidité
+  @override
+  bool isValid() {
+    if (unit == HumidityUnit.relative) {
+      return value >= minHumidity && value <= maxHumidity;
+    } else {
+      return value >= 0;
+    }
+  }
+
   @override
   String toString() {
     switch (unit) {
@@ -58,7 +64,6 @@ class Humidity {
     }
   }
 
-  // Conversion de l'unité en string
   static String unitToString(HumidityUnit unit) {
     switch (unit) {
       case HumidityUnit.relative:
@@ -88,17 +93,8 @@ class Humidity {
     }
   }
 
-  // Vérifie si la valeur de l'humidité est valide
   static bool isValidHumidity(double value, HumidityUnit unit, double temperatureCelsius) {
     Humidity humidity = Humidity(value, unit);
     return humidity.toRelative(temperatureCelsius) >= 0 && humidity.toRelative(temperatureCelsius) <= 100;
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'value': value,
-      'unit': unit.name,
-    };
-  }
-
 }

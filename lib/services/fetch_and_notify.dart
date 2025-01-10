@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../services/weather_service.dart';
 import '../services/notification_service.dart';
 import '../utils/user_preferences.dart';
-import '../types/weather_type.dart';
+import '../types/weather/weather.dart';
 
 // --- 1. Enum pour le niveau de sévérité ---
 enum WeatherSeverity {

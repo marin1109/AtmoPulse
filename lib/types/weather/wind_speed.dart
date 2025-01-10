@@ -1,12 +1,16 @@
+// lib/types/weather/wind_speed.dart
+import '../../utils/value_object.dart';
+
 enum WindUnit { kmh, ms, mph, fts, knots }
 
-class WindSpeed {
-  final int value;
+class WindSpeed extends ValueObject<int> {
+  static const int minWindSpeed = 0;
+  static const int maxWindSpeed = 408;
+
   final WindUnit unit;
 
-  WindSpeed(this.value, this.unit);
+  const WindSpeed(super.value, this.unit);
 
-  // Conversion en km/h
   int toKmh() {
     switch (unit) {
       case WindUnit.kmh:
@@ -22,7 +26,6 @@ class WindSpeed {
     }
   }
 
-  // Conversion en m/s
   int toMs() {
     switch (unit) {
       case WindUnit.kmh:
@@ -38,7 +41,6 @@ class WindSpeed {
     }
   }
 
-  // Conversion en mph
   int toMph() {
     switch (unit) {
       case WindUnit.kmh:
@@ -54,7 +56,6 @@ class WindSpeed {
     }
   }
 
-  // Conversion en ft/s
   int toFts() {
     switch (unit) {
       case WindUnit.kmh:
@@ -70,7 +71,6 @@ class WindSpeed {
     }
   }
 
-  // Conversion en nœuds
   int toKnots() {
     switch (unit) {
       case WindUnit.kmh:
@@ -86,7 +86,11 @@ class WindSpeed {
     }
   }
 
-  // Conversion en unité donnée
+  @override
+  bool isValid() {
+    return value >= minWindSpeed && value <= maxWindSpeed;
+  }
+
   @override
   String toString() {
     switch (unit) {
@@ -103,7 +107,6 @@ class WindSpeed {
     }
   }
 
-  // Conversion de l'unité en string
   static String unitToString(WindUnit unit) {
     switch (unit) {
       case WindUnit.kmh:
@@ -153,14 +156,13 @@ class WindSpeed {
 
   static bool isValidWindSpeed(int speed, WindUnit unit) {
     WindSpeed wind = WindSpeed(speed, unit);
-    return wind.toKmh() >= 0 && wind.toKmh() <= 408;
+    return wind.toKmh() >= minWindSpeed && wind.toKmh() <= maxWindSpeed;
   }
-  
+
   Map<String, dynamic> toJson() {
     return {
       'value': value,
       'unit': unit.name,
     };
   }
-
 }

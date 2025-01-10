@@ -1,17 +1,17 @@
 // Type imports
-import 'package:AtmoPulse/types/uv_type.dart';
+import 'package:AtmoPulse/types/weather/uv.dart';
 
-import 'humidity_type.dart';
-import 'precipitation_type.dart';
-import 'temperature_type.dart';
-import 'wind_type.dart';
-import 'latitude_type.dart';
-import 'longitude_type.dart';
-import 'city_type.dart';
-import 'region_type.dart';
-import 'country_type.dart';
-import 'timezone_type.dart';
-import 'localtime_type.dart';
+import 'humidity.dart';
+import 'precipitation.dart';
+import 'temperature.dart';
+import 'wind_speed.dart';
+import '../common/latitude.dart';
+import '../common/longitude.dart';
+import '../common/city.dart';
+import '../common/region.dart';
+import '../common/country.dart';
+import '../common/timezone.dart';
+import '../common/localtime.dart';
 
 
 class WeatherData {
@@ -79,19 +79,19 @@ class Location {
 
   Map<String, dynamic> toJson() {
     return {
-      'name': city.name,
-      'region': region.name,
-      'country': country.name,
-      'lat': latitude.latitude,
+      'name': city.value,
+      'region': region.value,
+      'country': country.value,
+      'lat': latitude.value,
       'lon': longitude.value,
-      'tz_id': timezone.timezone,
-      'localtime': localtime.localtime,
+      'tz_id': timezone.value,
+      'localtime': localtime.value,
     };
   }
 
   @override
   String toString() {
-    return '${city.name}, ${region.name}, ${country.name}';
+    return '${city.value}, ${region.value}, ${country.value}';
   }
 }
 

@@ -2,23 +2,23 @@
 import 'dart:convert';
 
 // Package imports
-import 'package:AtmoPulse/types/humidity_type.dart';
-import 'package:AtmoPulse/types/precipitation_type.dart';
-import 'package:AtmoPulse/types/temperature_type.dart';
-import 'package:AtmoPulse/types/uv_type.dart';
-import 'package:AtmoPulse/types/wind_type.dart';
+import 'package:AtmoPulse/types/weather/humidity.dart';
+import 'package:AtmoPulse/types/weather/precipitation.dart';
+import 'package:AtmoPulse/types/weather/temperature.dart';
+import 'package:AtmoPulse/types/weather/uv.dart';
+import 'package:AtmoPulse/types/weather/wind_speed.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Type imports
-import '../types/email_type.dart';
-import '../types/password_type.dart';
-import '../types/fname_type.dart';
-import '../types/lname_type.dart';
-import '../types/age_type.dart';
-import '../types/city_type.dart';
-import '../types/region_type.dart';
-import '../types/country_type.dart';
+import '../types/common/email.dart';
+import '../types/common/password.dart';
+import '../types/common/fname.dart';
+import '../types/common/lname.dart';
+import '../types/common/age.dart';
+import '../types/common/city.dart';
+import '../types/common/region.dart';
+import '../types/common/country.dart';
 
 final String apiBaseUrl = dotenv.env['GCLOUD_API_BASE_URL']!;
 
@@ -47,7 +47,7 @@ Future<void> addUser(
     body: jsonEncode({
       'prenom': prenom.toString(),
       'nom': nom.toString(),
-      'age': age.toInt(),
+      'age': age.value,
       'email': email.toString(),
       'mot_de_passe': motDePasse.toString(),
       'sensibilites': {
@@ -251,9 +251,9 @@ Future<void> addFavoriteCity(String email, String villeUrl, City villeNom, Regio
     body: jsonEncode({
       'email': email,
       'ville_url': villeUrl,
-      'ville_nom': villeNom.name,
-      'ville_region_nom': villeRegionNom.name,
-      'ville_pays_nom': villePaysNom.name,
+      'ville_nom': villeNom.value,
+      'ville_region_nom': villeRegionNom.value,
+      'ville_pays_nom': villePaysNom.value,
     }),
   );
 

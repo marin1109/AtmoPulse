@@ -1,12 +1,15 @@
+import '../../utils/value_object.dart';
+
 enum TemperatureUnit { celsius, fahrenheit, kelvin }
 
-class Temperature {
-  final int value;
+class Temperature extends ValueObject<int> {
+  static const int minTemperature = -100;
+  static const int maxTemperature = 60;
+
   final TemperatureUnit unit;
 
-  Temperature(this.value, this.unit);
+  const Temperature(super.value, this.unit);
 
-  // Conversion en °C
   int toCelsius() {
     switch (unit) {
       case TemperatureUnit.celsius:
@@ -18,7 +21,6 @@ class Temperature {
     }
   }
 
-  // Conversion en °F
   int toFahrenheit() {
     switch (unit) {
       case TemperatureUnit.celsius:
@@ -30,7 +32,6 @@ class Temperature {
     }
   }
 
-  // Conversion en K
   int toKelvin() {
     switch (unit) {
       case TemperatureUnit.celsius:
@@ -42,7 +43,11 @@ class Temperature {
     }
   }
 
-  // Conversion en unité donnée
+  @override
+  bool isValid() {
+    return value >= minTemperature && value <= maxTemperature;
+  }
+
   @override
   String toString() {
     switch (unit) {
@@ -55,7 +60,6 @@ class Temperature {
     }
   }
 
-  // Conversion de l'unité en string
   static String unitToString(TemperatureUnit unit) {
     switch (unit) {
       case TemperatureUnit.celsius:
@@ -91,10 +95,9 @@ class Temperature {
     }
   }
 
-  // Vérification de la validité de la valeur de température
   static bool isValidTemperature(int value, TemperatureUnit unit) {
     Temperature temperature = Temperature(value, unit);
-    return temperature.toCelsius() >= -100 && temperature.toCelsius() <= 60;
+    return temperature.toCelsius() >= minTemperature && temperature.toCelsius() <= maxTemperature;
   }
 
   Map<String, dynamic> toJson() {
@@ -103,5 +106,4 @@ class Temperature {
       'unit': unit.name,
     };
   }
-  
 }

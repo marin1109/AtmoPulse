@@ -1,7 +1,7 @@
 // deleteAccount_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../types/password_type.dart';
+import '../../types/common/password.dart';
 import '../../utils/user_preferences.dart';
 import '../../services/account_service.dart';
 import '../account/log_in_sign_up_page.dart';

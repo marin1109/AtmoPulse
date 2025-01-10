@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../types/password_type.dart';
+import '../../types/common/password.dart';
 import '../../utils/user_preferences.dart';
 import '../../services/account_service.dart';
 
@@ -49,7 +49,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez entrer un nouveau mot de passe';
-                  } else if (!Password.isValidPassword(Password(value))) {
+                  } else if (Password(value).isValid()) {
                     return 'Le mot de passe doit contenir au moins 8 caractères, '
                         'dont une majuscule, une minuscule, un chiffre et un caractère spécial.';
                   }
@@ -68,7 +68,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 validator: (value) {
                   if (value == null || Password(value).value != _newPassword.value) {
                     return 'Les mots de passe ne correspondent pas';
-                  } else if (!Password.isValidPassword(Password(value))) {
+                  } else if (Password(value).isValid()) {
                     return 'Le mot de passe doit contenir au moins 8 caractères, '
                         'dont une majuscule, une minuscule, un chiffre et un caractère spécial.';
                   }

@@ -18,15 +18,15 @@ import '../settings/preferences_page.dart';
 import '../dialogs/contact_dialog.dart';
 import '../dialogs/about_dialog.dart' as custom;
 
-import '../../types/weather_type.dart';
-import '../../types/temperature_type.dart';
-import '../../types/wind_type.dart';
-import '../../types/precipitation_type.dart';
-import '../../types/humidity_type.dart';
-import '../../types/villeSugg_type.dart';
-import '../../types/city_type.dart';
-import '../../types/region_type.dart';
-import '../../types/country_type.dart';
+import '../../types/weather/weather.dart';
+import '../../types/weather/temperature.dart';
+import '../../types/weather/wind_speed.dart';
+import '../../types/weather/precipitation.dart';
+import '../../types/weather/humidity.dart';
+import '../../types/common/vs.dart';
+import '../../types/common/city.dart';
+import '../../types/common/region.dart';
+import '../../types/common/country.dart';
 
 class CitySearchDelegate extends SearchDelegate<String> {
   final WeatherService weatherService;
@@ -52,8 +52,8 @@ class CitySearchDelegate extends SearchDelegate<String> {
           itemBuilder: (context, index) {
             final city = suggestions[index];
             return ListTile(
-              title: Text(city.city.name),
-              subtitle: Text('${city.region.name}, ${city.country.name}'),
+              title: Text(city.city.value),
+              subtitle: Text('${city.region.value}, ${city.country.value}'),
               onTap: () {
                 close(context, city.url);
               },
@@ -169,8 +169,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _addToFavorites(City name, String cityUrl,
-      Region villeRegionNom, Country villePaysNom) async {
+  Future<void> _addToFavorites(City name, String cityUrl, Region villeRegionNom,
+      Country villePaysNom) async {
     final prefs = await SharedPreferences.getInstance();
     final String? storedEmail = prefs.getString('email');
 
@@ -178,10 +178,10 @@ class _HomePageState extends State<HomePage> {
     if (!alreadyExists) {
       setState(() {
         _favorites.add({
-          'name': name.name,
+          'name': name.value,
           'url': cityUrl,
-          'region': villeRegionNom.name,
-          'country': villePaysNom.name,
+          'region': villeRegionNom.value,
+          'country': villePaysNom.value,
         });
       });
       await _saveFavoritesLocally();
@@ -316,8 +316,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  await _addToFavorites(
-                      city, cityUrl, cityRegion, cityCountry);
+                  await _addToFavorites(city, cityUrl, cityRegion, cityCountry);
                 },
                 child: const Text('Oui'),
               ),

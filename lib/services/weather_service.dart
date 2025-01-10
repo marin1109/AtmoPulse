@@ -7,8 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
 // Types imports
-import '../types/weather_type.dart';
-import '../types/villeSugg_type.dart';
+import '../types/weather/weather.dart';
+import '../types/common/vs.dart';
 
 // Classe pour gérer les services météo
 class WeatherService {
@@ -92,7 +92,8 @@ class WeatherService {
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
-      return data.map((item) => VS( item['name'], 
+      return data.map((item) => VS.fromValues( 
+                                    item['name'], 
                                     item['region'], 
                                     item['country'], 
                                     item['url'])).toList();

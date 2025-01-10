@@ -1,12 +1,15 @@
+import '../../utils/value_object.dart';
+
 enum PrecipitationUnit { mm, inches, litersPerSquareMeter }
 
-class Precipitation {
-  final int value;
+class Precipitation extends ValueObject<int> {
+  static const int minPrecipitation = 0;
+  static const int maxPrecipitation = 305;
+
   final PrecipitationUnit unit;
 
-  Precipitation(this.value, this.unit);
+  const Precipitation(super.value, this.unit);
 
-  // Conversion en millimètres (mm)
   int toMillimeters() {
     switch (unit) {
       case PrecipitationUnit.mm:
@@ -18,7 +21,6 @@ class Precipitation {
     }
   }
 
-  // Conversion en pouces (inches)
   int toInches() {
     switch (unit) {
       case PrecipitationUnit.mm:
@@ -30,7 +32,6 @@ class Precipitation {
     }
   }
 
-  // Conversion en litres par mètre carré (l/m²)
   int toLitersPerSquareMeter() {
     switch (unit) {
       case PrecipitationUnit.mm:
@@ -42,7 +43,11 @@ class Precipitation {
     }
   }
 
-  // Renvoie la valeur de la précipitation
+  @override
+  bool isValid() {
+    return value >= minPrecipitation && value <= maxPrecipitation;
+  }
+
   @override
   String toString() {
     switch (unit) {
@@ -55,7 +60,6 @@ class Precipitation {
     }
   }
 
-  // Conversion de l'unité en string
   static String unitToString(PrecipitationUnit unit) {
     switch (unit) {
       case PrecipitationUnit.mm:
@@ -80,7 +84,8 @@ class Precipitation {
     }
   }
 
-  static String loadPrecipitationText(Precipitation precipitation, PrecipitationUnit unit) {
+  static String loadPrecipitationText(
+      Precipitation precipitation, PrecipitationUnit unit) {
     switch (unit) {
       case PrecipitationUnit.mm:
         return "${precipitation.toMillimeters().toStringAsFixed(1)} mm";
@@ -93,7 +98,8 @@ class Precipitation {
 
   static bool isValidPrecipitation(int value, PrecipitationUnit unit) {
     Precipitation precipitation = Precipitation(value, unit);
-    return precipitation.toMillimeters() >= 0 && precipitation.toMillimeters() <= 305;
+    return precipitation.toMillimeters() >= minPrecipitation &&
+        precipitation.toMillimeters() <= maxPrecipitation;
   }
 
   Map<String, dynamic> toJson() {
@@ -102,5 +108,4 @@ class Precipitation {
       'unit': unit.name,
     };
   }
-  
 }

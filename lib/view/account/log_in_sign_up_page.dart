@@ -6,16 +6,16 @@ import 'package:provider/provider.dart';
 import '../../services/account_service.dart';
 
 // Types (email, password, etc.)
-import '../../types/email_type.dart';
-import '../../types/password_type.dart';
-import '../../types/lname_type.dart';
-import '../../types/fname_type.dart';
-import '../../types/age_type.dart';
-import '../../types/temperature_type.dart';
-import '../../types/humidity_type.dart';
-import '../../types/precipitation_type.dart';
-import '../../types/wind_type.dart';
-import '../../types/uv_type.dart';
+import '../../types/common/email.dart';
+import '../../types/common/password.dart';
+import '../../types/common/lname.dart';
+import '../../types/common/fname.dart';
+import '../../types/common/age.dart';
+import '../../types/weather/temperature.dart';
+import '../../types/weather/humidity.dart';
+import '../../types/weather/precipitation.dart';
+import '../../types/weather/wind_speed.dart';
+import '../../types/weather/uv.dart';
 
 // Page imports
 import 'user_page.dart';
@@ -741,7 +741,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       keyboardType: TextInputType.number,
       validator: (value) {
         if (value == null || value.isEmpty) return 'Requis';
-        if (!UV.isValidUV(int.parse(value))) {
+      
+        final uv = UV(int.parse(value));
+        if (!uv.isValid()) {
           return 'UV invalide';
         }
         return null;
@@ -765,7 +767,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un âge';
-        if (!Age.isValidAge(int.parse(value))) {
+        if (!Age(int.parse(value)).isValid()) {
           return 'L\'âge doit être entre 0 et 120 ans';
         }
         return null;
@@ -798,9 +800,11 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un email';
-        if (!Email.isValidEmail(Email(value))) {
+        
+        final email = Email(value);
+        if (!email.isValid()) {
           return 'Format d\'email invalide (ex: exemple@domaine.com)';
-        }
+        }        
         return null;
       },
       onSaved: (value) => _email = Email(value!),
@@ -822,8 +826,11 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         if (value == null || value.isEmpty) {
           return 'Veuillez entrer un mot de passe';
         }
-        if (!Password.isValidPassword(Password(value))) {
-          return 'Le mot de passe doit comporter au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.\nEx: Abcdef1!';
+        
+        final password = Password(value);
+        if (!password.isValid()) {
+          return 'Le mot de passe doit contenir au moins 8 caractères, '
+              'dont une majuscule, une minuscule, un chiffre et un caractère spécial.';
         }
         return null;
       },
@@ -843,7 +850,8 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un prénom';
-        if (!FName.isValidFName(value)) {
+        
+        if (FName(value).isValid()) {
           return 'Le prénom doit comporter au moins 2 lettres';
         }
         return null;
@@ -864,7 +872,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un nom';
-        if (!LName.isValidLName(value)) {
+        if (LName(value).isValid()) {
           return 'Le nom doit comporter au moins 2 lettres';
         }
         return null;
