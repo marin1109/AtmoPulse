@@ -25,12 +25,8 @@ class Condition extends ValueObject<Map<String, dynamic>> {
 
   @override
   bool isValid() {
-    // Définir une validation appropriée si nécessaire
     return text.isNotEmpty && icon.isNotEmpty && code >= 0;
   }
-
-  @override
-  String toString() => '$text';
 
   Map<String, dynamic> toJson() {
     return {

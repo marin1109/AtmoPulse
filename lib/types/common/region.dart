@@ -6,7 +6,7 @@ class Region extends ValueObject<String> with RegexValidation {
     r"^[a-zA-ZÀ-ÖØ-öø-ÿ' -]+(?: [a-zA-ZÀ-ÖØ-öø-ÿ' -]+)*$",
   );
 
-  Region(String value) : super(value) {
+  Region(super.value) {
     regex = _regionRegex;
   }
 }

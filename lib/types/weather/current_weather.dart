@@ -1,4 +1,3 @@
-// lib/types/weather/current_weather.dart
 import '../../utils/value_object.dart';
 import 'temperature.dart';
 import 'wind_speed.dart';

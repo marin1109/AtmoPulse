@@ -1,4 +1,3 @@
-// lib/models/user.dart
 import '../types/common/email.dart';
 import '../types/common/password.dart';
 import '../types/common/age.dart';
