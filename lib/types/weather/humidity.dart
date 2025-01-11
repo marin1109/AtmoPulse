@@ -10,7 +10,7 @@ class Humidity extends ValueObject<int> {
 
   const Humidity(super.value, this.unit);
 
-  double toAbsolute(double temperatureCelsius) {
+  double toAbsolute(int temperatureCelsius) {
     if (unit == HumidityUnit.absolute) {
       return value.toDouble();
     } else {
@@ -28,7 +28,7 @@ class Humidity extends ValueObject<int> {
     }
   }
 
-  double toRelative(double temperatureCelsius) {
+  double toRelative(int temperatureCelsius) {
     if (unit == HumidityUnit.relative) {
       return value.toDouble();
     } else {
@@ -84,7 +84,7 @@ class Humidity extends ValueObject<int> {
     }
   }
 
-  static bool isValidHumidity(int value, HumidityUnit unit, double temperatureCelsius) {
+  static bool isValidHumidity(int value, HumidityUnit unit, int temperatureCelsius) {
     Humidity humidity = Humidity(value, unit);
     double relativeHumidity = humidity.toRelative(temperatureCelsius);
     return relativeHumidity >= 0 && relativeHumidity <= 100;

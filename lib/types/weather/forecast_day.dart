@@ -10,7 +10,6 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
   final String date;
   final Temperature maxTemp;
   final Temperature minTemp;
-  final Temperature avgTemp;
   final WindSpeed maxWind;
   final Precipitation totalPrecipitation;
   final Humidity avgHumidity;
@@ -21,7 +20,6 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
     required this.date,
     required this.maxTemp,
     required this.minTemp,
-    required this.avgTemp,
     required this.maxWind,
     required this.totalPrecipitation,
     required this.avgHumidity,
@@ -31,7 +29,6 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
           'date': date,
           'maxTemp': maxTemp,
           'minTemp': minTemp,
-          'avgTemp': avgTemp,
           'maxWind': maxWind,
           'totalPrecipitation': totalPrecipitation,
           'avgHumidity': avgHumidity,
@@ -42,14 +39,13 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
   factory ForecastDay.fromJson(Map<String, dynamic> json) {
     return ForecastDay(
       date: json['date'],
-      maxTemp: Temperature(json['day']['maxtemp_c'].toInt(), TemperatureUnit.celsius),
-      minTemp: Temperature(json['day']['mintemp_c'].toInt(), TemperatureUnit.celsius),
-      avgTemp: Temperature(json['day']['avgtemp_c'].toInt(), TemperatureUnit.celsius),
-      maxWind: WindSpeed(json['day']['maxwind_kph'].toInt(), WindUnit.kmh),
-      totalPrecipitation: Precipitation(json['day']['totalprecip_mm'].toInt(), PrecipitationUnit.mm),
-      avgHumidity: Humidity(json['day']['avghumidity'].toInt(), HumidityUnit.relative),
+      maxTemp: Temperature(json['day']['maxtemp_c'].round(), TemperatureUnit.celsius),
+      minTemp: Temperature(json['day']['mintemp_c'].round(), TemperatureUnit.celsius),
+      maxWind: WindSpeed(json['day']['maxwind_kph'].round(), WindUnit.kmh),
+      totalPrecipitation: Precipitation(json['day']['totalprecip_mm'].round(), PrecipitationUnit.mm),
+      avgHumidity: Humidity(json['day']['avghumidity'].round(), HumidityUnit.relative),
       condition: Condition.fromJson(json['day']['condition']),
-      uv: UV(json['day']['uv'].toInt()),
+      uv: UV(json['day']['uv'].round()),
     );
   }
 
@@ -58,7 +54,6 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
     return date.isNotEmpty &&
         maxTemp.isValid() &&
         minTemp.isValid() &&
-        avgTemp.isValid() &&
         maxWind.isValid() &&
         totalPrecipitation.isValid() &&
         avgHumidity.isValid() &&
@@ -68,7 +63,7 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
 
   @override
   String toString() {
-    return 'Date: $date, Max Temp: ${maxTemp.toString()}, Min Temp: ${minTemp.toString()}, Avg Temp: ${avgTemp.toString()}, Max Wind: ${maxWind.toString()}, Total Precipitation: ${totalPrecipitation.toString()}, Avg Humidity: ${avgHumidity.toString()}, Condition: ${condition.toString()}, UV: ${uv.toString()}';
+    return 'Date: $date, Max Temp: ${maxTemp.toString()}, Min Temp: ${minTemp.toString()}, Max Wind: ${maxWind.toString()}, Total Precipitation: ${totalPrecipitation.toString()}, Avg Humidity: ${avgHumidity.toString()}, Condition: ${condition.toString()}, UV: ${uv.toString()}';
   }
 
   Map<String, dynamic> toJson() {
@@ -77,7 +72,6 @@ class ForecastDay extends ValueObject<Map<String, dynamic>> {
       'day': {
         'maxtemp_c': maxTemp.value,
         'mintemp_c': minTemp.value,
-        'avgtemp_c': avgTemp.value,
         'maxwind_kph': maxWind.value,
         'totalprecip_mm': totalPrecipitation.value,
         'avghumidity': avgHumidity.value,

@@ -50,10 +50,10 @@ Ce document recense les différents problèmes rencontrés ainsi que les solutio
 
 ---
 
-### Problème 4 : Comment ajouter les données de la météo à chaque heure dans la base de données.
+### Problème 4 : 
 **Date** :
 
-**Contexte** : Les données de la météo doivent être ajoutées à la base de données à chaque heure mais aussi pour chaque ville dont l'utilisateur suit la météo.
+**Contexte** : 
 
 **Statut** : Non commencé &#x274C;
 

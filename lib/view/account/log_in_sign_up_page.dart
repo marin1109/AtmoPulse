@@ -111,9 +111,9 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
 
       try {
         final userData = await loginUser(_email, _password);
-        
+
         final data = await getPreferencesUnit(_email);
-        
+
         await userPrefs.setPreferredTemperatureUnit(
           Temperature.stringToTemperatureUnit(data['unite_temperature']),
         );
@@ -155,10 +155,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setHumidityMax(userData['humidite_max'].toDouble());
         }
         if (userData['precipitations_min'] != null) {
-          await userPrefs.setPrecipMin(userData['precipitations_min'].toDouble());
+          await userPrefs
+              .setPrecipMin(userData['precipitations_min'].toDouble());
         }
         if (userData['precipitations_max'] != null) {
-          await userPrefs.setPrecipMax(userData['precipitations_max'].toDouble());
+          await userPrefs
+              .setPrecipMax(userData['precipitations_max'].toDouble());
         }
         if (userData['vent_min'] != null) {
           await userPrefs.setWindMin(userData['vent_min'].toInt());
@@ -235,10 +237,12 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setHumidityMax(userData['humidite_max'].toDouble());
         }
         if (userData['precipitations_min'] != null) {
-          await userPrefs.setPrecipMin(userData['precipitations_min'].toDouble());
+          await userPrefs
+              .setPrecipMin(userData['precipitations_min'].toDouble());
         }
         if (userData['precipitations_max'] != null) {
-          await userPrefs.setPrecipMax(userData['precipitations_max'].toDouble());
+          await userPrefs
+              .setPrecipMax(userData['precipitations_max'].toDouble());
         }
         if (userData['vent_min'] != null) {
           await userPrefs.setWindMin(userData['vent_min'].toInt());
@@ -274,7 +278,8 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: const Text(
           'Compte Utilisateur',
-          style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+          style:
+              TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -379,7 +384,8 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
                 Center(child: _buildSubmitButton('Inscription', _registerUser)),
                 const SizedBox(height: 20),
                 Center(
-                  child: _buildToggleFormButton('Déjà un compte ? Connectez-vous'),
+                  child:
+                      _buildToggleFormButton('Déjà un compte ? Connectez-vous'),
                 ),
               ],
             ),
@@ -423,72 +429,68 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   // ==============================
   Widget _buildTemperatureFields(UserPreferences userPrefs) {
     final tempUnit = userPrefs.preferredTemperatureUnit;
-    late String tempUnitLabel;
-    switch (tempUnit) {
-      case TemperatureUnit.celsius:
-        tempUnitLabel = '°C';
-        break;
-      case TemperatureUnit.fahrenheit:
-        tempUnitLabel = '°F';
-        break;
-      case TemperatureUnit.kelvin:
-        tempUnitLabel = 'K';
-        break;
-    }
+    final tempUnitLabel = Temperature.unitToString(tempUnit);
 
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: TextFormField(
-            controller: _tempMinController,
-            decoration: InputDecoration(
-              labelText: 'Température min ($tempUnitLabel)',
-              prefixIcon: const Icon(Icons.thermostat, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        TextFormField(
+          controller: _tempMinController,
+          decoration: InputDecoration(
+            labelText: 'Température min ($tempUnitLabel)',
+            prefixIcon: const Icon(Icons.thermostat, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final val = int.tryParse(value);
-              if (val == null || !Temperature.isValidTemperature(val, tempUnit)) {
-                return 'Température invalide';
-              }
-              return null;
-            },
-            onSaved: (value) => _temperature_min = Temperature(int.parse(value!), tempUnit),
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final val = int.tryParse(value);
+            if (val == null || !Temperature.isValidTemperature(val, tempUnit)) {
+              return 'Température comprise entre ${Temperature.minTemperature} et ${Temperature.maxTemperature}';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _temperature_min = Temperature(int.parse(value), tempUnit);
+            }
+          },
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextFormField(
-            controller: _tempMaxController,
-            decoration: InputDecoration(
-              labelText: 'Température max ($tempUnitLabel)',
-              prefixIcon: const Icon(Icons.thermostat, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: _tempMaxController,
+          decoration: InputDecoration(
+            labelText: 'Température max ($tempUnitLabel)',
+            prefixIcon: const Icon(Icons.thermostat, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = int.tryParse(value);
-              if (maxVal == null || !Temperature.isValidTemperature(maxVal, tempUnit)) {
-                return 'Température invalide';
-              }
-
-              if (_tempMinController.text.isNotEmpty) {
-                final minVal = int.tryParse(_tempMinController.text);
-                if (minVal != null && maxVal < minVal) {
-                  return 'La température max doit être >= à la min';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) => _temperature_max = Temperature(int.parse(value!), tempUnit),
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final maxVal = int.tryParse(value);
+            if (maxVal == null || !Temperature.isValidTemperature(maxVal, tempUnit)) {
+              return 'Température comprise entre ${Temperature.minTemperature} et ${Temperature.maxTemperature}';
+            }
+            if (_tempMinController.text.isNotEmpty) {
+              final minVal = int.tryParse(_tempMinController.text);
+              if (minVal != null && maxVal < minVal) {
+                return 'La température max doit être >= à la min';
+              }
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _temperature_max = Temperature(int.parse(value), tempUnit);
+            }
+          },
         ),
       ],
     );
@@ -499,77 +501,70 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   // ==============================
   Widget _buildHumidityFields(UserPreferences userPrefs) {
     final humidityUnit = userPrefs.preferredHumidityUnit;
-    late String humidityUnitLabel;
-    switch (humidityUnit) {
-      case HumidityUnit.relative:
-        humidityUnitLabel = '%';
-        break;
-      case HumidityUnit.absolute:
-        humidityUnitLabel = 'g/m³';
-        break;
-    }
+    final humidityUnitLabel = Humidity.unitToString(humidityUnit);
 
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: TextFormField(
-            controller: _humidityMinController,
-            decoration: InputDecoration(
-              labelText: 'Humidité min ($humidityUnitLabel)',
-              prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        TextFormField(
+          controller: _humidityMinController,
+          decoration: InputDecoration(
+            labelText: 'Humidité min ($humidityUnitLabel)',
+            prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final intVal = int.tryParse(value);
-              if (intVal == null || !Humidity.isValidHumidity(intVal, humidityUnit, 25)) {
-                return 'Humidité invalide';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              if (value != null) {
-                _humidity_min = Humidity(int.parse(value), humidityUnit);
-              }
-            },
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final intVal = int.tryParse(value);
+            if (intVal == null ||
+                !Humidity.isValidHumidity(intVal, humidityUnit, 25)) {
+              return 'Humidité comprise entre ${Humidity.minHumidity} et ${Humidity.maxHumidity}';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _humidity_min = Humidity(int.parse(value), humidityUnit);
+            }
+          },
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextFormField(
-            controller: _humidityMaxController,
-            decoration: InputDecoration(
-              labelText: 'Humidité max ($humidityUnitLabel)',
-              prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: _humidityMaxController,
+          decoration: InputDecoration(
+            labelText: 'Humidité max ($humidityUnitLabel)',
+            prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = int.tryParse(value);
-              if (maxVal == null || !Humidity.isValidHumidity(maxVal, humidityUnit, 25)) {
-                return 'Humidité invalide';
-              }
-
-              if (_humidityMinController.text.isNotEmpty) {
-                final minVal = int.tryParse(_humidityMinController.text);
-                if (minVal != null && maxVal < minVal) {
-                  return 'L\'humidité max doit être >= à la min';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) {
-              if (value != null) {
-                _humidity_max = Humidity(int.parse(value), humidityUnit);
-              }
-            },
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final maxVal = int.tryParse(value);
+            if (maxVal == null ||
+                !Humidity.isValidHumidity(maxVal, humidityUnit, 25)) {
+              return 'Humidité comprise entre ${Humidity.minHumidity} et ${Humidity.maxHumidity}';
+            }
+            if (_humidityMinController.text.isNotEmpty) {
+              final minVal = int.tryParse(_humidityMinController.text);
+              if (minVal != null && maxVal < minVal) {
+                return 'L\'humidité max doit être >= à la min';
+              }
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _humidity_max = Humidity(int.parse(value), humidityUnit);
+            }
+          },
         ),
       ],
     );
@@ -580,72 +575,70 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   // ==============================
   Widget _buildPrecipitationFields(UserPreferences userPrefs) {
     final precipitationUnit = userPrefs.preferredPrecipitationUnit;
-    late String precipitationUnitLabel;
-    switch (precipitationUnit) {
-      case PrecipitationUnit.mm:
-        precipitationUnitLabel = 'mm';
-        break;
-      case PrecipitationUnit.inches:
-        precipitationUnitLabel = 'inches';
-        break;
-      case PrecipitationUnit.litersPerSquareMeter:
-        precipitationUnitLabel = 'l/m²';
-        break;
-    }
+    final precipitationUnitLabel = Precipitation.unitToString(precipitationUnit);
 
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: TextFormField(
-            controller: _precipitationMinController,
-            decoration: InputDecoration(
-              labelText: 'Précipitations min ($precipitationUnitLabel)',
-              prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        TextFormField(
+          controller: _precipitationMinController,
+          decoration: InputDecoration(
+            labelText: 'Précipitations min ($precipitationUnitLabel)',
+            prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final val = int.tryParse(value);
-              if (val == null || !Precipitation.isValidPrecipitation(val, precipitationUnit)) {
-                return 'Précipitations invalides';
-              }
-              return null;
-            },
-            onSaved: (value) => _precipitation_min = Precipitation(int.parse(value!), precipitationUnit),
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final val = int.tryParse(value);
+            if (val == null || 
+                !Precipitation.isValidPrecipitation(val, precipitationUnit)) {
+              return 'Compris entre ${Precipitation.minPrecipitation} et ${Precipitation.maxPrecipitation}';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _precipitation_min = Precipitation(int.parse(value), precipitationUnit);
+            }
+          },
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextFormField(
-            controller: _precipitationMaxController,
-            decoration: InputDecoration(
-              labelText: 'Précipitations max ($precipitationUnitLabel)',
-              prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: _precipitationMaxController,
+          decoration: InputDecoration(
+            labelText: 'Précipitations max ($precipitationUnitLabel)',
+            prefixIcon: const Icon(Icons.water, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = int.tryParse(value);
-              if (maxVal == null || !Precipitation.isValidPrecipitation(maxVal, precipitationUnit)) {
-                return 'Précipitations invalides';
-              }
-
-              if (_precipitationMinController.text.isNotEmpty) {
-                final minVal = double.tryParse(_precipitationMinController.text);
-                if (minVal != null && maxVal < minVal) {
-                  return 'Les précipitations max doivent être >= min';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) => _precipitation_max = Precipitation(int.parse(value!), precipitationUnit),
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final maxVal = int.tryParse(value);
+            if (maxVal == null ||
+                !Precipitation.isValidPrecipitation(maxVal, precipitationUnit)) {
+              return 'Compris entre ${Precipitation.minPrecipitation} et ${Precipitation.maxPrecipitation}';
+            }
+            if (_precipitationMinController.text.isNotEmpty) {
+              final minVal = double.tryParse(_precipitationMinController.text);
+              if (minVal != null && maxVal <= minVal) {
+                return 'Les précipitations max doivent être > min';
+              }
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _precipitation_max = Precipitation(int.parse(value), precipitationUnit);
+            }
+          },
         ),
       ],
     );
@@ -656,78 +649,68 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
   // ==============================
   Widget _buildWindFields(UserPreferences userPrefs) {
     final windUnit = userPrefs.preferredWindUnit;
-    late String windUnitLabel;
-    switch (windUnit) {
-      case WindUnit.kmh:
-        windUnitLabel = 'km/h';
-        break;
-      case WindUnit.ms:
-        windUnitLabel = 'm/s';
-        break;
-      case WindUnit.mph:
-        windUnitLabel = 'mph';
-        break;
-      case WindUnit.fts:
-        windUnitLabel = 'ft/s';
-        break;
-      case WindUnit.knots:
-        windUnitLabel = 'nœuds';
-        break;
-    }
+    final windUnitLabel = WindSpeed.unitToString(windUnit);
 
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: TextFormField(
-            controller: _windMinController,
-            decoration: InputDecoration(
-              labelText: 'Vitesse du vent min ($windUnitLabel)',
-              prefixIcon: const Icon(Icons.air, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        TextFormField(
+          controller: _windMinController,
+          decoration: InputDecoration(
+            labelText: 'Vitesse du vent min ($windUnitLabel)',
+            prefixIcon: const Icon(Icons.air, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final val = int.tryParse(value);
-              if (val == null || !WindSpeed.isValidWindSpeed(val, windUnit)) {
-                return 'Vitesse du vent invalide';
-              }
-              return null;
-            },
-            onSaved: (value) => _wind_min = WindSpeed(int.parse(value!), windUnit),
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final val = int.tryParse(value);
+            if (val == null || !WindSpeed.isValidWindSpeed(val, windUnit)) {
+              return 'Vitesse du vent comprise entre ${WindSpeed.minWindSpeed} et ${WindSpeed.maxWindSpeed}';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _wind_min = WindSpeed(int.parse(value), windUnit);
+            }
+          },
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextFormField(
-            controller: _windMaxController,
-            decoration: InputDecoration(
-              labelText: 'Vitesse du vent max ($windUnitLabel)',
-              prefixIcon: const Icon(Icons.air, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-              filled: true,
-              fillColor: Colors.blue.shade50,
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: _windMaxController,
+          decoration: InputDecoration(
+            labelText: 'Vitesse du vent max ($windUnitLabel)',
+            prefixIcon: const Icon(Icons.air, color: Colors.blueAccent),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Requis';
-              final maxVal = int.tryParse(value);
-              if (maxVal == null || !WindSpeed.isValidWindSpeed(maxVal, windUnit)) {
-                return 'Vitesse du vent invalide';
-              }
-
-              if (_windMinController.text.isNotEmpty) {
-                final minVal = int.tryParse(_windMinController.text);
-                if (minVal != null && maxVal < minVal) {
-                  return 'La vitesse du vent max doit être >= à la min';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) => _wind_max = WindSpeed(int.parse(value!), windUnit),
+            filled: true,
+            fillColor: Colors.blue.shade50,
           ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Requis';
+            final maxVal = int.tryParse(value);
+            if (maxVal == null || !WindSpeed.isValidWindSpeed(maxVal, windUnit)) {
+              return 'Vitesse du vent comprise entre ${WindSpeed.minWindSpeed} et ${WindSpeed.maxWindSpeed}';
+            }
+            if (_windMinController.text.isNotEmpty) {
+              final minVal = int.tryParse(_windMinController.text);
+              if (minVal != null && maxVal < minVal) {
+                return 'La vitesse du vent max doit être >= à la min';
+              }
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null) {
+              _wind_max = WindSpeed(int.parse(value), windUnit);
+            }
+          },
         ),
       ],
     );
@@ -749,10 +732,10 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       keyboardType: TextInputType.number,
       validator: (value) {
         if (value == null || value.isEmpty) return 'Requis';
-      
+
         final uv = UV(int.parse(value));
         if (!uv.isValid()) {
-          return 'UV invalide';
+          return 'UV doit être compris entre ${UV.minUV} et ${UV.maxUV}';
         }
         return null;
       },
@@ -776,7 +759,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un âge';
         if (!Age(int.parse(value)).isValid()) {
-          return 'L\'âge doit être entre 0 et 120 ans';
+          return 'L\'âge doit être entre ${Age.minAge} et ${Age.maxAge}';
         }
         return null;
       },
@@ -808,11 +791,11 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un email';
-        
+
         final email = Email(value);
         if (!email.isValid()) {
           return 'Format d\'email invalide (ex: exemple@domaine.com)';
-        }        
+        }
         return null;
       },
       onSaved: (value) => _email = Email(value!),
@@ -834,7 +817,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         if (value == null || value.isEmpty) {
           return 'Veuillez entrer un mot de passe';
         }
-        
+
         final password = Password(value);
         if (!password.isValid()) {
           return 'Le mot de passe doit contenir au moins 8 caractères, '
@@ -858,7 +841,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un prénom';
-        
+
         if (!FName(value).isValid()) {
           return 'Le prénom doit comporter au moins 2 lettres';
         }
@@ -880,7 +863,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Veuillez entrer un nom';
-        
+
         if (!LName(value).isValid()) {
           return 'Le nom doit comporter au moins 2 lettres';
         }

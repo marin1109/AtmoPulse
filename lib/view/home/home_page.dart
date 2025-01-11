@@ -612,6 +612,7 @@ class _HomePageState extends State<HomePage> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: weeklyForecast!.forecastDays.length,
                             itemBuilder: (context, index) {
+                              
                               final day = weeklyForecast!.forecastDays[index];
                               final date = DateTime.parse(day.date);
                               final dayOfWeek = _getJourSemaine(date);

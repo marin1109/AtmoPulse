@@ -19,17 +19,17 @@ ________________________________________________________________________________
 | `nom`                 | VARCHAR(50)      | Nom de l'utilisateur.                          |
 | `email`               | VARCHAR(100) (U) | Email unique pour chaque utilisateur.          |
 | `mot_de_passe`        | VARBINARY(255)   | Mot de passe (haché).                          |
-| `age`                 | INT              | Âge de l'utilisateur.                          |
+| `age`                 | TINYINT          | Âge de l'utilisateur.                          |
 | `date_inscription`    | TIMESTAMP        | Date et heure d'inscription.                   |
-| `humidite_max`        | SMALLINT         | Humidité maximale souhaitée (en %).            |
-| `humidite_min`        | SMALLINT         | Humidité minimale souhaitée (en %).            |
-| `temperature_max`     | SMALLINT         | Température maximale souhaitée (en C).         |
-| `temperature_min`     | SMALLINT         | Température minimale souhaitée (en C).         |
-| `vent_max`            | SMALLINT         | Vitesse du vent maximale souhaitée (en km/h)   |
-| `vent_min`            | SMALLINT         | Vitesse du vent minimale souhaitée (en km/h)   |
+| `humidite_max`        | SMALLINT         | Humidité maximale souhaitée.                   |
+| `humidite_min`        | SMALLINT         | Humidité minimale souhaitée.                   |
+| `temperature_max`     | SMALLINT         | Température maximale souhaitée.                |
+| `temperature_min`     | SMALLINT         | Température minimale souhaitée.                |
+| `vent_max`            | SMALLINT         | Vitesse du vent maximale souhaitée.            |
+| `vent_min`            | SMALLINT         | Vitesse du vent minimale souhaitée.            |
 | `uv`                  | TINYINT          | Index UV maximal souhaité.                     |
-| `precipitations_max`  | SMALLINT         | Précipitations maximales souhaitées (en mm).   |
-| `precipitations_min`  | SMALLINT         | Précipitations minimales souhaitées (en mm).   |
+| `precipitations_max`  | SMALLINT         | Précipitations maximales souhaitées.           |
+| `precipitations_min`  | SMALLINT         | Précipitations minimales souhaitées.           |
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ---
 
