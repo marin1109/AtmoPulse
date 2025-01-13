@@ -85,7 +85,7 @@ class PreferencesPage extends StatelessWidget {
                           prefs.setPreferredTemperatureUnit(newValue);
                           updatePreferencesUnit(
                             prefs.email,
-                            prefs.preferredTemperatureUnit,
+                            newValue,
                             prefs.preferredWindUnit,
                             prefs.preferredHumidityUnit,
                             prefs.preferredPrecipitationUnit,
@@ -128,7 +128,7 @@ class PreferencesPage extends StatelessWidget {
                           updatePreferencesUnit(
                             prefs.email,
                             prefs.preferredTemperatureUnit,
-                            prefs.preferredWindUnit,
+                            newValue,
                             prefs.preferredHumidityUnit,
                             prefs.preferredPrecipitationUnit,
                           );
@@ -173,7 +173,7 @@ class PreferencesPage extends StatelessWidget {
                             prefs.preferredTemperatureUnit,
                             prefs.preferredWindUnit,
                             prefs.preferredHumidityUnit,
-                            prefs.preferredPrecipitationUnit,
+                            newValue,
                           );
                         }
 
@@ -212,11 +212,12 @@ class PreferencesPage extends StatelessWidget {
                       onChanged: (HumidityUnit? newValue) {
                         if (newValue != null) {
                           prefs.setPreferredHumidityUnit(newValue);
+
                           updatePreferencesUnit(
                             prefs.email,
                             prefs.preferredTemperatureUnit,
                             prefs.preferredWindUnit,
-                            prefs.preferredHumidityUnit,
+                            newValue,
                             prefs.preferredPrecipitationUnit,
                           );
 
