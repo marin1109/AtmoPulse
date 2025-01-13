@@ -10,6 +10,15 @@ class Humidity extends ValueObject<int> {
 
   const Humidity(super.value, this.unit);
 
+  static Humidity convert(Humidity humidity, HumidityUnit unit) {
+    switch (unit) {
+      case HumidityUnit.relative:
+        return Humidity(humidity.toRelative(0).round(), unit);
+      case HumidityUnit.absolute:
+        return Humidity(humidity.toAbsolute(0).round(), unit);
+    }
+  }
+
   double toAbsolute(int temperatureCelsius) {
     if (unit == HumidityUnit.absolute) {
       return value.toDouble();

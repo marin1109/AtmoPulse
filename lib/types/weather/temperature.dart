@@ -10,6 +10,17 @@ class Temperature extends ValueObject<int> {
 
   const Temperature(super.value, this.unit);
 
+  static Temperature convert(Temperature temperature, TemperatureUnit unit) {
+    switch (unit) {
+      case TemperatureUnit.celsius:
+        return Temperature(temperature.toCelsius(), unit);
+      case TemperatureUnit.fahrenheit:
+        return Temperature(temperature.toFahrenheit(), unit);
+      case TemperatureUnit.kelvin:
+        return Temperature(temperature.toKelvin(), unit);
+    }
+  }
+
   int toCelsius() {
     switch (unit) {
       case TemperatureUnit.celsius:

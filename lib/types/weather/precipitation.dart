@@ -10,6 +10,17 @@ class Precipitation extends ValueObject<int> {
 
   const Precipitation(super.value, this.unit);
 
+  static Precipitation convert(Precipitation precipitation, PrecipitationUnit unit) {
+    switch (unit) {
+      case PrecipitationUnit.mm:
+        return Precipitation(precipitation.toMillimeters(), unit);
+      case PrecipitationUnit.inches:
+        return Precipitation(precipitation.toInches(), unit);
+      case PrecipitationUnit.litersPerSquareMeter:
+        return Precipitation(precipitation.toLitersPerSquareMeter(), unit);
+    }
+  }
+
   int toMillimeters() {
     switch (unit) {
       case PrecipitationUnit.mm:

@@ -97,6 +97,7 @@
 │   │   ├── home/               # Page d'accueil et affichage des données météo
 │   │   └── settings/           # Page des préférences
 │   ├── utils/                  # Logique de l'application (UserPreferences, etc.)
+│   ├── models/                 # Modèles de données (User, Weather)
 │   ├── [...]
 │   └── [...]
 ├── DataBase_descriptive.md     # Description de la base de données et du schéma

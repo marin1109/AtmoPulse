@@ -10,6 +10,21 @@ class WindSpeed extends ValueObject<int> {
 
   const WindSpeed(super.value, this.unit);
 
+  static WindSpeed convert(WindSpeed wind, WindUnit unit) {
+    switch (unit) {
+      case WindUnit.kmh:
+        return WindSpeed(wind.toKmh(), WindUnit.kmh);
+      case WindUnit.ms:
+        return WindSpeed(wind.toMs(), WindUnit.ms);
+      case WindUnit.mph:
+        return WindSpeed(wind.toMph(), WindUnit.mph);
+      case WindUnit.fts:
+        return WindSpeed(wind.toFts(), WindUnit.fts);
+      case WindUnit.knots:
+        return WindSpeed(wind.toKnots(), WindUnit.knots);
+    }
+  } 
+
   int toKmh() {
     switch (unit) {
       case WindUnit.kmh:

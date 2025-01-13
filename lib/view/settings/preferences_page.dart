@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 // Utils
 import '../../utils/user_preferences.dart';
+import '../../services/account_service.dart';
 
 // Types - Weather
 import '../../types/weather/humidity.dart';
@@ -17,9 +18,9 @@ class PreferencesPage extends StatelessWidget {
   const PreferencesPage({super.key});
 
   static const Map<int, String> intervalsMap = {
-    15:  '15 minutes',
-    30:  '30 minutes',
-    60:  '1 heure',
+    15: '15 minutes',
+    30: '30 minutes',
+    60: '1 heure',
     120: '2 heures',
     240: '4 heures',
     480: '8 heures',
@@ -82,6 +83,13 @@ class PreferencesPage extends StatelessWidget {
                       onChanged: (TemperatureUnit? newValue) {
                         if (newValue != null) {
                           prefs.setPreferredTemperatureUnit(newValue);
+                          updatePreferencesUnit(
+                            prefs.email,
+                            prefs.preferredTemperatureUnit,
+                            prefs.preferredWindUnit,
+                            prefs.preferredHumidityUnit,
+                            prefs.preferredPrecipitationUnit,
+                          );
                         }
                       },
                       items: _temperatureUnits.map((TemperatureUnit value) {
@@ -105,6 +113,13 @@ class PreferencesPage extends StatelessWidget {
                       onChanged: (WindUnit? newValue) {
                         if (newValue != null) {
                           prefs.setPreferredWindUnit(newValue);
+                          updatePreferencesUnit(
+                            prefs.email,
+                            prefs.preferredTemperatureUnit,
+                            prefs.preferredWindUnit,
+                            prefs.preferredHumidityUnit,
+                            prefs.preferredPrecipitationUnit,
+                          );
                         }
                       },
                       items: _windSpeedUnits.map((WindUnit value) {
@@ -128,6 +143,13 @@ class PreferencesPage extends StatelessWidget {
                       onChanged: (PrecipitationUnit? newValue) {
                         if (newValue != null) {
                           prefs.setPreferredPrecipitationUnit(newValue);
+                          updatePreferencesUnit(
+                            prefs.email,
+                            prefs.preferredTemperatureUnit,
+                            prefs.preferredWindUnit,
+                            prefs.preferredHumidityUnit,
+                            prefs.preferredPrecipitationUnit,
+                          );
                         }
                       },
                       items: _precipitationUnits.map((PrecipitationUnit value) {
@@ -151,6 +173,25 @@ class PreferencesPage extends StatelessWidget {
                       onChanged: (HumidityUnit? newValue) {
                         if (newValue != null) {
                           prefs.setPreferredHumidityUnit(newValue);
+                          updatePreferencesUnit(
+                            prefs.email,
+                            prefs.preferredTemperatureUnit,
+                            prefs.preferredWindUnit,
+                            prefs.preferredHumidityUnit,
+                            prefs.preferredPrecipitationUnit,
+                          );
+                          updateSensibilites(
+                            prefs.email,
+                            humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
+                            humiditeMax: Humidity.convert(prefs.humidityMax!, prefs.preferredHumidityUnit).value,
+                            precipitationsMin: Precipitation.convert(prefs.precipMin!, prefs.preferredPrecipitationUnit).value,
+                            precipitationsMax: Precipitation.convert(prefs.precipMax!, prefs.preferredPrecipitationUnit).value,
+                            temperatureMin: Temperature.convert(prefs.tempMin!, prefs.preferredTemperatureUnit).value,
+                            temperatureMax: Temperature.convert(prefs.tempMax!, prefs.preferredTemperatureUnit).value,
+                            ventMin: WindSpeed.convert(prefs.windMin!, prefs.preferredWindUnit).value,
+                            ventMax: WindSpeed.convert(prefs.windMin!, prefs.preferredWindUnit).value,
+                            uv: prefs.uvValue!.value,
+                          );
                         }
                       },
                       items: _humidityUnits.map((HumidityUnit value) {
@@ -168,23 +209,23 @@ class PreferencesPage extends StatelessWidget {
                     ),
                   ),
                   if (prefs.isLogged)
-                  _buildPreferenceSection(
-                    title: "Fréquence de mise à jour",
-                    child: DropdownButton<int>(
-                      value: prefs.fetchIntervalInMinutes,
-                      onChanged: (int? newVal) async {
-                        if (newVal != null) {
-                          await prefs.setFetchIntervalInMinutes(newVal);
-                        }
-                      },
-                      items: intervalsMap.entries.map((entry) {
-                        return DropdownMenuItem<int>(
-                          value: entry.key,
-                          child: Text(entry.value),
-                        );
-                      }).toList(),
+                    _buildPreferenceSection(
+                      title: "Fréquence de mise à jour",
+                      child: DropdownButton<int>(
+                        value: prefs.fetchIntervalInMinutes,
+                        onChanged: (int? newVal) async {
+                          if (newVal != null) {
+                            await prefs.setFetchIntervalInMinutes(newVal);
+                          }
+                        },
+                        items: intervalsMap.entries.map((entry) {
+                          return DropdownMenuItem<int>(
+                            value: entry.key,
+                            child: Text(entry.value),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -194,7 +235,8 @@ class PreferencesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPreferenceSection({required String title, required Widget child}) {
+  Widget _buildPreferenceSection(
+      {required String title, required Widget child}) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
