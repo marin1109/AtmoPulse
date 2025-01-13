@@ -80,7 +80,7 @@ class PreferencesPage extends StatelessWidget {
                     title: 'Unité de Température',
                     child: DropdownButton<TemperatureUnit>(
                       value: prefs.preferredTemperatureUnit,
-                      onChanged: (TemperatureUnit? newValue) {
+                      onChanged: (TemperatureUnit? newValue) async {
                         if (newValue != null) {
                           prefs.setPreferredTemperatureUnit(newValue);
 
@@ -129,7 +129,7 @@ class PreferencesPage extends StatelessWidget {
                     title: 'Unité de Vitesse du Vent',
                     child: DropdownButton<WindUnit>(
                       value: prefs.preferredWindUnit,
-                      onChanged: (WindUnit? newValue) {
+                      onChanged: (WindUnit? newValue) async {
                         if (newValue != null) {
                           prefs.setPreferredWindUnit(newValue);
 
@@ -178,10 +178,10 @@ class PreferencesPage extends StatelessWidget {
                     title: 'Unité de Précipitations',
                     child: DropdownButton<PrecipitationUnit>(
                       value: prefs.preferredPrecipitationUnit,
-                      onChanged: (PrecipitationUnit? newValue) {
+                      onChanged: (PrecipitationUnit? newValue) async {
                         if (newValue != null) {
                           prefs.setPreferredPrecipitationUnit(newValue);
-                          
+
                           updatePreferencesUnit(
                             prefs.email,
                             prefs.preferredTemperatureUnit,
@@ -227,7 +227,7 @@ class PreferencesPage extends StatelessWidget {
                     title: 'Unité d\'Humidité',
                     child: DropdownButton<HumidityUnit>(
                       value: prefs.preferredHumidityUnit,
-                      onChanged: (HumidityUnit? newValue) {
+                      onChanged: (HumidityUnit? newValue) async {
                         if (newValue != null) {
                           prefs.setPreferredHumidityUnit(newValue);
 
@@ -239,7 +239,7 @@ class PreferencesPage extends StatelessWidget {
                             prefs.preferredPrecipitationUnit,
                           );
 
-                          updateSensibilites(
+                          await updateSensibilites(
                             prefs.email,
 
                             humiditeMin: Humidity.convert(prefs.humidityMin!, newValue).value,
