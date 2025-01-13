@@ -101,8 +101,8 @@ class PreferencesPage extends StatelessWidget {
                             precipitationsMin: Precipitation.convert(prefs.precipMin!, prefs.preferredPrecipitationUnit).value,
                             precipitationsMax: Precipitation.convert(prefs.precipMax!, prefs.preferredPrecipitationUnit).value,
                             
-                            temperatureMin: Temperature.convert(prefs.tempMin!, prefs.preferredTemperatureUnit).value,
-                            temperatureMax: Temperature.convert(prefs.tempMax!, prefs.preferredTemperatureUnit).value,
+                            temperatureMin: Temperature.convert(prefs.tempMin!, newValue).value,
+                            temperatureMax: Temperature.convert(prefs.tempMax!, newValue).value,
                             
                             ventMin: WindSpeed.convert(prefs.windMin!, prefs.preferredWindUnit).value,
                             ventMax: WindSpeed.convert(prefs.windMax!, prefs.preferredWindUnit).value,
