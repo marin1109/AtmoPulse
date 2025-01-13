@@ -1,26 +1,33 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:provider/provider.dart';
 
+// Services
 import '../../services/account_service.dart';
+import '../../services/fetch_and_notify.dart';
 
-// Types (email, password, etc.)
+// Types - Common
 import '../../types/common/email.dart';
 import '../../types/common/password.dart';
 import '../../types/common/lname.dart';
 import '../../types/common/fname.dart';
 import '../../types/common/age.dart';
+
+// Types - Weather
 import '../../types/weather/temperature.dart';
 import '../../types/weather/humidity.dart';
 import '../../types/weather/precipitation.dart';
 import '../../types/weather/wind_speed.dart';
 import '../../types/weather/uv.dart';
 
-// Page imports
+// Pages
 import 'user_page.dart';
 
-// UserPreferences
+// Utils
 import '../../utils/user_preferences.dart';
 
 class LSPage extends StatefulWidget {
@@ -171,6 +178,8 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
         if (userData['uv'] != null) {
           await userPrefs.setUV(userData['uv'].toInt());
         }
+
+        fetchAndNotify();
 
         _navigateToUserPage();
       } catch (e) {

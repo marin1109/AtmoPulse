@@ -1,8 +1,17 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:provider/provider.dart';
-import '../../types/common/password.dart';
+
+// Utils
 import '../../utils/user_preferences.dart';
+
+// Services
 import '../../services/account_service.dart';
+
+// Types - Common
+import '../../types/common/password.dart';
 
 class ChangePasswordDialog extends StatefulWidget {
   const ChangePasswordDialog({super.key});

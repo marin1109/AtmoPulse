@@ -11,6 +11,31 @@ import 'utils/user_preferences.dart';
 import 'view/home/home_page.dart';
 import 'services/fetch_and_notify.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestPermissions() async {
+  // Demander l'autorisation pour la localisation
+  if (await Permission.location.isDenied) {
+    await Permission.location.request();
+  }
+
+  // Demander l'autorisation pour le stockage
+  if (await Permission.storage.isDenied) {
+    await Permission.storage.request();
+  }
+
+  // Demander l'autorisation pour les notifications (Android 13+)
+  if (await Permission.notification.isDenied) {
+    await Permission.notification.request();
+  }
+
+  // Vérifiez si les permissions sont toujours refusées
+  if (await Permission.location.isPermanentlyDenied) {
+    openAppSettings();
+  }
+}
+
+
 /// 1. Callback "headless" pour background_fetch (Android lorsque l’appli est tuée).
 @pragma('vm:entry-point')
 Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
@@ -48,6 +73,8 @@ Future<void> main() async {
     print("Headless Task non enregistré : plateforme non supportée");
   }
 
+  await requestPermissions();
+
   // Lancer l'application
   runApp(
     ChangeNotifierProvider(
@@ -65,13 +92,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  int? _lastFetchInterval;
+
   @override
   void initState() {
     super.initState();
     _configureBackgroundFetch();
     final userPrefs = Provider.of<UserPreferences>(context, listen: false);
     userPrefs.addListener(() {
-      _configureBackgroundFetch();
+      final newInterval = userPrefs.fetchIntervalInMinutes;
+      if (_lastFetchInterval != newInterval) {
+        _configureBackgroundFetch();
+      }
     });
   }
 
@@ -88,9 +120,11 @@ class _MyAppState extends State<MyApp> {
       print('background_fetch désactivé : utilisateur non connecté');
       return;
     }
+    fetchAndNotify();
 
     final fetchInterval = 
         Provider.of<UserPreferences>(context, listen: false).fetchIntervalInMinutes;
+    _lastFetchInterval = fetchInterval;
 
     try {
       await BackgroundFetch.configure(

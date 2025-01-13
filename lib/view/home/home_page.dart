@@ -1,34 +1,44 @@
+// Flutter imports
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'dart:convert';
 
+// Package imports
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Services
 import '../../services/location_service.dart';
 import '../../services/weather_service.dart';
 import '../../services/account_service.dart';
 
+// Utils
 import '../../utils/user_preferences.dart';
 
-import '../account/log_in_sign_up_page.dart';
-import '../account/user_page.dart';
-import '../settings/preferences_page.dart';
-
-import '../dialogs/contact_dialog.dart';
-import '../dialogs/about_dialog.dart' as custom;
-
+// Models
 import '../../models/weather_data.dart';
+
+// Types
 import '../../types/weather/temperature.dart';
 import '../../types/weather/wind_speed.dart';
 import '../../types/weather/precipitation.dart';
 import '../../types/weather/humidity.dart';
+import '../../types/weather/forecast_weather.dart';
+import '../../types/weather/current_weather.dart';
 import '../../types/common/vs.dart';
 import '../../types/common/city.dart';
 import '../../types/common/region.dart';
 import '../../types/common/country.dart';
-import '../../types/weather/forecast_weather.dart';
-import '../../types/weather/current_weather.dart';
+
+// Views
+import '../account/log_in_sign_up_page.dart';
+import '../account/user_page.dart';
+import '../settings/preferences_page.dart';
+
+// Dialogs
+import '../dialogs/contact_dialog.dart';
+import '../dialogs/about_dialog.dart' as custom;
+
 
 class CitySearchDelegate extends SearchDelegate<String> {
   final WeatherService weatherService;

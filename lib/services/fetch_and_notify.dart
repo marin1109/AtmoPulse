@@ -67,7 +67,7 @@ WeatherSeverity evaluateWind({
 }) {
   if (actualWind < minWind) {
     final diff = (minWind - actualWind).abs();
-    if (diff > 10) { // Exemple: marge arbitraire
+    if (diff > 10) { 
       return WeatherSeverity.critical;
     } else {
       return WeatherSeverity.moderate;

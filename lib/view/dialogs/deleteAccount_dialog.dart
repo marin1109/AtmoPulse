@@ -1,9 +1,19 @@
-// deleteAccount_dialog.dart
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:provider/provider.dart';
-import '../../types/common/password.dart';
+
+// Utils
 import '../../utils/user_preferences.dart';
+
+// Services
 import '../../services/account_service.dart';
+
+// Types - Common
+import '../../types/common/password.dart';
+
+// Views
 import '../account/log_in_sign_up_page.dart';
 
 class DeleteAccountDialog extends StatefulWidget {

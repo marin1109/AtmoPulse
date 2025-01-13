@@ -1,7 +1,13 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:provider/provider.dart';
 
+// Utils
 import '../../utils/user_preferences.dart';
+
+// Views
 import '../account/log_in_sign_up_page.dart';
 
 class LogoutDialog extends StatelessWidget {

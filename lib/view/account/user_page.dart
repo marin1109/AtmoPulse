@@ -1,11 +1,14 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:provider/provider.dart';
 
-// Page d'authentification
-import 'log_in_sign_up_page.dart';
-
-// UserPreferences
+// Utils
 import '../../utils/user_preferences.dart';
+
+// Pages
+import 'log_in_sign_up_page.dart';
 
 // Dialogs
 import '../dialogs/editPreferences_dialog.dart';

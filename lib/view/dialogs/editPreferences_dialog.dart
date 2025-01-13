@@ -1,6 +1,13 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:provider/provider.dart';
+
+// Utils
 import '../../utils/user_preferences.dart';
+
+// Services
 import '../../services/account_service.dart';
 
 class EditPreferencesDialog extends StatefulWidget {

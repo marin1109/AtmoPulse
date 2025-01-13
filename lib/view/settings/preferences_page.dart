@@ -1,10 +1,13 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Package imports
 import 'package:provider/provider.dart';
 
-// Imports
+// Utils
 import '../../utils/user_preferences.dart';
 
-// Types
+// Types - Weather
 import '../../types/weather/humidity.dart';
 import '../../types/weather/precipitation.dart';
 import '../../types/weather/temperature.dart';
