@@ -6,6 +6,11 @@ import 'package:provider/provider.dart';
 
 // Utils
 import '../../utils/user_preferences.dart';
+import '../../types/weather/temperature.dart';
+import '../../types/weather/wind_speed.dart';
+import '../../types/weather/precipitation.dart';
+import '../../types/weather/humidity.dart';
+
 
 // Pages
 import 'log_in_sign_up_page.dart';
@@ -270,14 +275,14 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _buildInfoRow('Température min/max',
+                    _buildInfoRow('Température min/max ${Temperature.unitToString(userPrefs.preferredTemperatureUnit)}',
                         '$temperatureMin / $temperatureMax', Icons.thermostat),
-                    _buildInfoRow('Humidité min/max',
+                    _buildInfoRow('Humidité min/max ${Humidity.unitToString(userPrefs.preferredHumidityUnit)}',
                         '$humidityMin / $humidityMax', Icons.water),
-                    _buildInfoRow('Précipitations min/max',
+                    _buildInfoRow('Précipitations min/max ${Precipitation.unitToString(userPrefs.preferredPrecipitationUnit)}',
                         '${userPrefs.precipMin?.value ?? 0} / ${userPrefs.precipMax?.value ?? 100}',
                         Icons.water_drop),
-                    _buildInfoRow('Vent min/max', '$windMin / $windMax',
+                    _buildInfoRow('Vent min/max ${WindSpeed.unitToString(userPrefs.preferredWindUnit)}', '$windMin / $windMax',
                         Icons.air),
                     _buildInfoRow('UV', '$uvValue', Icons.wb_sunny),
                     const SizedBox(height: 20),
