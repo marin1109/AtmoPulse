@@ -84,7 +84,7 @@ class PreferencesPage extends StatelessWidget {
                         if (newValue != null) {
                           prefs.setPreferredTemperatureUnit(newValue);
 
-                          updatePreferencesUnit(
+                          await updatePreferencesUnit(
                             prefs.email,
                             newValue,
                             prefs.preferredWindUnit,
@@ -133,7 +133,7 @@ class PreferencesPage extends StatelessWidget {
                         if (newValue != null) {
                           prefs.setPreferredWindUnit(newValue);
 
-                          updatePreferencesUnit(
+                          await updatePreferencesUnit(
                             prefs.email,
                             prefs.preferredTemperatureUnit,
                             newValue,
@@ -182,7 +182,7 @@ class PreferencesPage extends StatelessWidget {
                         if (newValue != null) {
                           prefs.setPreferredPrecipitationUnit(newValue);
 
-                          updatePreferencesUnit(
+                          await updatePreferencesUnit(
                             prefs.email,
                             prefs.preferredTemperatureUnit,
                             prefs.preferredWindUnit,
