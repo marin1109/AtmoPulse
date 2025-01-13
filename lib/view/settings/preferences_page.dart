@@ -92,7 +92,7 @@ class PreferencesPage extends StatelessWidget {
                             prefs.preferredPrecipitationUnit,
                           );
 
-                          updateSensibilites(
+                          await updateSensibilites(
                             prefs.email,
                             
                             humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
@@ -141,7 +141,7 @@ class PreferencesPage extends StatelessWidget {
                             prefs.preferredPrecipitationUnit,
                           );
 
-                          updateSensibilites(
+                          await updateSensibilites(
                             prefs.email,
                             
                             humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
@@ -190,7 +190,7 @@ class PreferencesPage extends StatelessWidget {
                             newValue,
                           );
                           
-                          updateSensibilites(
+                          await updateSensibilites(
                             prefs.email,
                             
                             humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
@@ -231,7 +231,7 @@ class PreferencesPage extends StatelessWidget {
                         if (newValue != null) {
                           prefs.setPreferredHumidityUnit(newValue);
 
-                          updatePreferencesUnit(
+                          await updatePreferencesUnit(
                             prefs.email,
                             prefs.preferredTemperatureUnit,
                             prefs.preferredWindUnit,
