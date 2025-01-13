@@ -51,7 +51,8 @@ class UserPreferences extends ChangeNotifier {
   // ==============================
   TemperatureUnit get preferredTemperatureUnit => _preferredTemperatureUnit;
   WindUnit get preferredWindUnit => _preferredWindUnit;
-  PrecipitationUnit get preferredPrecipitationUnit => _preferredPrecipitationUnit;
+  PrecipitationUnit get preferredPrecipitationUnit =>
+      _preferredPrecipitationUnit;
   HumidityUnit get preferredHumidityUnit => _preferredHumidityUnit;
 
   bool get isLogged => _isLogged;
@@ -103,43 +104,23 @@ class UserPreferences extends ChangeNotifier {
     _prenom = FName(prefs.getString('prenom') ?? '');
     _age = Age(prefs.getInt('age') ?? 0);
 
-    _humidityMin = Humidity(
-      prefs.getInt('humidite_min') ?? 0,
-      _preferredHumidityUnit
-    );
-    _humidityMax = Humidity(
-      prefs.getInt('humidite_max') ?? 100,
-      _preferredHumidityUnit
-    );
+    _humidityMin =
+        Humidity(prefs.getInt('humidite_min') ?? 0, _preferredHumidityUnit);
+    _humidityMax =
+        Humidity(prefs.getInt('humidite_max') ?? 100, _preferredHumidityUnit);
     _precipMin = Precipitation(
-      prefs.getInt('precipitations_min') ?? 0,
-      _preferredPrecipitationUnit
-    );
+        prefs.getInt('precipitations_min') ?? 0, _preferredPrecipitationUnit);
     _precipMax = Precipitation(
-      prefs.getInt('precipitations_max') ?? 100,
-      _preferredPrecipitationUnit
-    );
+        prefs.getInt('precipitations_max') ?? 100, _preferredPrecipitationUnit);
     _tempMin = Temperature(
-      prefs.getInt('temperature_min') ?? -50,
-      _preferredTemperatureUnit
-    );
+        prefs.getInt('temperature_min') ?? -50, _preferredTemperatureUnit);
     _tempMax = Temperature(
-      prefs.getInt('temperature_max') ?? 50,
-      _preferredTemperatureUnit
-    );
+        prefs.getInt('temperature_max') ?? 50, _preferredTemperatureUnit);
 
-    _windMin = WindSpeed(
-      (prefs.getInt('vent_min') ?? 0), 
-      _preferredWindUnit
-    );
-    _windMax = WindSpeed(
-      (prefs.getInt('vent_max') ?? 200), 
-      _preferredWindUnit
-    );
+    _windMin = WindSpeed((prefs.getInt('vent_min') ?? 0), _preferredWindUnit);
+    _windMax = WindSpeed((prefs.getInt('vent_max') ?? 200), _preferredWindUnit);
 
-    _uvValue = UV(
-      prefs.getInt('uv') ?? 0
-    );
+    _uvValue = UV(prefs.getInt('uv') ?? 0);
 
     _fetchIntervalInMinutes = prefs.getInt('fetchIntervalInMinutes') ?? 15;
 
@@ -174,10 +155,10 @@ class UserPreferences extends ChangeNotifier {
     await prefs.setString('unite_temperature', unit.name);
     _preferredTemperatureUnit = unit;
     if (_tempMin != null) {
-      _tempMin = Temperature(_tempMin!.value, _preferredTemperatureUnit);
+      _tempMin = Temperature.convert(_tempMin!, unit);
     }
     if (_tempMax != null) {
-      _tempMax = Temperature(_tempMax!.value, _preferredTemperatureUnit);
+      _tempMax = Temperature.convert(_tempMax!, unit);
     }
     notifyListeners();
   }
@@ -187,10 +168,10 @@ class UserPreferences extends ChangeNotifier {
     await prefs.setString('unite_vitesse', unit.name);
     _preferredWindUnit = unit;
     if (_windMin != null) {
-      _windMin = WindSpeed(_windMin!.value, _preferredWindUnit);
+      _windMin = WindSpeed.convert(_windMin!, unit);
     }
     if (_windMax != null) {
-      _windMax = WindSpeed(_windMax!.value, _preferredWindUnit);
+      _windMax = WindSpeed.convert(_windMax!, unit);
     }
     notifyListeners();
   }
@@ -200,10 +181,10 @@ class UserPreferences extends ChangeNotifier {
     await prefs.setString('unite_precipitations', unit.name);
     _preferredPrecipitationUnit = unit;
     if (_precipMin != null) {
-      _precipMin = Precipitation(_precipMin!.value, _preferredPrecipitationUnit);
+      _precipMin = Precipitation.convert(_precipMin!, unit);
     }
     if (_precipMax != null) {
-      _precipMax = Precipitation(_precipMax!.value, _preferredPrecipitationUnit);
+      _precipMax = Precipitation.convert(_precipMax!, unit);
     }
     notifyListeners();
   }
@@ -213,10 +194,10 @@ class UserPreferences extends ChangeNotifier {
     await prefs.setString('unite_humidite', unit.name);
     _preferredHumidityUnit = unit;
     if (_humidityMin != null) {
-      _humidityMin = Humidity(_humidityMin!.value, _preferredHumidityUnit);
+      _humidityMin = Humidity.convert(_humidityMin!, unit);
     }
     if (_humidityMax != null) {
-      _humidityMax = Humidity(_humidityMax!.value, _preferredHumidityUnit);
+      _humidityMax = Humidity.convert(_humidityMax!, unit);
     }
     notifyListeners();
   }

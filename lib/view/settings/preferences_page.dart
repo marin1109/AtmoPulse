@@ -94,18 +94,18 @@ class PreferencesPage extends StatelessWidget {
 
                           await updateSensibilites(
                             prefs.email,
+
+                            humiditeMin: prefs.humidityMin!.value,
+                            humiditeMax: prefs.humidityMax!.value,
+
+                            precipitationsMin: prefs.precipMin!.value,
+                            precipitationsMax: prefs.precipMax!.value,
                             
-                            humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
-                            humiditeMax: Humidity.convert(prefs.humidityMax!, prefs.preferredHumidityUnit).value,
+                            temperatureMin: prefs.tempMin!.value,
+                            temperatureMax: prefs.tempMax!.value,
                             
-                            precipitationsMin: Precipitation.convert(prefs.precipMin!, prefs.preferredPrecipitationUnit).value,
-                            precipitationsMax: Precipitation.convert(prefs.precipMax!, prefs.preferredPrecipitationUnit).value,
-                            
-                            temperatureMin: Temperature.convert(prefs.tempMin!, newValue).value,
-                            temperatureMax: Temperature.convert(prefs.tempMax!, newValue).value,
-                            
-                            ventMin: WindSpeed.convert(prefs.windMin!, prefs.preferredWindUnit).value,
-                            ventMax: WindSpeed.convert(prefs.windMax!, prefs.preferredWindUnit).value,
+                            ventMin: prefs.windMin!.value,
+                            ventMax: prefs.windMax!.value,
                             
                             uv: prefs.uvValue!.value,
                           );
@@ -143,18 +143,18 @@ class PreferencesPage extends StatelessWidget {
 
                           await updateSensibilites(
                             prefs.email,
+
+                            humiditeMin: prefs.humidityMin!.value,
+                            humiditeMax: prefs.humidityMax!.value,
+
+                            precipitationsMin: prefs.precipMin!.value,
+                            precipitationsMax: prefs.precipMax!.value,
                             
-                            humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
-                            humiditeMax: Humidity.convert(prefs.humidityMax!, prefs.preferredHumidityUnit).value,
+                            temperatureMin: prefs.tempMin!.value,
+                            temperatureMax: prefs.tempMax!.value,
                             
-                            precipitationsMin: Precipitation.convert(prefs.precipMin!, prefs.preferredPrecipitationUnit).value,
-                            precipitationsMax: Precipitation.convert(prefs.precipMax!, prefs.preferredPrecipitationUnit).value,
-                            
-                            temperatureMin: Temperature.convert(prefs.tempMin!, prefs.preferredTemperatureUnit).value,
-                            temperatureMax: Temperature.convert(prefs.tempMax!, prefs.preferredTemperatureUnit).value,
-                            
-                            ventMin: WindSpeed.convert(prefs.windMin!, newValue).value,
-                            ventMax: WindSpeed.convert(prefs.windMax!, newValue).value,
+                            ventMin: prefs.windMin!.value,
+                            ventMax: prefs.windMax!.value,
                             
                             uv: prefs.uvValue!.value,
                           );
@@ -192,18 +192,18 @@ class PreferencesPage extends StatelessWidget {
                           
                           await updateSensibilites(
                             prefs.email,
+
+                            humiditeMin: prefs.humidityMin!.value,
+                            humiditeMax: prefs.humidityMax!.value,
+
+                            precipitationsMin: prefs.precipMin!.value,
+                            precipitationsMax: prefs.precipMax!.value,
                             
-                            humiditeMin: Humidity.convert(prefs.humidityMin!, prefs.preferredHumidityUnit).value,
-                            humiditeMax: Humidity.convert(prefs.humidityMax!, prefs.preferredHumidityUnit).value,
+                            temperatureMin: prefs.tempMin!.value,
+                            temperatureMax: prefs.tempMax!.value,
                             
-                            precipitationsMin: Precipitation.convert(prefs.precipMin!, newValue).value,
-                            precipitationsMax: Precipitation.convert(prefs.precipMax!, newValue).value,
-                            
-                            temperatureMin: Temperature.convert(prefs.tempMin!, prefs.preferredTemperatureUnit).value,
-                            temperatureMax: Temperature.convert(prefs.tempMax!, prefs.preferredTemperatureUnit).value,
-                            
-                            ventMin: WindSpeed.convert(prefs.windMin!, prefs.preferredWindUnit).value,
-                            ventMax: WindSpeed.convert(prefs.windMax!, prefs.preferredWindUnit).value,
+                            ventMin: prefs.windMin!.value,
+                            ventMax: prefs.windMax!.value,
                             
                             uv: prefs.uvValue!.value,
                           );
@@ -242,17 +242,17 @@ class PreferencesPage extends StatelessWidget {
                           await updateSensibilites(
                             prefs.email,
 
-                            humiditeMin: Humidity.convert(prefs.humidityMin!, newValue).value,
-                            humiditeMax: Humidity.convert(prefs.humidityMax!, newValue).value,
+                            humiditeMin: prefs.humidityMin!.value,
+                            humiditeMax: prefs.humidityMax!.value,
 
-                            precipitationsMin: Precipitation.convert(prefs.precipMin!, prefs.preferredPrecipitationUnit).value,
-                            precipitationsMax: Precipitation.convert(prefs.precipMax!, prefs.preferredPrecipitationUnit).value,
+                            precipitationsMin: prefs.precipMin!.value,
+                            precipitationsMax: prefs.precipMax!.value,
                             
-                            temperatureMin: Temperature.convert(prefs.tempMin!, prefs.preferredTemperatureUnit).value,
-                            temperatureMax: Temperature.convert(prefs.tempMax!, prefs.preferredTemperatureUnit).value,
+                            temperatureMin: prefs.tempMin!.value,
+                            temperatureMax: prefs.tempMax!.value,
                             
-                            ventMin: WindSpeed.convert(prefs.windMin!, prefs.preferredWindUnit).value,
-                            ventMax: WindSpeed.convert(prefs.windMax!, prefs.preferredWindUnit).value,
+                            ventMin: prefs.windMin!.value,
+                            ventMax: prefs.windMax!.value,
                             
                             uv: prefs.uvValue!.value,
                           );
