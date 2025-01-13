@@ -149,18 +149,18 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setTempMax(userData['temperature_max'].toInt());
         }
         if (userData['humidite_min'] != null) {
-          await userPrefs.setHumidityMin(userData['humidite_min'].toDouble());
+          await userPrefs.setHumidityMin(userData['humidite_min'].toInt());
         }
         if (userData['humidite_max'] != null) {
-          await userPrefs.setHumidityMax(userData['humidite_max'].toDouble());
+          await userPrefs.setHumidityMax(userData['humidite_max'].toInt());
         }
         if (userData['precipitations_min'] != null) {
           await userPrefs
-              .setPrecipMin(userData['precipitations_min'].toDouble());
+              .setPrecipMin(userData['precipitations_min'].toInt());
         }
         if (userData['precipitations_max'] != null) {
           await userPrefs
-              .setPrecipMax(userData['precipitations_max'].toDouble());
+              .setPrecipMax(userData['precipitations_max'].toInt());
         }
         if (userData['vent_min'] != null) {
           await userPrefs.setWindMin(userData['vent_min'].toInt());
@@ -169,7 +169,7 @@ class _LSPageState extends State<LSPage> with SingleTickerProviderStateMixin {
           await userPrefs.setWindMax(userData['vent_max'].toInt());
         }
         if (userData['uv'] != null) {
-          await userPrefs.setUV(userData['uv'].toDouble());
+          await userPrefs.setUV(userData['uv'].toInt());
         }
 
         _navigateToUserPage();
