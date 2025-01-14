@@ -76,219 +76,79 @@ class PreferencesPage extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: [
-                  _buildPreferenceSection(
+                  _buildDropdownSection<TemperatureUnit>(
                     title: 'Unité de Température',
-                    child: DropdownButton<TemperatureUnit>(
-                      value: prefs.preferredTemperatureUnit,
-                      onChanged: (TemperatureUnit? newValue) async {
-                        if (newValue != null) {
-                          prefs.setPreferredTemperatureUnit(newValue);
-
-                          await updatePreferencesUnit(
-                            prefs.email,
-                            newValue,
-                            prefs.preferredWindUnit,
-                            prefs.preferredHumidityUnit,
-                            prefs.preferredPrecipitationUnit,
-                          );
-
-                          await updateSensibilites(
-                            prefs.email,
-
-                            humiditeMin: prefs.humidityMin!.value,
-                            humiditeMax: prefs.humidityMax!.value,
-
-                            precipitationsMin: prefs.precipMin!.value,
-                            precipitationsMax: prefs.precipMax!.value,
-                            
-                            temperatureMin: prefs.tempMin!.value,
-                            temperatureMax: prefs.tempMax!.value,
-                            
-                            ventMin: prefs.windMin!.value,
-                            ventMax: prefs.windMax!.value,
-                            
-                            uv: prefs.uvValue!.value,
-                          );
-                        }
-                      },
-                      items: _temperatureUnits.map((TemperatureUnit value) {
-                        return DropdownMenuItem<TemperatureUnit>(
-                          value: value,
-                          child: Text(
-                            Temperature.unitToString(value),
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 16,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                    currentValue: prefs.preferredTemperatureUnit,
+                    items: _temperatureUnits,
+                    unitToString: Temperature.unitToString,
+                    onValueChanged: (newValue) async {
+                      prefs.setPreferredTemperatureUnit(newValue);
+                      await _handleUnitChange(
+                        prefs,
+                        temperature: newValue,
+                        wind: prefs.preferredWindUnit,
+                        humidity: prefs.preferredHumidityUnit,
+                        precipitation: prefs.preferredPrecipitationUnit,
+                      );
+                    },
                   ),
-                  _buildPreferenceSection(
+                  _buildDropdownSection<WindUnit>(
                     title: 'Unité de Vitesse du Vent',
-                    child: DropdownButton<WindUnit>(
-                      value: prefs.preferredWindUnit,
-                      onChanged: (WindUnit? newValue) async {
-                        if (newValue != null) {
-                          prefs.setPreferredWindUnit(newValue);
-
-                          await updatePreferencesUnit(
-                            prefs.email,
-                            prefs.preferredTemperatureUnit,
-                            newValue,
-                            prefs.preferredHumidityUnit,
-                            prefs.preferredPrecipitationUnit,
-                          );
-
-                          await updateSensibilites(
-                            prefs.email,
-
-                            humiditeMin: prefs.humidityMin!.value,
-                            humiditeMax: prefs.humidityMax!.value,
-
-                            precipitationsMin: prefs.precipMin!.value,
-                            precipitationsMax: prefs.precipMax!.value,
-                            
-                            temperatureMin: prefs.tempMin!.value,
-                            temperatureMax: prefs.tempMax!.value,
-                            
-                            ventMin: prefs.windMin!.value,
-                            ventMax: prefs.windMax!.value,
-                            
-                            uv: prefs.uvValue!.value,
-                          );
-                        }
-                      },
-                      items: _windSpeedUnits.map((WindUnit value) {
-                        return DropdownMenuItem<WindUnit>(
-                          value: value,
-                          child: Text(
-                            WindSpeed.unitToString(value),
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 16,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                    currentValue: prefs.preferredWindUnit,
+                    items: _windSpeedUnits,
+                    unitToString: WindSpeed.unitToString,
+                    onValueChanged: (newValue) async {
+                      prefs.setPreferredWindUnit(newValue);
+                      await _handleUnitChange(
+                        prefs,
+                        temperature: prefs.preferredTemperatureUnit,
+                        wind: newValue,
+                        humidity: prefs.preferredHumidityUnit,
+                        precipitation: prefs.preferredPrecipitationUnit,
+                      );
+                    },
                   ),
-                  _buildPreferenceSection(
+                  _buildDropdownSection<PrecipitationUnit>(
                     title: 'Unité de Précipitations',
-                    child: DropdownButton<PrecipitationUnit>(
-                      value: prefs.preferredPrecipitationUnit,
-                      onChanged: (PrecipitationUnit? newValue) async {
-                        if (newValue != null) {
-                          prefs.setPreferredPrecipitationUnit(newValue);
-
-                          await updatePreferencesUnit(
-                            prefs.email,
-                            prefs.preferredTemperatureUnit,
-                            prefs.preferredWindUnit,
-                            prefs.preferredHumidityUnit,
-                            newValue,
-                          );
-                          
-                          await updateSensibilites(
-                            prefs.email,
-
-                            humiditeMin: prefs.humidityMin!.value,
-                            humiditeMax: prefs.humidityMax!.value,
-
-                            precipitationsMin: prefs.precipMin!.value,
-                            precipitationsMax: prefs.precipMax!.value,
-                            
-                            temperatureMin: prefs.tempMin!.value,
-                            temperatureMax: prefs.tempMax!.value,
-                            
-                            ventMin: prefs.windMin!.value,
-                            ventMax: prefs.windMax!.value,
-                            
-                            uv: prefs.uvValue!.value,
-                          );
-                        }
-                      },
-                      items: _precipitationUnits.map((PrecipitationUnit value) {
-                        return DropdownMenuItem<PrecipitationUnit>(
-                          value: value,
-                          child: Text(
-                            Precipitation.unitToString(value),
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 16,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                    currentValue: prefs.preferredPrecipitationUnit,
+                    items: _precipitationUnits,
+                    unitToString: Precipitation.unitToString,
+                    onValueChanged: (newValue) async {
+                      prefs.setPreferredPrecipitationUnit(newValue);
+                      await _handleUnitChange(
+                        prefs,
+                        temperature: prefs.preferredTemperatureUnit,
+                        wind: prefs.preferredWindUnit,
+                        humidity: prefs.preferredHumidityUnit,
+                        precipitation: newValue,
+                      );
+                    },
                   ),
-                  _buildPreferenceSection(
+                  _buildDropdownSection<HumidityUnit>(
                     title: 'Unité d\'Humidité',
-                    child: DropdownButton<HumidityUnit>(
-                      value: prefs.preferredHumidityUnit,
-                      onChanged: (HumidityUnit? newValue) async {
-                        if (newValue != null) {
-                          prefs.setPreferredHumidityUnit(newValue);
-
-                          await updatePreferencesUnit(
-                            prefs.email,
-                            prefs.preferredTemperatureUnit,
-                            prefs.preferredWindUnit,
-                            newValue,
-                            prefs.preferredPrecipitationUnit,
-                          );
-
-                          await updateSensibilites(
-                            prefs.email,
-
-                            humiditeMin: prefs.humidityMin!.value,
-                            humiditeMax: prefs.humidityMax!.value,
-
-                            precipitationsMin: prefs.precipMin!.value,
-                            precipitationsMax: prefs.precipMax!.value,
-                            
-                            temperatureMin: prefs.tempMin!.value,
-                            temperatureMax: prefs.tempMax!.value,
-                            
-                            ventMin: prefs.windMin!.value,
-                            ventMax: prefs.windMax!.value,
-                            
-                            uv: prefs.uvValue!.value,
-                          );
-                        }
-                      },
-                      items: _humidityUnits.map((HumidityUnit value) {
-                        return DropdownMenuItem<HumidityUnit>(
-                          value: value,
-                          child: Text(
-                            Humidity.unitToString(value),
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 16,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                    currentValue: prefs.preferredHumidityUnit,
+                    items: _humidityUnits,
+                    unitToString: Humidity.unitToString,
+                    onValueChanged: (newValue) async {
+                      prefs.setPreferredHumidityUnit(newValue);
+                      await _handleUnitChange(
+                        prefs,
+                        temperature: prefs.preferredTemperatureUnit,
+                        wind: prefs.preferredWindUnit,
+                        humidity: newValue,
+                        precipitation: prefs.preferredPrecipitationUnit,
+                      );
+                    },
                   ),
                   if (prefs.isLogged)
-                    _buildPreferenceSection(
+                    _buildDropdownSection<int>(
                       title: "Fréquence de mise à jour",
-                      child: DropdownButton<int>(
-                        value: prefs.fetchIntervalInMinutes,
-                        onChanged: (int? newVal) async {
-                          if (newVal != null) {
-                            await prefs.setFetchIntervalInMinutes(newVal);
-                          }
-                        },
-                        items: intervalsMap.entries.map((entry) {
-                          return DropdownMenuItem<int>(
-                            value: entry.key,
-                            child: Text(entry.value),
-                          );
-                        }).toList(),
-                      ),
+                      currentValue: prefs.fetchIntervalInMinutes,
+                      items: intervalsMap.keys.toList(),
+                      unitToString: (int value) => intervalsMap[value] ?? '',
+                      onValueChanged: (newVal) async {
+                        await prefs.setFetchIntervalInMinutes(newVal);
+                      },
                     ),
                 ],
               ),
@@ -299,8 +159,75 @@ class PreferencesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPreferenceSection(
-      {required String title, required Widget child}) {
+  Future<void> _handleUnitChange(
+    UserPreferences prefs, {
+    required TemperatureUnit temperature,
+    required WindUnit wind,
+    required HumidityUnit humidity,
+    required PrecipitationUnit precipitation,
+  }) async {
+    await updatePreferencesUnit(
+      prefs.email,
+      temperature,
+      wind,
+      humidity,
+      precipitation,
+    );
+
+    await _updateSensibilities(prefs);
+  }
+
+  Future<void> _updateSensibilities(UserPreferences prefs) async {
+    await updateSensibilites(
+      prefs.email,
+      humiditeMin: prefs.humidityMin!.value,
+      humiditeMax: prefs.humidityMax!.value,
+      precipitationsMin: prefs.precipMin!.value,
+      precipitationsMax: prefs.precipMax!.value,
+      temperatureMin: prefs.tempMin!.value,
+      temperatureMax: prefs.tempMax!.value,
+      ventMin: prefs.windMin!.value,
+      ventMax: prefs.windMax!.value,
+      uv: prefs.uvValue!.value,
+    );
+  }
+
+  Widget _buildDropdownSection<T>({
+    required String title,
+    required T currentValue,
+    required List<T> items,
+    required String Function(T) unitToString,
+    required Future<void> Function(T) onValueChanged,
+  }) {
+    return _buildPreferenceSection(
+      title: title,
+      child: DropdownButton<T>(
+        value: currentValue,
+        onChanged: (T? newValue) async {
+          if (newValue != null) {
+            await onValueChanged(newValue);
+          }
+        },
+        items: items.map((T value) {
+          return DropdownMenuItem<T>(
+            value: value,
+            child: Text(
+              unitToString(value),
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+                fontSize: 16,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildPreferenceSection({
+    required String title,
+    required Widget child,
+  }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
