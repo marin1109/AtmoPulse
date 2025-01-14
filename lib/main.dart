@@ -13,29 +13,6 @@ import 'services/fetch_and_notify.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
-Future<void> requestPermissions() async {
-  // Demander l'autorisation pour la localisation
-  if (await Permission.location.isDenied) {
-    await Permission.location.request();
-  }
-
-  // Demander l'autorisation pour le stockage
-  if (await Permission.storage.isDenied) {
-    await Permission.storage.request();
-  }
-
-  // Demander l'autorisation pour les notifications (Android 13+)
-  if (await Permission.notification.isDenied) {
-    await Permission.notification.request();
-  }
-
-  // Vérifiez si les permissions sont toujours refusées
-  if (await Permission.location.isPermanentlyDenied) {
-    openAppSettings();
-  }
-}
-
-
 /// 1. Callback "headless" pour background_fetch (Android lorsque l’appli est tuée).
 @pragma('vm:entry-point')
 Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
@@ -72,8 +49,6 @@ Future<void> main() async {
   } else {
     print("Headless Task non enregistré : plateforme non supportée");
   }
-
-  await requestPermissions();
 
   // Lancer l'application
   runApp(

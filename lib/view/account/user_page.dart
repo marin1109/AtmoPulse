@@ -11,7 +11,6 @@ import '../../types/weather/wind_speed.dart';
 import '../../types/weather/precipitation.dart';
 import '../../types/weather/humidity.dart';
 
-
 // Pages
 import 'log_in_sign_up_page.dart';
 
@@ -20,6 +19,8 @@ import '../dialogs/editPreferences_dialog.dart';
 import '../dialogs/changePassword_dialog.dart';
 import '../dialogs/deleteAccount_dialog.dart';
 import '../dialogs/logout_dialog.dart';
+
+import 'info_row.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -39,103 +40,10 @@ class _UserPageState extends State<UserPage> {
   // ==============================
   void _logout(BuildContext context) async {
     final userPrefs = Provider.of<UserPreferences>(context, listen: false);
-
     await userPrefs.clearAll();
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LSPage()),
-    );
-  }
-
-  Widget contentBox(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.only(
-              left: 20, top: 65, right: 20, bottom: 20),
-          margin: const EdgeInsets.only(top: 45),
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black45,
-                offset: Offset(0, 10),
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Déconnexion',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-              const SizedBox(height: 15),
-              const Text(
-                'Êtes-vous sûr de vouloir vous déconnecter ?',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Montserrat',
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 22),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(
-                      'Annuler',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.blueAccent,
-                        fontFamily: 'Montserrat',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _logout(context);
-                    },
-                    child: const Text(
-                      'Oui',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.blueAccent,
-                        fontFamily: 'Montserrat',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          left: 20,
-          right: 20,
-          child: CircleAvatar(
-            backgroundColor: Colors.blueAccent,
-            radius: 45,
-            child: const Icon(
-              Icons.logout,
-              color: Colors.white,
-              size: 50,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -158,12 +66,12 @@ class _UserPageState extends State<UserPage> {
     // Récupération via Provider
     final userPrefs = Provider.of<UserPreferences>(context);
 
-    final prenom = userPrefs.prenom; // FName
-    final nom = userPrefs.nom;       // LName
-    final age = userPrefs.age;       // Age
+    final prenom = userPrefs.prenom; // Prénom
+    final nom = userPrefs.nom;       // Nom
+    final age = userPrefs.age;       // Âge
     final email = userPrefs.email;   // Email
 
-    // Exemple de récupération de vos sensibilités (valeurs brutes)
+    // Récupération des sensibilités
     final humidityMin = userPrefs.humidityMin?.value ?? 0.0;
     final humidityMax = userPrefs.humidityMax?.value ?? 100.0;
     final temperatureMin = userPrefs.tempMin?.value ?? -50;
@@ -198,8 +106,10 @@ class _UserPageState extends State<UserPage> {
           PopupMenuButton<int>(
             onSelected: (item) => _onSelected(context, item),
             itemBuilder: (context) => [
-              const PopupMenuItem<int>(value: 0, child: Text('Changer le mot de passe')),
-              const PopupMenuItem<int>(value: 1, child: Text('Supprimer le compte')),
+              const PopupMenuItem<int>(
+                  value: 0, child: Text('Changer le mot de passe')),
+              const PopupMenuItem<int>(
+                  value: 1, child: Text('Supprimer le compte')),
             ],
           ),
         ],
@@ -220,8 +130,8 @@ class _UserPageState extends State<UserPage> {
             ),
             elevation: 8,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 30.0, horizontal: 20.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -232,7 +142,7 @@ class _UserPageState extends State<UserPage> {
                       child: Text(
                         prenom.toString().isNotEmpty
                             ? prenom.toString().substring(0, 1).toUpperCase()
-                            : 'U', // 'U' pour user
+                            : 'U', // 'U' pour User si prénom vide
                         style: const TextStyle(
                           fontSize: 50,
                           color: Colors.white,
@@ -261,11 +171,10 @@ class _UserPageState extends State<UserPage> {
                     const SizedBox(height: 20),
                     const Divider(),
                     const SizedBox(height: 10),
-                    _buildInfoRow('Âge', '${age.toString()} ans', Icons.cake),
+                    InfoRow(label: 'Âge', value: '${age.toString()} ans', icon: Icons.cake),
                     const SizedBox(height: 20),
                     const Divider(),
                     const SizedBox(height: 10),
-                    // Section préférences
                     const Text(
                       'Vos préférences',
                       style: TextStyle(
@@ -275,16 +184,27 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _buildInfoRow('Température min/max ${Temperature.unitToString(userPrefs.preferredTemperatureUnit)}',
-                        '$temperatureMin / $temperatureMax', Icons.thermostat),
-                    _buildInfoRow('Humidité min/max ${Humidity.unitToString(userPrefs.preferredHumidityUnit)}',
-                        '$humidityMin / $humidityMax', Icons.water),
-                    _buildInfoRow('Précipitations min/max ${Precipitation.unitToString(userPrefs.preferredPrecipitationUnit)}',
-                        '${userPrefs.precipMin?.value ?? 0} / ${userPrefs.precipMax?.value ?? 100}',
-                        Icons.water_drop),
-                    _buildInfoRow('Vent min/max ${WindSpeed.unitToString(userPrefs.preferredWindUnit)}', '$windMin / $windMax',
-                        Icons.air),
-                    _buildInfoRow('UV', '$uvValue', Icons.wb_sunny),
+                    InfoRow(
+                      label: 'Température min/max ${Temperature.unitToString(userPrefs.preferredTemperatureUnit)}',
+                      value: '$temperatureMin / $temperatureMax',
+                      icon: Icons.thermostat,
+                    ),
+                    InfoRow(
+                      label: 'Humidité min/max ${Humidity.unitToString(userPrefs.preferredHumidityUnit)}',
+                      value: '$humidityMin / $humidityMax',
+                      icon: Icons.water,
+                    ),
+                    InfoRow(
+                      label: 'Précipitations min/max ${Precipitation.unitToString(userPrefs.preferredPrecipitationUnit)}',
+                      value: '${userPrefs.precipMin?.value ?? 0} / ${userPrefs.precipMax?.value ?? 100}',
+                      icon: Icons.water_drop,
+                    ),
+                    InfoRow(
+                      label: 'Vent min/max ${WindSpeed.unitToString(userPrefs.preferredWindUnit)}',
+                      value: '$windMin / $windMax',
+                      icon: Icons.air,
+                    ),
+                    InfoRow(label: 'UV', value: '$uvValue', icon: Icons.wb_sunny),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.edit),
@@ -310,35 +230,6 @@ class _UserPageState extends State<UserPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.blueAccent),
-          const SizedBox(width: 10),
-          Text(
-            '$label : ',
-            style: const TextStyle(
-              fontSize: 18,
-              fontFamily: 'Montserrat',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'Montserrat',
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

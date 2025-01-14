@@ -39,7 +39,6 @@ import '../settings/preferences_page.dart';
 import '../dialogs/contact_dialog.dart';
 import '../dialogs/about_dialog.dart' as custom;
 
-
 class CitySearchDelegate extends SearchDelegate<String> {
   final WeatherService weatherService;
   CitySearchDelegate({required this.weatherService});
@@ -135,11 +134,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ===================
+  // Méthodes pour SharedPreferences
+  // ===================
+  Future<SharedPreferences> get _prefs async => SharedPreferences.getInstance();
+
+  Future<String?> get _storedEmail async {
+    final prefs = await _prefs;
+    return prefs.getString('email');
+  }
+
+  // ===================
   // GESTION DES FAVORIS
   // ===================
   Future<void> _loadFavoritesLocally() async {
-    // A vous de voir si vous voulez stocker dans userPrefs ou dans SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _prefs;
     final String? favString = prefs.getString('favorites');
     if (favString != null) {
       final List<dynamic> decoded = jsonDecode(favString);
@@ -151,17 +159,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _saveFavoritesLocally() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _prefs;
     final String encoded = jsonEncode(_favorites);
     await prefs.setString('favorites', encoded);
   }
 
   Future<void> _syncFavoritesFromServerIfLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedEmail = prefs.getString('email');
-    if (storedEmail != null && storedEmail.isNotEmpty) {
+    final email = await _storedEmail;
+    if (email != null && email.isNotEmpty) {
       try {
-        final serverFavorites = await getFavoriteCities(storedEmail);
+        final serverFavorites = await getFavoriteCities(email);
         final adapted = serverFavorites.map((fav) {
           return {
             'id': fav['id'].toString(),
@@ -181,11 +188,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _addToFavorites(City name, String cityUrl, Region villeRegionNom,
-      Country villePaysNom) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedEmail = prefs.getString('email');
-
+  Future<void> _addToFavorites(
+      City name, String cityUrl, Region villeRegionNom, Country villePaysNom) async {
+    final email = await _storedEmail;
     final bool alreadyExists = _favorites.any((item) => item['url'] == cityUrl);
     if (!alreadyExists) {
       setState(() {
@@ -198,18 +203,17 @@ class _HomePageState extends State<HomePage> {
       });
       await _saveFavoritesLocally();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$name a été ajouté(e) aux favoris !')),
+        SnackBar(content: Text('${name.value} a été ajouté(e) aux favoris !')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$name est déjà dans vos favoris.')),
+        SnackBar(content: Text('${name.value} est déjà dans vos favoris.')),
       );
     }
-    // Envoi au serveur si loggedIn
-    if (storedEmail != null && storedEmail.isNotEmpty) {
+    // Envoi au serveur si connecté
+    if (email != null && email.isNotEmpty) {
       try {
-        await addFavoriteCity(
-            storedEmail, cityUrl, name, villeRegionNom, villePaysNom);
+        await addFavoriteCity(email, cityUrl, name, villeRegionNom, villePaysNom);
       } catch (e) {
         print('Erreur côté serveur : $e');
       }
@@ -217,17 +221,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _removeFromFavorites(String cityUrl) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedEmail = prefs.getString('email');
-
+    final email = await _storedEmail;
     setState(() {
       _favorites.removeWhere((item) => item['url'] == cityUrl);
     });
     await _saveFavoritesLocally();
 
-    if (storedEmail != null && storedEmail.isNotEmpty) {
+    if (email != null && email.isNotEmpty) {
       try {
-        await removeFavoriteCity(storedEmail, cityUrl);
+        await removeFavoriteCity(email, cityUrl);
       } catch (e) {
         print('Erreur côté serveur : $e');
       }
@@ -235,9 +237,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showFavoritesDialog() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedEmail = prefs.getString('email');
-    if (storedEmail == null || storedEmail.isEmpty) {
+    final email = await _storedEmail;
+    if (email == null || email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content:
@@ -312,14 +313,13 @@ class _HomePageState extends State<HomePage> {
     final city = currentData.location.city;
     final cityRegion = currentData.location.region;
     final cityCountry = currentData.location.country;
-    final bool isLoggedIn = await _isUserLoggedIn();
-    if (isLoggedIn) {
+    if (await _isUserLoggedIn()) {
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text('Ajouter aux favoris ?'),
-            content: Text('Voulez-vous ajouter $city à vos favoris ?'),
+            content: Text('Voulez-vous ajouter ${city.value} à vos favoris ?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -340,16 +340,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> _isUserLoggedIn() async {
-    // Vérification simple (depuis prefs)
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedEmail = prefs.getString('email');
-    return (storedEmail != null && storedEmail.isNotEmpty);
+    final email = await _storedEmail;
+    return (email != null && email.isNotEmpty);
   }
 
   void _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedEmail = prefs.getString('email');
-    if (storedEmail != null && storedEmail.isNotEmpty) {
+    final email = await _storedEmail;
+    if (email != null && email.isNotEmpty) {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => const UserPage()));
     } else {
@@ -384,7 +381,7 @@ class _HomePageState extends State<HomePage> {
           weeklyForecast = forecastData.forecast;
         });
         // Sauvegarde en local
-        final sharedPrefs = await SharedPreferences.getInstance();
+        final prefs = await _prefs;
         final Map<String, dynamic> weatherMap = {
           'location': currentData.location.toJson(),
           'current': currentData.current.toJson(),
@@ -394,8 +391,8 @@ class _HomePageState extends State<HomePage> {
           'current': forecastData.current.toJson(),
           'forecast': forecastData.forecast?.toJson(),
         };
-        await sharedPrefs.setString('currentWeather', jsonEncode(weatherMap));
-        await sharedPrefs.setString('forecastWeather', jsonEncode(forecastMap));
+        await prefs.setString('currentWeather', jsonEncode(weatherMap));
+        await prefs.setString('forecastWeather', jsonEncode(forecastMap));
       }
     } catch (e) {
       print('Erreur inattendue : $e');
@@ -403,7 +400,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> loadSavedWeatherData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _prefs;
     final String? weatherString = prefs.getString('currentWeather');
     final String? forecastString = prefs.getString('forecastWeather');
     if (weatherString != null && forecastString != null) {
@@ -442,8 +439,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   final cityUrl = await showSearch<String>(
                     context: context,
-                    delegate:
-                        CitySearchDelegate(weatherService: weatherService),
+                    delegate: CitySearchDelegate(weatherService: weatherService),
                   );
                   if (cityUrl != null && cityUrl.isNotEmpty) {
                     await _onCitySelected(cityUrl);
@@ -493,7 +489,8 @@ class _HomePageState extends State<HomePage> {
                       break;
                   }
                 },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                       value: 'compte', child: Text('Compte')),
                   const PopupMenuItem<String>(
@@ -622,12 +619,11 @@ class _HomePageState extends State<HomePage> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: weeklyForecast!.forecastDays.length,
                             itemBuilder: (context, index) {
-                              
                               final day = weeklyForecast!.forecastDays[index];
                               final date = DateTime.parse(day.date);
                               final dayOfWeek = _getJourSemaine(date);
-
-                              final String minMaxTemp = '${Temperature.loadTemperatureText(
+                              final String minMaxTemp =
+                                  '${Temperature.loadTemperatureText(
                                 day.minTemp,
                                 userPreferences.preferredTemperatureUnit,
                               )} / ${Temperature.loadTemperatureText(
@@ -647,7 +643,8 @@ class _HomePageState extends State<HomePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -685,7 +682,8 @@ class _HomePageState extends State<HomePage> {
                     )
                   : const Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
             ),
