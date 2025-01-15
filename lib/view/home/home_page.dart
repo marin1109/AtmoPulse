@@ -1,110 +1,19 @@
-// Flutter imports
+import 'package:AtmoPulse/types/weather/humidity.dart';
+import 'package:AtmoPulse/types/weather/precipitation.dart';
+import 'package:AtmoPulse/types/weather/temperature.dart';
+import 'package:AtmoPulse/types/weather/wind_speed.dart';
+import 'package:AtmoPulse/types/weather/uv.dart';
+import 'package:AtmoPulse/view/dialogs/contact_dialog.dart';
+import 'package:AtmoPulse/view/dialogs/about_dialog.dart' as custom;
+import 'package:AtmoPulse/view/settings/preferences_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
-// Package imports
-import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-// Services
-import '../../services/location_service.dart';
-import '../../services/weather_service.dart';
-import '../../services/account_service.dart';
-
-// Utils
-import '../../utils/user_preferences.dart';
-
-// Models
-import '../../models/weather_data.dart';
-
-// Types
-import '../../types/weather/temperature.dart';
-import '../../types/weather/wind_speed.dart';
-import '../../types/weather/precipitation.dart';
-import '../../types/weather/humidity.dart';
-import '../../types/weather/forecast_weather.dart';
-import '../../types/weather/current_weather.dart';
-import '../../types/common/vs.dart';
-import '../../types/common/city.dart';
-import '../../types/common/region.dart';
-import '../../types/common/country.dart';
-
-// Views
-import '../account/log_in_sign_up_page.dart';
-import '../account/user_page.dart';
-import '../settings/preferences_page.dart';
-
-// Dialogs
-import '../dialogs/contact_dialog.dart';
-import '../dialogs/about_dialog.dart' as custom;
-
-class CitySearchDelegate extends SearchDelegate<String> {
-  final WeatherService weatherService;
-  CitySearchDelegate({required this.weatherService});
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    if (query.isEmpty) {
-      return const Center(child: Text("Tapez le nom d'une ville..."));
-    }
-    return FutureBuilder<List<VS>>(
-      future: weatherService.fetchCitySuggestions(query),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final suggestions = snapshot.data!;
-        if (suggestions.isEmpty) {
-          return Center(child: Text("Aucune ville trouvée pour '$query'"));
-        }
-        return ListView.builder(
-          itemCount: suggestions.length,
-          itemBuilder: (context, index) {
-            final city = suggestions[index];
-            return ListTile(
-              title: Text(city.city.value),
-              subtitle: Text('${city.region.value}, ${city.country.value}'),
-              onTap: () {
-                close(context, city.url);
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      close(context, query);
-    });
-    return Container();
-  }
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, '');
-      },
-    );
-  }
-}
+import '../../../utils/user_preferences.dart';
+import 'home_controller.dart';
+import 'city_search_delegate.dart';
+import 'widgets/weather_info_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -113,315 +22,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final LocationService locationService = LocationService();
-  final WeatherService weatherService = WeatherService();
-
-  Location? location;
-  CurrentWeather? weatherData;
-  ForecastWeather? weeklyForecast;
-  bool _isCustomCity = false;
-
-  // Cache local des favoris
-  List<Map<String, String>> _favorites = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadSavedWeatherData();
-    getWeatherData();
-    _loadFavoritesLocally();
-  }
-
-  // ===================
-  // Méthodes pour SharedPreferences
-  // ===================
-  Future<SharedPreferences> get _prefs async => SharedPreferences.getInstance();
-
-  Future<String?> get _storedEmail async {
-    final prefs = await _prefs;
-    return prefs.getString('email');
-  }
-
-  // ===================
-  // GESTION DES FAVORIS
-  // ===================
-  Future<void> _loadFavoritesLocally() async {
-    final prefs = await _prefs;
-    final String? favString = prefs.getString('favorites');
-    if (favString != null) {
-      final List<dynamic> decoded = jsonDecode(favString);
-      setState(() {
-        _favorites =
-            decoded.map((item) => Map<String, String>.from(item)).toList();
-      });
-    }
-  }
-
-  Future<void> _saveFavoritesLocally() async {
-    final prefs = await _prefs;
-    final String encoded = jsonEncode(_favorites);
-    await prefs.setString('favorites', encoded);
-  }
-
-  Future<void> _syncFavoritesFromServerIfLoggedIn() async {
-    final email = await _storedEmail;
-    if (email != null && email.isNotEmpty) {
-      try {
-        final serverFavorites = await getFavoriteCities(email);
-        final adapted = serverFavorites.map((fav) {
-          return {
-            'id': fav['id'].toString(),
-            'url': fav['ville_url'].toString(),
-            'name': fav['ville_nom']?.toString() ?? 'Inconnu',
-            'region': fav['ville_region_nom']?.toString() ?? 'Inconnue',
-            'country': fav['ville_pays_nom']?.toString() ?? 'Inconnu',
-          };
-        }).toList();
-        setState(() {
-          _favorites = adapted;
-        });
-        await _saveFavoritesLocally();
-      } catch (e) {
-        print('Erreur chargement favoris serveur : $e');
-      }
-    }
-  }
-
-  Future<void> _addToFavorites(
-      City name, String cityUrl, Region villeRegionNom, Country villePaysNom) async {
-    final email = await _storedEmail;
-    final bool alreadyExists = _favorites.any((item) => item['url'] == cityUrl);
-    if (!alreadyExists) {
-      setState(() {
-        _favorites.add({
-          'name': name.value,
-          'url': cityUrl,
-          'region': villeRegionNom.value,
-          'country': villePaysNom.value,
-        });
-      });
-      await _saveFavoritesLocally();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${name.value} a été ajouté(e) aux favoris !')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${name.value} est déjà dans vos favoris.')),
-      );
-    }
-    // Envoi au serveur si connecté
-    if (email != null && email.isNotEmpty) {
-      try {
-        await addFavoriteCity(email, cityUrl, name, villeRegionNom, villePaysNom);
-      } catch (e) {
-        print('Erreur côté serveur : $e');
-      }
-    }
-  }
-
-  Future<void> _removeFromFavorites(String cityUrl) async {
-    final email = await _storedEmail;
-    setState(() {
-      _favorites.removeWhere((item) => item['url'] == cityUrl);
-    });
-    await _saveFavoritesLocally();
-
-    if (email != null && email.isNotEmpty) {
-      try {
-        await removeFavoriteCity(email, cityUrl);
-      } catch (e) {
-        print('Erreur côté serveur : $e');
-      }
-    }
-  }
-
-  void _showFavoritesDialog() async {
-    final email = await _storedEmail;
-    if (email == null || email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('Vous devez être connecté pour accéder à vos favoris.')),
-      );
-      return;
-    }
-    await _syncFavoritesFromServerIfLoggedIn();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Mes favoris'),
-          content: (_favorites.isEmpty)
-              ? const Text('Vous n\'avez pas encore de favoris.')
-              : SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _favorites.map((fav) {
-                      final cityUrl = fav['url'] ?? '';
-                      final cityName = fav['name'] ?? 'Inconnu';
-                      final regionName = fav['region'] ?? 'Inconnue';
-                      final countryName = fav['country'] ?? 'Inconnu';
-
-                      return ListTile(
-                        title: Text(cityName),
-                        subtitle: Text('$regionName, $countryName'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            await _removeFromFavorites(cityUrl);
-                            _showFavoritesDialog();
-                          },
-                        ),
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          await _onCitySelected(cityUrl);
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Fermer'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // ===================
-  // Méthodes Météo
-  // ===================
-  Future<void> _onCitySelected(String cityUrl) async {
-    final currentData = await weatherService.fetchCurrentWeatherByUrl(cityUrl);
-    final forecastData = await weatherService.fetchWeeklyForecastByUrl(cityUrl);
-    if (currentData == null || forecastData == null) {
-      print('Données météo introuvables pour $cityUrl.');
-      return;
-    }
-    setState(() {
-      location = currentData.location;
-      weatherData = currentData.current;
-      weeklyForecast = forecastData.forecast;
-      _isCustomCity = true;
-    });
-
-    final city = currentData.location.city;
-    final cityRegion = currentData.location.region;
-    final cityCountry = currentData.location.country;
-    if (await _isUserLoggedIn()) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Ajouter aux favoris ?'),
-            content: Text('Voulez-vous ajouter ${city.value} à vos favoris ?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Non'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await _addToFavorites(city, cityUrl, cityRegion, cityCountry);
-                },
-                child: const Text('Oui'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  Future<bool> _isUserLoggedIn() async {
-    final email = await _storedEmail;
-    return (email != null && email.isNotEmpty);
-  }
-
-  void _checkLoginStatus() async {
-    final email = await _storedEmail;
-    if (email != null && email.isNotEmpty) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const UserPage()));
-    } else {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const LSPage()));
-    }
-  }
-
-  Future<void> getWeatherData() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.deniedForever) {
-          print(
-              'Les permissions de localisation sont refusées de façon permanente.');
-          return;
-        }
-      }
-      if (permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse) {
-        final position = await locationService.getUserLocation();
-        final currentData = await weatherService.fetchCurrentWeather(position);
-        final forecastData = await weatherService.fetchWeeklyForecast(position);
-        if (currentData == null || forecastData == null) {
-          print('Données météo non disponibles.');
-          return;
-        }
-        setState(() {
-          location = currentData.location;
-          weatherData = currentData.current;
-          weeklyForecast = forecastData.forecast;
-        });
-        // Sauvegarde en local
-        final prefs = await _prefs;
-        final Map<String, dynamic> weatherMap = {
-          'location': currentData.location.toJson(),
-          'current': currentData.current.toJson(),
-        };
-        final Map<String, dynamic> forecastMap = {
-          'location': forecastData.location.toJson(),
-          'current': forecastData.current.toJson(),
-          'forecast': forecastData.forecast?.toJson(),
-        };
-        await prefs.setString('currentWeather', jsonEncode(weatherMap));
-        await prefs.setString('forecastWeather', jsonEncode(forecastMap));
-      }
-    } catch (e) {
-      print('Erreur inattendue : $e');
-    }
-  }
-
-  Future<void> loadSavedWeatherData() async {
-    final prefs = await _prefs;
-    final String? weatherString = prefs.getString('currentWeather');
-    final String? forecastString = prefs.getString('forecastWeather');
-    if (weatherString != null && forecastString != null) {
-      final decodedJson = jsonDecode(weatherString) as Map<String, dynamic>;
-      final decodedForecastJson =
-          jsonDecode(forecastString) as Map<String, dynamic>;
-      final locationObj = Location.fromJson(decodedJson['location']);
-      final currentObj = CurrentWeather.fromJson(decodedJson['current']);
-      final weeklyForecastObj =
-          ForecastWeather.fromJson(decodedForecastJson['forecast']);
-      setState(() {
-        location = locationObj;
-        weatherData = currentObj;
-        weeklyForecast = weeklyForecastObj;
-      });
-      print('Données météo chargées depuis les SharedPreferences.');
-    } else {
-      print('Aucune donnée météo sauvegardée.');
-    }
-  }
-
+class _HomePageState extends State<HomePage> with HomePageController {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserPreferences>(
@@ -431,7 +32,9 @@ class _HomePageState extends State<HomePage> {
             title: const Text(
               'AtmoPulse',
               style: TextStyle(
-                  fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+              ),
             ),
             actions: [
               IconButton(
@@ -439,24 +42,25 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   final cityUrl = await showSearch<String>(
                     context: context,
-                    delegate: CitySearchDelegate(weatherService: weatherService),
+                    delegate:
+                        CitySearchDelegate(weatherService: weatherService),
                   );
                   if (cityUrl != null && cityUrl.isNotEmpty) {
-                    await _onCitySelected(cityUrl);
+                    await onCitySelected(cityUrl);
                   }
                 },
               ),
               IconButton(
                 icon: const Icon(Icons.star),
-                onPressed: () => _showFavoritesDialog(),
+                onPressed: () => showFavoritesDialog(context),
               ),
-              if (_isCustomCity)
+              if (isCustomCity)
                 IconButton(
                   icon: const Icon(Icons.home),
                   onPressed: () async {
                     await getWeatherData();
                     setState(() {
-                      _isCustomCity = false;
+                      isCustomCity = false;
                     });
                   },
                 ),
@@ -465,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                 onSelected: (String value) {
                   switch (value) {
                     case 'compte':
-                      _checkLoginStatus();
+                      checkLoginStatus(context);
                       break;
                     case 'preferences':
                       Navigator.push(
@@ -489,8 +93,7 @@ class _HomePageState extends State<HomePage> {
                       break;
                   }
                 },
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<String>>[
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                       value: 'compte', child: Text('Compte')),
                   const PopupMenuItem<String>(
@@ -542,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(height: 10),
                         Center(
                           child: Text(
-                            Temperature.loadTemperatureText(
+                            _loadTemperatureText(
                               weatherData!.temp,
                               userPreferences.preferredTemperatureUnit,
                             ),
@@ -568,35 +171,36 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Expanded(
-                              child: _buildWeatherInfo(
-                                icon: Icons.air,
-                                value: WindSpeed.loadWindText(
-                                  weatherData!.wind,
-                                  userPreferences.preferredWindUnit,
-                                ),
-                                label: 'Vent',
+                            WeatherInfoWidget(
+                              icon: Icons.air,
+                              value: _loadWindText(
+                                weatherData!.wind,
+                                userPreferences.preferredWindUnit,
                               ),
+                              label: 'Vent',
                             ),
-                            Expanded(
-                              child: _buildWeatherInfo(
-                                icon: Icons.water,
-                                value: Humidity.loadHumidityText(
-                                  weatherData!.humidity,
-                                  userPreferences.preferredHumidityUnit,
-                                ),
-                                label: 'Humidité',
+                            WeatherInfoWidget(
+                              icon: Icons.water,
+                              value: _loadHumidityText(
+                                weatherData!.humidity,
+                                userPreferences.preferredHumidityUnit,
                               ),
+                              label: 'Humidité',
                             ),
-                            Expanded(
-                              child: _buildWeatherInfo(
-                                icon: Icons.opacity,
-                                value: Precipitation.loadPrecipitationText(
-                                  weatherData!.precipitation,
-                                  userPreferences.preferredPrecipitationUnit,
-                                ),
-                                label: 'Précip.',
+                            WeatherInfoWidget(
+                              icon: Icons.opacity,
+                              value: _loadPrecipitationText(
+                                weatherData!.precipitation,
+                                userPreferences.preferredPrecipitationUnit,
                               ),
+                              label: 'Précipitations',
+                            ),
+                            WeatherInfoWidget(
+                              icon: Icons.wb_sunny,
+                              value: _loadUVText(
+                                weatherData!.uv,
+                              ),
+                              label: 'UV',
                             ),
                           ],
                         ),
@@ -623,13 +227,8 @@ class _HomePageState extends State<HomePage> {
                               final date = DateTime.parse(day.date);
                               final dayOfWeek = _getJourSemaine(date);
                               final String minMaxTemp =
-                                  '${Temperature.loadTemperatureText(
-                                day.minTemp,
-                                userPreferences.preferredTemperatureUnit,
-                              )} / ${Temperature.loadTemperatureText(
-                                day.maxTemp,
-                                userPreferences.preferredTemperatureUnit,
-                              )}';
+                                  '${_loadTemperatureText(day.minTemp, userPreferences.preferredTemperatureUnit)} / '
+                                  '${_loadTemperatureText(day.maxTemp, userPreferences.preferredTemperatureUnit)}';
 
                               return Card(
                                 color: Colors.white.withOpacity(0.2),
@@ -682,8 +281,7 @@ class _HomePageState extends State<HomePage> {
                     )
                   : const Center(
                       child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
             ),
@@ -716,32 +314,23 @@ class _HomePageState extends State<HomePage> {
     return joursSemaine[dayOfWeek - 1];
   }
 
-  Widget _buildWeatherInfo({
-    required IconData icon,
-    required String value,
-    required String label,
-  }) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white, size: 28),
-        const SizedBox(height: 5),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontFamily: 'Montserrat',
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Montserrat',
-            color: Colors.white70,
-          ),
-        ),
-      ],
-    );
+  String _loadTemperatureText(Temperature temperature, TemperatureUnit unit) {
+    return Temperature.loadTemperatureText(temperature, unit);
+  }
+
+  String _loadWindText(WindSpeed wind, WindUnit unit) {
+    return WindSpeed.loadWindText(wind, unit);
+  }
+
+  String _loadHumidityText(Humidity humidity, HumidityUnit unit) {
+    return Humidity.loadHumidityText(humidity, unit);
+  }
+
+  String _loadPrecipitationText(Precipitation precipitation, PrecipitationUnit unit) {
+    return Precipitation.loadPrecipitationText(precipitation, unit);
+  }
+
+  String _loadUVText(UV uv) {
+    return UV.loadUVText(uv);
   }
 }

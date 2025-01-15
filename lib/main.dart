@@ -11,8 +11,6 @@ import 'utils/user_preferences.dart';
 import 'view/home/home_page.dart';
 import 'services/fetch_and_notify.dart';
 
-import 'package:permission_handler/permission_handler.dart';
-
 /// 1. Callback "headless" pour background_fetch (Android lorsque l’appli est tuée).
 @pragma('vm:entry-point')
 Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {

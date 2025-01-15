@@ -25,4 +25,11 @@ class UV extends ValueObject<int> {
   static bool isValidUV(double value) {
     return value >= minUV && value <= maxUV;
   }
+
+  static String loadUVText(UV uv) {
+    switch (uv.unit) {
+      case UVUnit.uv:
+        return uv.value.toString();
+    }
+  }
 }

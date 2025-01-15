@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../../utils/user_preferences.dart';
 
 // Views
-import '../account/log_in_sign_up_page.dart';
+import '../account/login_signup/log_in_sign_up_page.dart';
 
 class LogoutDialog extends StatelessWidget {
   const LogoutDialog({super.key});

@@ -153,8 +153,8 @@ class WindSpeed extends ValueObject<int> {
     }
   }
 
-  static String loadWindText(WindSpeed wind, WindUnit prefs) {
-    switch (prefs) {
+  static String loadWindText(WindSpeed wind, WindUnit unit) {
+    switch (unit) {
       case WindUnit.kmh:
         return "${wind.toKmh()} km/h";
       case WindUnit.ms:

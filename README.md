@@ -114,6 +114,7 @@
   - `home/` : page d’accueil pour afficher la météo actuelle et les prévisions.  
   - `settings/` : gestion des préférences d’unités.  
 - **`utils/`** : comprend des classes utilitaires (ex. : `UserPreferences`) pour gérer la logique d’état et de stockage local.  
+- **`models/`** : modèles de données (User, Weather) pour structurer les informations.
 
 ---
 
