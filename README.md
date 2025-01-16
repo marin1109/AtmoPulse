@@ -134,4 +134,4 @@ N’hésitez pas à proposer vos idées et corrections !
 
 **Marin Postolachi**  
 - [GitHub](https://github.com/marin1109)  
-- [*Pour toute question ou suggestion, n’hésitez pas à me contacter.*](marin.postolachi@etu.u-paris.fr)
+- [*Pour toute question ou suggestion, n’hésitez pas à me contacter.*](mailto:marin.postolachi@etu.u-paris.fr)
