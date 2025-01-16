@@ -19,14 +19,14 @@
 ## Fonctionnalités
 
 - **Météo actuelle** : Affiche la température, l’humidité, la vitesse et direction du vent, la pression, les précipitations, l’indice UV, etc.  
-- **Prévisions sur plusieurs jours** : Possibilité de consulter les prévisions météo pour la semaine à venir.  
-- **Recherche de villes** : Permet de rechercher des villes par leur nom et d’obtenir instantanément les conditions météorologiques.  
+- **Prévisions sur plusieurs jours** : Possibilité de consulter les temperatures minimales et maximales pour les 3 prochains jours.
+- **Recherche de villes** : Permet de rechercher des villes par leur nom et d’obtenir instantanément les conditions météorologiques et d'ajouter des villes en favoris.
 - **Géolocalisation** : Récupère automatiquement la position GPS de l’utilisateur afin d’afficher la météo locale (avec l’autorisation de l’utilisateur).  
 - **Gestion de compte** :  
-  - Inscription et connexion sécurisées.  
-  - Sauvegarde des préférences de l’utilisateur (température en °C, °F ou K, etc.).  
-  - Possibilité de mettre à jour son mot de passe ou de supprimer son compte.  
-- **Alertes météo** : Envoi d’alertes en cas de conditions météorologiques dangereuses (fortes précipitations, températures extrêmes, etc.).  
+  - Inscription et connexion.
+  - Sauvegarde des préférences de l’utilisateur (température en °C, °F ou K, etc.).
+  - Possibilité de mettre à jour son mot de passe ou de supprimer son compte.
+- **Alertes météo** : Envoi d’alertes en cas de conditions météorologiques dangereuses par rapport aux préférences de l’utilisateur (température, vent, etc.).
 
 ---
 
@@ -39,15 +39,15 @@
 ## Technologies Utilisées
 
 - **Langage & Framework** :  
-  - [Flutter](https://flutter.dev/) (Dart) – pour la création de l’application mobile multiplateforme.  
-- **Backend** :  
-  - [Flask](https://flask.palletsprojects.com/) – API REST pour la gestion des comptes, la communication avec la BDD, etc.  
-  - [Google Cloud SQL](https://cloud.google.com/sql/) – Base de données distante pour stocker les informations utilisateurs et préférences.  
-  - [Google Cloud App Engine](https://cloud.google.com/appengine/) – Hébergement du backend Flask.  
+  - [Flutter](https://flutter.dev/) (Dart) – pour la création de l’application mobile multiplateforme.
+- **Backend** :
+  - [Flask](https://flask.palletsprojects.com/) – API REST pour la gestion des comptes, la communication avec la BDD, etc.
+  - [Google Cloud SQL](https://cloud.google.com/sql/) – Base de données distante pour stocker les informations utilisateurs et préférences.
+  - [Google Cloud App Engine](https://cloud.google.com/appengine/) – Hébergement du backend Flask.
 - **API Météo** : [WeatherAPI](https://www.weatherapi.com/) – récupération des données météo.  
-- **Géolocalisation** : [Geolocator](https://pub.dev/packages/geolocator) – plugin Flutter pour accéder à la position GPS.  
-- **Persistance locale** : [SharedPreferences](https://pub.dev/packages/shared_preferences) – permet de sauvegarder localement les préférences d’unités, etc.  
-- **Gestion d’États** : [Provider](https://pub.dev/packages/provider) – pour partager et réagir aux modifications des préférences (unité de température, etc.).  
+- **Géolocalisation** : [Geolocator](https://pub.dev/packages/geolocator) – plugin Flutter pour accéder à la position GPS.
+- **Persistance locale** : [SharedPreferences](https://pub.dev/packages/shared_preferences) – permet de sauvegarder localement les préférences d’unités, etc. 
+- **Gestion d’États** : [Provider](https://pub.dev/packages/provider) – pour partager et réagir aux modifications des préférences (unité de température, etc.).
 
 ---
 
@@ -124,8 +124,7 @@
 - *Idées d’amélioration* :  
   - Ajout de tests unitaires et d’intégration.  
   - Gestion des thèmes (dark mode, light mode).  
-  - Localisation multi-langues.  
-  - Intégration plus poussée des alertes (notifications push).  
+  - Localisation multi-langues.
 
 N’hésitez pas à proposer vos idées et corrections !
 
