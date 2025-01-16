@@ -6,11 +6,11 @@ class InfoRow extends StatelessWidget {
   final IconData icon;
 
   const InfoRow({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     required this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
