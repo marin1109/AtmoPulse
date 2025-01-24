@@ -76,7 +76,7 @@ Future<void> addUser(
 }
 
 // Fonction pour se connecter
-Future<Map<String, dynamic>> loginUser(Email email, Password motDePasse) async {
+Future<Map<String, dynamic>> loginUserService(Email email, Password motDePasse) async {
   final url = Uri.parse(
       '$apiBaseUrl/login_utilisateurs');
   final response = await http.post(

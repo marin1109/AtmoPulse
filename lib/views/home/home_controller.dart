@@ -12,8 +12,8 @@ import '../../../types/weather/forecast_weather.dart';
 import '../../../types/common/city.dart';
 import '../../../types/common/region.dart';
 import '../../../types/common/country.dart';
-import '../account/login_signup/log_in_sign_up_page.dart';
-import '../account/user_page/user_page.dart';
+import '../login_signup/ls_page.dart';
+import '../user/user_page.dart';
 
 /// Cette classe gère la logique et l'état de HomePage.
 /// Elle peut être un mixin sur State<HomePage>, ou un ChangeNotifier si vous préférez un état géré par Provider.

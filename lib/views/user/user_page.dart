@@ -1,25 +1,22 @@
-// Flutter imports
 import 'package:flutter/material.dart';
-
-// Package imports
 import 'package:provider/provider.dart';
 
+// Contrôleur
+import '../../../controllers/user_controller.dart';
+
 // Utils
-import '../../utils/user_preferences.dart';
-import '../../types/weather/temperature.dart';
-import '../../types/weather/wind_speed.dart';
-import '../../types/weather/precipitation.dart';
-import '../../types/weather/humidity.dart';
+import '../../../utils/user_preferences.dart';
 
-// Pages
-import 'log_in_sign_up_page.dart';
+// Types
+import '../../../types/weather/temperature.dart';
+import '../../../types/weather/humidity.dart';
+import '../../../types/weather/precipitation.dart';
+import '../../../types/weather/wind_speed.dart';
 
-// Dialogs
+// Dialog pour modifier les préférences
 import '../dialogs/editPreferences_dialog.dart';
-import '../dialogs/changePassword_dialog.dart';
-import '../dialogs/deleteAccount_dialog.dart';
-import '../dialogs/logout_dialog.dart';
 
+// Widget InfoRow
 import 'info_row.dart';
 
 class UserPage extends StatefulWidget {
@@ -31,59 +28,28 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  // ==============================
-  // Déconnexion
-  // ==============================
-  void _logout(BuildContext context) async {
-    final userPrefs = Provider.of<UserPreferences>(context, listen: false);
-    await userPrefs.clearAll();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LSPage()),
-    );
-  }
-
-  void _onSelected(BuildContext context, int item) {
-    switch (item) {
-      case 0:
-        showDialog(
-          context: context,
-          builder: (context) => const ChangePasswordDialog(),
-        );
-        break;
-      case 1:
-        DeleteAccountDialog.showConfirmDialog(context);
-        break;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // Récupération via Provider
+    // Récupère les préférences utilisateur
     final userPrefs = Provider.of<UserPreferences>(context);
 
-    final prenom = userPrefs.prenom; // Prénom
-    final nom = userPrefs.nom;       // Nom
-    final age = userPrefs.age;       // Âge
-    final email = userPrefs.email;   // Email
+    final prenom = userPrefs.prenom;
+    final nom = userPrefs.nom;
+    final age = userPrefs.age;
+    final email = userPrefs.email;
 
-    // Récupération des sensibilités
+    // Sensibilités
     final humidityMin = userPrefs.humidityMin?.value ?? 0.0;
     final humidityMax = userPrefs.humidityMax?.value ?? 100.0;
     final temperatureMin = userPrefs.tempMin?.value ?? -50;
     final temperatureMax = userPrefs.tempMax?.value ?? 50;
-    final windMin = userPrefs.windMin?.value ?? 0; 
+    final windMin = userPrefs.windMin?.value ?? 0;
     final windMax = userPrefs.windMax?.value ?? 200;
     final uvValue = userPrefs.uvValue?.value.toInt() ?? 0;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bienvenue, ${prenom.toString().isNotEmpty ? prenom : email}',
+          'Bienvenue, $prenom',
           style: const TextStyle(
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
@@ -91,25 +57,18 @@ class _UserPageState extends State<UserPage> {
         ),
         backgroundColor: Colors.blueAccent,
         actions: [
+          // Bouton logout
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const LogoutDialog();
-                },
-              );
-            },
+            onPressed: () => UserController.showLogoutDialog(context),
             tooltip: 'Déconnexion',
           ),
+          // Menu déroulant (changer MDP, supprimer compte)
           PopupMenuButton<int>(
-            onSelected: (item) => _onSelected(context, item),
-            itemBuilder: (context) => [
-              const PopupMenuItem<int>(
-                  value: 0, child: Text('Changer le mot de passe')),
-              const PopupMenuItem<int>(
-                  value: 1, child: Text('Supprimer le compte')),
+            onSelected: (item) => UserController.onSelected(context, item),
+            itemBuilder: (_) => [
+              const PopupMenuItem(value: 0, child: Text('Changer le mot de passe')),
+              const PopupMenuItem(value: 1, child: Text('Supprimer le compte')),
             ],
           ),
         ],
@@ -130,19 +89,17 @@ class _UserPageState extends State<UserPage> {
             ),
             elevation: 8,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Avatar
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.blueAccent,
                       child: Text(
-                        prenom.toString().isNotEmpty
-                            ? prenom.toString().substring(0, 1).toUpperCase()
-                            : 'U', // 'U' pour User si prénom vide
+                        prenom.value.substring(0, 1).toUpperCase(),
                         style: const TextStyle(
                           fontSize: 50,
                           color: Colors.white,
@@ -151,6 +108,7 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Nom complet
                     Text(
                       '$prenom $nom',
                       style: const TextStyle(
@@ -160,8 +118,9 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
+                    // Email
                     Text(
-                      email.toString(),
+                      email.value,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.grey.shade600,
@@ -171,7 +130,12 @@ class _UserPageState extends State<UserPage> {
                     const SizedBox(height: 20),
                     const Divider(),
                     const SizedBox(height: 10),
-                    InfoRow(label: 'Âge', value: '${age.toString()} ans', icon: Icons.cake),
+                    // Age
+                    InfoRow(
+                      label: 'Âge',
+                      value: '${age.toString()} ans',
+                      icon: Icons.cake,
+                    ),
                     const SizedBox(height: 20),
                     const Divider(),
                     const SizedBox(height: 10),
@@ -184,28 +148,43 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Températures
                     InfoRow(
-                      label: 'Température min/max ${Temperature.unitToString(userPrefs.preferredTemperatureUnit)}',
+                      label: 'Température min/max '
+                          '${Temperature.unitToString(userPrefs.preferredTemperatureUnit)}',
                       value: '$temperatureMin / $temperatureMax',
                       icon: Icons.thermostat,
                     ),
+                    // Humidité
                     InfoRow(
-                      label: 'Humidité min/max ${Humidity.unitToString(userPrefs.preferredHumidityUnit)}',
+                      label: 'Humidité min/max '
+                          '${Humidity.unitToString(userPrefs.preferredHumidityUnit)}',
                       value: '$humidityMin / $humidityMax',
                       icon: Icons.water,
                     ),
+                    // Précipitations
                     InfoRow(
-                      label: 'Précipitations min/max ${Precipitation.unitToString(userPrefs.preferredPrecipitationUnit)}',
-                      value: '${userPrefs.precipMin?.value ?? 0} / ${userPrefs.precipMax?.value ?? 100}',
+                      label: 'Précipitations min/max '
+                          '${Precipitation.unitToString(userPrefs.preferredPrecipitationUnit)}',
+                      value:
+                          '${userPrefs.precipMin?.value ?? 0} / ${userPrefs.precipMax?.value ?? 100}',
                       icon: Icons.water_drop,
                     ),
+                    // Vent
                     InfoRow(
-                      label: 'Vent min/max ${WindSpeed.unitToString(userPrefs.preferredWindUnit)}',
+                      label: 'Vent min/max '
+                          '${WindSpeed.unitToString(userPrefs.preferredWindUnit)}',
                       value: '$windMin / $windMax',
                       icon: Icons.air,
                     ),
-                    InfoRow(label: 'UV', value: '$uvValue', icon: Icons.wb_sunny),
+                    // UV
+                    InfoRow(
+                      label: 'UV',
+                      value: '$uvValue',
+                      icon: Icons.wb_sunny,
+                    ),
                     const SizedBox(height: 20),
+                    // Bouton modifier préférences
                     ElevatedButton.icon(
                       icon: const Icon(Icons.edit),
                       label: const Text('Modifier mes préférences'),
@@ -217,7 +196,9 @@ class _UserPageState extends State<UserPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 15),
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),

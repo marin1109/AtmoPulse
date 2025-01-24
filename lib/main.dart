@@ -8,7 +8,7 @@ import 'dart:io' show Platform;
 // Import de mes fichiers
 import 'services/notification_service.dart';
 import 'utils/user_preferences.dart';
-import 'view/home/home_page.dart';
+import 'views/home/home_page.dart';
 import 'services/fetch_and_notify.dart';
 
 /// 1. Callback "headless" pour background_fetch (Android lorsque l’appli est tuée).

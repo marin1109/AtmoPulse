@@ -14,7 +14,7 @@ import '../../services/account_service.dart';
 import '../../types/common/password.dart';
 
 // Views
-import '../account/login_signup/log_in_sign_up_page.dart';
+import '../login_signup/ls_page.dart';
 
 class DeleteAccountDialog extends StatefulWidget {
   const DeleteAccountDialog({super.key});
