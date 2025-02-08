@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 class Longitude extends ValueObject<double> {
   static const double minLongitude = -180.0;

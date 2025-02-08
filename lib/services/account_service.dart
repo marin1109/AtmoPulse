@@ -2,23 +2,23 @@
 import 'dart:convert';
 
 // Package imports
-import 'package:AtmoPulse/types/weather/humidity.dart';
-import 'package:AtmoPulse/types/weather/precipitation.dart';
-import 'package:AtmoPulse/types/weather/temperature.dart';
-import 'package:AtmoPulse/types/weather/uv.dart';
-import 'package:AtmoPulse/types/weather/wind_speed.dart';
+import 'package:AtmoPulse/models/types/weather/humidity.dart';
+import 'package:AtmoPulse/models/types/weather/precipitation.dart';
+import 'package:AtmoPulse/models/types/weather/temperature.dart';
+import 'package:AtmoPulse/models/types/weather/uv.dart';
+import 'package:AtmoPulse/models/types/weather/wind_speed.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Type imports
-import '../types/common/email.dart';
-import '../types/common/password.dart';
-import '../types/common/fname.dart';
-import '../types/common/lname.dart';
-import '../types/common/age.dart';
-import '../types/common/city.dart';
-import '../types/common/region.dart';
-import '../types/common/country.dart';
+import '../models/types/common/email.dart';
+import '../models/types/common/password.dart';
+import '../models/types/common/fname.dart';
+import '../models/types/common/lname.dart';
+import '../models/types/common/age.dart';
+import '../models/types/common/city.dart';
+import '../models/types/common/region.dart';
+import '../models/types/common/country.dart';
 
 final String apiBaseUrl = dotenv.env['GCLOUD_API_BASE_URL']!;
 

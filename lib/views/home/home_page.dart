@@ -1,8 +1,8 @@
-import 'package:AtmoPulse/types/weather/humidity.dart';
-import 'package:AtmoPulse/types/weather/precipitation.dart';
-import 'package:AtmoPulse/types/weather/temperature.dart';
-import 'package:AtmoPulse/types/weather/wind_speed.dart';
-import 'package:AtmoPulse/types/weather/uv.dart';
+import 'package:AtmoPulse/models/types/weather/humidity.dart';
+import 'package:AtmoPulse/models/types/weather/precipitation.dart';
+import 'package:AtmoPulse/models/types/weather/temperature.dart';
+import 'package:AtmoPulse/models/types/weather/wind_speed.dart';
+import 'package:AtmoPulse/models/types/weather/uv.dart';
 import 'package:AtmoPulse/views/dialogs/contact_dialog.dart';
 import 'package:AtmoPulse/views/dialogs/about_dialog.dart' as custom;
 import 'package:AtmoPulse/views/settings/preferences_page.dart';

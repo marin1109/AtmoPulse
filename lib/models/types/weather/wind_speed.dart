@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 enum WindUnit { kmh, ms, mph, fts, knots }
 

@@ -11,7 +11,7 @@ import '../../utils/user_preferences.dart';
 import '../../services/account_service.dart';
 
 // Types - Common
-import '../../types/common/password.dart';
+import '../../models/types/common/password.dart';
 
 // Views
 import '../login_signup/ls_page.dart';

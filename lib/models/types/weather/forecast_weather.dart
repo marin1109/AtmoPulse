@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 import 'forecast_day.dart';
 
 class ForecastWeather extends ValueObject<Map<String, dynamic>> {

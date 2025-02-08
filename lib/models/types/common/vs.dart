@@ -1,7 +1,7 @@
 import 'city.dart';
 import 'region.dart';
 import 'country.dart';
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 class VS extends ValueObject<Map<String, dynamic>> {
   final City city;

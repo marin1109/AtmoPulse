@@ -1,13 +1,13 @@
-import '../types/common/email.dart';
-import '../types/common/password.dart';
-import '../types/common/age.dart';
-import '../types/common/lname.dart';
-import '../types/common/fname.dart';
-import '../types/weather/humidity.dart';
-import '../types/weather/precipitation.dart';
-import '../types/weather/temperature.dart';
-import '../types/weather/uv.dart';
-import '../types/weather/wind_speed.dart';
+import 'types/common/email.dart';
+import 'types/common/password.dart';
+import 'types/common/age.dart';
+import 'types/common/lname.dart';
+import 'types/common/fname.dart';
+import 'types/weather/humidity.dart';
+import 'types/weather/precipitation.dart';
+import 'types/weather/temperature.dart';
+import 'types/weather/uv.dart';
+import 'types/weather/wind_speed.dart';
 
 class User {
   final Email email;

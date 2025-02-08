@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Importez WeatherService et tout ce dont vous avez besoin
 import '../../../services/weather_service.dart';
-import '../../../types/common/vs.dart';
+import '../../models/types/common/vs.dart';
 
 class CitySearchDelegate extends SearchDelegate<String> {
   final WeatherService weatherService;

@@ -2,15 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Importez vos types exacts
-import '../types/common/email.dart';
-import '../types/common/lname.dart';
-import '../types/common/fname.dart';
-import '../types/common/age.dart';
-import '../types/weather/temperature.dart';
-import '../types/weather/wind_speed.dart';
-import '../types/weather/precipitation.dart';
-import '../types/weather/humidity.dart';
-import '../types/weather/uv.dart';
+import '../models/types/common/email.dart';
+import '../models/types/common/lname.dart';
+import '../models/types/common/fname.dart';
+import '../models/types/common/age.dart';
+import '../models/types/weather/temperature.dart';
+import '../models/types/weather/wind_speed.dart';
+import '../models/types/weather/precipitation.dart';
+import '../models/types/weather/humidity.dart';
+import '../models/types/weather/uv.dart';
 
 class UserPreferences extends ChangeNotifier {
   // Unités

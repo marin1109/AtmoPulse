@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 enum PrecipitationUnit { mm, inches, litersPerSquareMeter }
 

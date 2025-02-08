@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import '../../utils/user_preferences.dart';
 
 // Types - Weather
-import '../../types/weather/humidity.dart';
-import '../../types/weather/precipitation.dart';
-import '../../types/weather/temperature.dart';
-import '../../types/weather/wind_speed.dart';
+import '../../models/types/weather/humidity.dart';
+import '../../models/types/weather/precipitation.dart';
+import '../../models/types/weather/temperature.dart';
+import '../../models/types/weather/wind_speed.dart';
 
 // Controller
 import 'preferences_controller.dart';
