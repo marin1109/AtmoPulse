@@ -1,112 +1,94 @@
+Voici une version révisée et harmonisée du document, avec corrections et améliorations de style et d’orthographe :
+
+---
+
 # Documentation des Solutions aux Problèmes Rencontrés
 
 ## Introduction
-Ce document recense les différents problèmes rencontrés ainsi que les solutions apportées pour les résoudre. Il a pour objectif de servir de référence pour éviter de rencontrer les mêmes difficultés à l'avenir.
+Ce document recense les différents problèmes rencontrés ainsi que les solutions apportées pour les résoudre. Il a pour objectif de servir de référence et d’éviter que ces difficultés ne se reproduisent à l’avenir.
 
 ## Problèmes et Solutions
 
-### Problème 1 : Comment garder l'utilisateur connecté après la fermeture de l'application ou le deplacement vers une autre page
-**Date** : 07/11/2024
-
-**Contexte** : L'utilisateur doit se reconnecter à chaque fois qu'il ferme l'application ou change de page.
-
+### Problème 1 : Conserver la session de l’utilisateur après la fermeture de l’application ou le déplacement vers une autre page
+**Date** : 07/11/2024  
+**Contexte** : L’utilisateur doit actuellement se reconnecter à chaque fois qu’il ferme l’application ou change de page.  
 **Statut** : Résolu &#x2705;
 
 #### Solution
-- Utiliser le Shared Preferences pour stocker les informations, sans le mot de passe, car risque de sécurité. Ainsi, l'utilisateur n'aura pas à se reconnecter à chaque fois.
+- Utiliser **SharedPreferences** pour stocker les informations nécessaires à l’authentification, **sans y inclure le mot de passe** (pour des raisons de sécurité). Cela permet de maintenir la session de l’utilisateur.
 
 #### Remarques
-- Il est important de nommer les variables de la même manière pour éviter les erreurs.
+- Veiller à nommer les variables de manière cohérente pour éviter les erreurs.  
+- Ne jamais stocker de mot de passe en clair.
 
 ---
 
-### Problème 2 : Comment séparer les unités de mesure de la donnée dans la base de données
-**Date** : 23/11/2024
-
-**Contexte** : Les données sont stockées dans la base de données avec des unitées de mesure prédéfinies, sans possibilité de les modifier. ex : 10km/h, 20°C, 1000hPa.
-
+### Problème 2 : Séparer les unités de mesure des données dans la base de données
+**Date** : 23/11/2024  
+**Contexte** : Les données sont stockées dans la base de données avec des unités de mesure prédéfinies (ex. : 10 km/h, 20 °C, 1000 hPa), sans possibilité de modification a posteriori.  
 **Statut** : Résolu &#x2705;
 
 #### Solution
-- Créer une table pour les unités de mesure, puis une table pour les données. Ainsi, les données seront stockées sans unitées de mesure, et l'unitée de mesure sera stockée dans une autre table.
+- Créer une table dédiée aux unités de mesure et une autre pour les données.  
+- Dans la table des données, stocker uniquement la valeur brute (sans unité).  
+- Dans la table des unités, gérer la correspondance entre une donnée et son unité de mesure.
 
 #### Remarques
-- Il est important de mettre à jour la donnée de la mesure une fois que l'unitée de mesure est modifiée.
+- Mettre à jour la valeur de la mesure ou l’unité de mesure de manière cohérente lorsqu’un changement survient.  
 
 ---
 
-### Problème 3 : Comment envoyer les notifications à l'utilisateur
-**Date** : 
-
-**Contexte** : L'utilisateur doit être notifié lorsqu'une donnée dépasse ses limites.
-
-**Statut** : Non commencé &#x274C;
-
-#### Solution
-- Utiliser le service de notification de Firebase pour envoyer les notifications à l'utilisateur.
-
-#### Remarques
-- Il est important de bien configurer le service de notification pour éviter les erreurs.
-
----
-
-### Problème 4 : 
-**Date** :
-
-**Contexte** : 
-
-**Statut** : Non commencé &#x274C;
-
-#### Solution
-- 
-
-#### Remarques
--
-
---- 
-
-### Problème 5 : Comment sécuriser les données de l'utilisateur
-**Date** : 
-
-**Contexte** : Les données de l'utilisateur sont stockées en clair dans SharedPreferences.
-
-**Statut** : Non commencé &#x274C;
-
-#### Solution
-- Utiliser flutter_secure_storage pour stocker les données de l'utilisateur de manière sécurisée.
-
-#### Remarques
-- Il est important de ne pas stocker le mot de passe de l'utilisateur.
-
----
-
-### Problème 6 : Mauvais paramètrage de l'inscription de l'utilisateur avec les unités de mesure et les données météorologiques
-
-**Date** : 06/12/2024
-
-**Contexte** : Lors de l'inscription, l'utilisateur ajoute ses données météorologiques préférées avec des unités de mesure basique. Cependant, dans la table de ses unités de mesure préférées, les préférences qu'il a dans l'application au moment de l'inscription sont stockées, ce qui crée une incohérence entre les deux tables.
-
+### Problème 3 : Envoi de notifications à l’utilisateur
+**Date** : 20/01/2025  
+**Contexte** : L’utilisateur doit être notifié lorsqu’une donnée dépasse ses limites configurées.  
 **Statut** : Résolu &#x2705;
 
 #### Solution
-- Utiliser les unités du Provider pour récuperer le type d'unités de mesure préférées.
+- Utiliser le service de notification **Firebase** pour envoyer des notifications en temps réel à l’utilisateur.
 
 #### Remarques
-- Il est important de mettre à jour les unités de mesure préférées de l'utilisateur lorsqu'il les modifie.
+- Bien configurer le service de notification (permissions, token de l’utilisateur, etc.) pour éviter tout dysfonctionnement.
 
-### Problème 7 : Les préférences de l'utilisateur ne sont pas réglées lorsque l'utilisateur modifie les unités de mesure
+---
 
-**Date** : 25/12/2024
-
-**Contexte** : L'utilisateur peut modifier les unités de mesure dans les paramètres de l'application, cependant, les données de préférences de l'utilisateur restent inchangées.
-
+### Problème 4 : Sécuriser les données de l’utilisateur
+**Date** : 08/02/2025  
+**Contexte** : Les données de l’utilisateur sont actuellement stockées en clair dans **SharedPreferences**, ce qui pose un problème de sécurité.  
 **Statut** : Non commencé &#x274C;
 
 #### Solution
-- Créer une fonction qui met à jour les préférences de l'utilisateur lorsqu'il modifie les unités de mesure.
+- Utiliser **flutter_secure_storage** pour stocker de manière chiffrée les informations sensibles de l’utilisateur.
 
 #### Remarques
-- Il est important de mettre à jour les préférences de l'utilisateur lorsqu'il modifie les unités de mesure.
+- Ne pas stocker le mot de passe de l’utilisateur, même dans un stockage sécurisé, si cela peut être évité. Utiliser plutôt des jetons d’authentification.
+
+---
+
+### Problème 5 : Mauvais paramétrage de l’inscription de l’utilisateur (unités de mesure et données météorologiques)
+**Date** : 06/12/2024  
+**Contexte** : Lors de l’inscription, l’utilisateur ajoute ses données météorologiques préférées avec des unités de mesure basiques. Cependant, la table recensant les unités de mesure préférées de l’utilisateur enregistre les préférences au moment de l’inscription, créant une incohérence entre les tables lorsque l’utilisateur effectue des modifications ultérieures.  
+**Statut** : Résolu &#x2705;
+
+#### Solution
+- Récupérer les unités préférées depuis le **Provider** pour garantir la cohérence et la mise à jour des préférences de l’utilisateur.
+
+#### Remarques
+- Mettre à jour les unités de mesure préférées lorsqu’elles sont modifiées par l’utilisateur.
+
+---
+
+### Problème 6 : Les préférences de l’utilisateur ne sont pas actualisées lors de la modification des unités de mesure
+**Date** : 25/12/2024  
+**Contexte** : Lorsqu’un utilisateur modifie ses unités de mesure dans les paramètres, les données associées à ses préférences ne sont pas mises à jour.  
+**Statut** : Résolu &#x2705;
+
+#### Solution
+- Créer une fonction de mise à jour des préférences de l’utilisateur qui sera appelée dès que ce dernier modifie ses unités de mesure.
+
+#### Remarques
+- Il est primordial de gérer la cohérence entre la modification des unités et la base de données, afin que ces changements soient effectivement pris en compte.
+
+---
 
 ## Conclusion
-Ce document a permis de recenser les différents problèmes rencontrés ainsi que les solutions apportées pour les résoudre. Il nous a permis de capitaliser sur les erreurs passées pour éviter de les reproduire à l'avenir.
+Ce document recense les problèmes rencontrés ainsi que les solutions apportées ou envisagées. Il constitue un référentiel pour capitaliser sur les expériences passées et éviter de reproduire les mêmes erreurs. Les mises à jour régulières de ce document sont fortement recommandées afin de maintenir une documentation fiable et à jour.
