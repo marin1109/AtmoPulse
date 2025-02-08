@@ -11,7 +11,7 @@ import '../../models/types/weather/temperature.dart';
 import '../../models/types/weather/wind_speed.dart';
 
 // Controller
-import 'preferences_controller.dart';
+import '../../controllers/preferences_controller.dart';
 
 class PreferencesPage extends StatefulWidget {
   const PreferencesPage({super.key});

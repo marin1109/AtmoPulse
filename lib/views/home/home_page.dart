@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import '../../../utils/user_preferences.dart';
-import 'home_controller.dart';
+import '../../controllers/home_controller.dart';
 import 'city_search_delegate.dart';
 import 'widgets/weather_info_widget.dart';
 

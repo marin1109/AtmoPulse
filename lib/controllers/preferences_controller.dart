@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/user_preferences.dart';
-import '../../services/account_service.dart';
+import '../utils/user_preferences.dart';
+import '../services/account_service.dart';
 
 // Types - Weather
-import '../../models/types/weather/humidity.dart';
-import '../../models/types/weather/precipitation.dart';
-import '../../models/types/weather/temperature.dart';
-import '../../models/types/weather/wind_speed.dart';
+import '../models/types/weather/humidity.dart';
+import '../models/types/weather/precipitation.dart';
+import '../models/types/weather/temperature.dart';
+import '../models/types/weather/wind_speed.dart';
 
 mixin PreferencesController<T extends StatefulWidget> on State<T> {
   static const Map<int, String> intervalsMap = {
