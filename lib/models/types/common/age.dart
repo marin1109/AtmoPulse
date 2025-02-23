@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 class Age extends ValueObject<int> {
   static const int minAge = 0;

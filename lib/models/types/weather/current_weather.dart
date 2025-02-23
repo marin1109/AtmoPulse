@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 import 'temperature.dart';
 import 'wind_speed.dart';
 import 'precipitation.dart';

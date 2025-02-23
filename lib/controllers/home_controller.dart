@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../services/location_service.dart';
-import '../../../services/weather_service.dart';
-import '../../../services/account_service.dart';
-import '../../../models/weather_data.dart';
-import '../../../types/weather/current_weather.dart';
-import '../../../types/weather/forecast_weather.dart';
-import '../../../types/common/city.dart';
-import '../../../types/common/region.dart';
-import '../../../types/common/country.dart';
-import '../login_signup/ls_page.dart';
-import '../user/user_page.dart';
+import '../../services/location_service.dart';
+import '../../services/weather_service.dart';
+import '../../services/account_service.dart';
+import '../../models/weather_data.dart';
+import '../models/types/weather/current_weather.dart';
+import '../models/types/weather/forecast_weather.dart';
+import '../models/types/common/city.dart';
+import '../models/types/common/region.dart';
+import '../models/types/common/country.dart';
+import '../views/login_signup/ls_page.dart';
+import '../views/user/user_page.dart';
 
 /// Cette classe gère la logique et l'état de HomePage.
 /// Elle peut être un mixin sur State<HomePage>, ou un ChangeNotifier si vous préférez un état géré par Provider.

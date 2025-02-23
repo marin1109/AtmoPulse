@@ -1,12 +1,12 @@
-import '../types/common/city.dart';
-import '../types/common/region.dart';
-import '../types/common/country.dart';
-import '../types/common/latitude.dart';
-import '../types/common/longitude.dart';
-import '../types/common/timezone.dart';
-import '../types/common/localtime.dart';
-import '../types/weather/current_weather.dart';
-import '../types/weather/forecast_weather.dart';
+import 'types/common/city.dart';
+import 'types/common/region.dart';
+import 'types/common/country.dart';
+import 'types/common/latitude.dart';
+import 'types/common/longitude.dart';
+import 'types/common/timezone.dart';
+import 'types/common/localtime.dart';
+import 'types/weather/current_weather.dart';
+import 'types/weather/forecast_weather.dart';
 import '../utils/value_object.dart';
 
 class WeatherData extends ValueObject<Map<String, dynamic>> {

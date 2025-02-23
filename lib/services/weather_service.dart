@@ -8,7 +8,7 @@ import 'package:geolocator/geolocator.dart';
 
 // Types imports
 import '../models/weather_data.dart';
-import '../types/common/vs.dart';
+import '../models/types/common/vs.dart';
 
 // Classe pour gérer les services météo
 class WeatherService {

@@ -84,16 +84,16 @@
 ├── lib/
 │   ├── main.dart               # Point d'entrée de l'application Flutter
 │   ├── services/               # Services (météo, géolocalisation, compte)
-│   ├── types/                  # Types de données (Temp, Humidity, etc.) avec validation et conversion
 │   ├── view/                   # Vues de l'application
-│   │   ├── account/            # Pages de connexion, inscription, profil utilisateur
+│   │   ├── user/               # Page de l'utilisateur
 │   │   ├── dialogs/            # Dialogues (à propos, contact, etc.)
 │   │   ├── home/               # Page d'accueil et affichage des données météo
+│   │   ├── login_signup/       # Pages de connexion et d'inscription
 │   │   └── settings/           # Page des préférences
-│   ├── utils/                  # Logique de l'application (UserPreferences, etc.)
+│   ├── utils/                  # Logique de l'application (UserPreferences et classes abstractes)
 │   ├── models/                 # Modèles de données (User, Weather)
-│   ├── [...]
-│   └── [...]
+│   │   └── types/              # Types de données (Temp, Humidity, etc.) avec validation et conversion
+│   └── controllers/            # Contrôleurs pour gérer les interactions entre les vues et les services/models
 ├── DataBase_descriptive.md     # Description de la base de données et du schéma
 ├── Solutions.md                # Liste des problèmes rencontrés et solutions trouvées
 └── README.md                   # Documentation du projet
@@ -101,26 +101,42 @@
 
 - **`main.dart`** : point d’entrée de l’application Flutter.  
 - **`services/`** : contient la logique d’interaction avec les APIs (Weather API, backend Flask).  
-- **`types/`** : définitions et conversions des unités météo (température, pression, humidité, etc.).  
 - **`view/`** : l’interface utilisateur (UI) :  
-  - `account/` : pages de connexion, inscription, gestion du compte.  
+  - `user/` : gestion du compte utilisateur connecté (profil, déconnexion, etc.).
+  - `login_signup/` : pages de connexion et d’inscription.
   - `dialogs/` : boîtes de dialogue (contact, à propos, etc.).  
   - `home/` : page d’accueil pour afficher la météo actuelle et les prévisions.  
   - `settings/` : gestion des préférences d’unités.  
 - **`utils/`** : comprend des classes utilitaires (ex. : `UserPreferences`) pour gérer la logique d’état et de stockage local.  
 - **`models/`** : modèles de données (User, Weather) pour structurer les informations.
-
+  - `types/` : définitions et conversions des unités météo (température, pression, humidité, etc.).
+- **`controllers/`** : contrôleurs pour gérer les interactions entre les vues et les  
 ---
 
 ## Contributions & Roadmap
 
 - Les **Issues** et **Pull Requests** sont les bienvenus.  
-- *Idées d’amélioration* :  
-  - Ajout de tests unitaires et d’intégration.  
+- *Idées d'ajout de fonctionnalitées* :  
   - Gestion des thèmes (dark mode, light mode).  
   - Localisation multi-langues.
+- *Idées d'amélioration* :  
+  - Ajout de tests unitaires et d’intégration.  
+  - Passage de SharedPreferences à une solution plus sécurisée (ex. : flutter_secure_storage).
+  - Mise en place d’un linter et de règles de style pour uniformiser le code (ex. Effective Dart).
+  - Gestion centralisée des erreurs et logs.
+  - Envisager l’utilisation de tokens sécurisés (OAuth2, JWT), le chiffrement des données en transit (HTTPS).
 
 N’hésitez pas à proposer vos idées et corrections !
+
+---
+
+## Ce que ce projet m’a permis d’apprendre
+
+- Planification de l’architecture dès le début : J’ai réalisé à quel point une architecture claire (par exemple, en s’inspirant de la MVC) est essentielle pour faciliter la maintenance, la compréhension et l’évolution du code.
+- Importance des patrons de conception : L’utilisation de patrons conceptuels (comme Provider pour la gestion d’états, Repository pour la gestion des données, etc.) permet de structurer et de découpler les différentes couches de l’application.
+- Gestion des données et sécurité : Le choix des technologies de persistance (SharedPreferences, flutter_secure_storage) et la sécurisation de la communication (HTTPS, gestion des tokens, etc.) doivent être pensés en amont pour éviter les mauvaises surprises.
+- Meilleure organisation en équipe : Même en solo, s’habituer à une organisation modulaire (services, models, views) permet d’accueillir plus facilement de nouveaux collaborateurs ou contributeurs.
+- Gestion des états complexes : Avec Provider, j’ai pu apprendre à gérer les états et les préférences de l’utilisateur, notamment pour les unités de mesure. Cela m’a également montré l’importance de maintenir la cohérence entre les données stockées localement, en base de données et à l’écran.
 
 ---
 

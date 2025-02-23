@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 class Condition extends ValueObject<Map<String, dynamic>> {
   final String text;

@@ -1,4 +1,4 @@
-import '../../utils/value_object.dart';
+import '../../../utils/value_object.dart';
 
 class Timezone extends ValueObject<String> {
   static final RegExp _timezoneRegex = RegExp(
