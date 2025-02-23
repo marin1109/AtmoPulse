@@ -1,7 +1,3 @@
-Voici une version révisée et harmonisée du document, avec corrections et améliorations de style et d’orthographe :
-
----
-
 # Documentation des Solutions aux Problèmes Rencontrés
 
 ## Introduction
