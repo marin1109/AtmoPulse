@@ -30,12 +30,6 @@
 
 ---
 
-## Aperçu de l’Application
-
-*(A Completer)*
-
----
-
 ## Technologies Utilisées
 
 - **Langage & Framework** :  
